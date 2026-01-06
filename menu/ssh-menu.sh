@@ -34,39 +34,51 @@ read -p "Select Menu [0-12]: " menu
 case $menu in
     1)
         /usr/local/sbin/tunneling/ssh-create.sh
+        /usr/local/sbin/tunneling/ssh-menu.sh
         ;;
     2)
         /usr/local/sbin/tunneling/ssh-trial.sh
+        /usr/local/sbin/tunneling/ssh-menu.sh
         ;;
     3)
         /usr/local/sbin/tunneling/ssh-renew.sh
+        /usr/local/sbin/tunneling/ssh-menu.sh
         ;;
     4)
         /usr/local/sbin/tunneling/ssh-delete.sh
+        /usr/local/sbin/tunneling/ssh-menu.sh
         ;;
     5)
         /usr/local/sbin/tunneling/ssh-check.sh
+        /usr/local/sbin/tunneling/ssh-menu.sh
         ;;
     6)
         /usr/local/sbin/tunneling/ssh-list.sh
+        /usr/local/sbin/tunneling/ssh-menu.sh
         ;;
     7)
         /usr/local/sbin/tunneling/ssh-delete-expired.sh
+        /usr/local/sbin/tunneling/ssh-menu.sh
         ;;
     8)
         /usr/local/sbin/tunneling/ssh-lock.sh
+        /usr/local/sbin/tunneling/ssh-menu.sh
         ;;
     9)
         /usr/local/sbin/tunneling/ssh-unlock.sh
+        /usr/local/sbin/tunneling/ssh-menu.sh
         ;;
     10)
-        /usr/local/sbin/tunneling/ssh-detail.sh
+        /usr/local/sbin/tunneling/ssh-details.sh
+        /usr/local/sbin/tunneling/ssh-menu.sh
         ;;
     11)
         /usr/local/sbin/tunneling/ssh-limit-ip.sh
+        /usr/local/sbin/tunneling/ssh-menu.sh
         ;;
     12)
         /usr/local/sbin/tunneling/ssh-limit-quota.sh
+        /usr/local/sbin/tunneling/ssh-menu.sh
         ;;
     0)
         /usr/local/sbin/tunneling/main-menu.sh
