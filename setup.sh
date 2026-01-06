@@ -158,6 +158,16 @@ wget -q -O info-menu.sh "${BASE_URL}/menu/info-menu.sh" 2>/dev/null || curl -sL 
 echo -e "${CYAN}[INFO]${NC} Downloading SSH scripts..."
 wget -q -O ssh-create.sh "${BASE_URL}/ssh/ssh-create.sh" 2>/dev/null || curl -sL "${BASE_URL}/ssh/ssh-create.sh" -o ssh-create.sh
 wget -q -O ssh-trial.sh "${BASE_URL}/ssh/ssh-trial.sh" 2>/dev/null || curl -sL "${BASE_URL}/ssh/ssh-trial.sh" -o ssh-trial.sh
+wget -q -O ssh-renew.sh "${BASE_URL}/ssh/ssh-renew.sh" 2>/dev/null || curl -sL "${BASE_URL}/ssh/ssh-renew.sh" -o ssh-renew.sh
+wget -q -O ssh-delete.sh "${BASE_URL}/ssh/ssh-delete.sh" 2>/dev/null || curl -sL "${BASE_URL}/ssh/ssh-delete.sh" -o ssh-delete.sh
+wget -q -O ssh-check.sh "${BASE_URL}/ssh/ssh-check.sh" 2>/dev/null || curl -sL "${BASE_URL}/ssh/ssh-check.sh" -o ssh-check.sh
+wget -q -O ssh-list.sh "${BASE_URL}/ssh/ssh-list.sh" 2>/dev/null || curl -sL "${BASE_URL}/ssh/ssh-list.sh" -o ssh-list.sh
+wget -q -O ssh-delete-expired.sh "${BASE_URL}/ssh/ssh-delete-expired.sh" 2>/dev/null || curl -sL "${BASE_URL}/ssh/ssh-delete-expired.sh" -o ssh-delete-expired.sh
+wget -q -O ssh-lock.sh "${BASE_URL}/ssh/ssh-lock.sh" 2>/dev/null || curl -sL "${BASE_URL}/ssh/ssh-lock.sh" -o ssh-lock.sh
+wget -q -O ssh-unlock.sh "${BASE_URL}/ssh/ssh-unlock.sh" 2>/dev/null || curl -sL "${BASE_URL}/ssh/ssh-unlock.sh" -o ssh-unlock.sh
+wget -q -O ssh-details.sh "${BASE_URL}/ssh/ssh-details.sh" 2>/dev/null || curl -sL "${BASE_URL}/ssh/ssh-details.sh" -o ssh-details.sh
+wget -q -O ssh-limit-ip.sh "${BASE_URL}/ssh/ssh-limit-ip.sh" 2>/dev/null || curl -sL "${BASE_URL}/ssh/ssh-limit-ip.sh" -o ssh-limit-ip.sh
+wget -q -O ssh-limit-quota.sh "${BASE_URL}/ssh/ssh-limit-quota.sh" 2>/dev/null || curl -sL "${BASE_URL}/ssh/ssh-limit-quota.sh" -o ssh-limit-quota.sh
 wget -q -O setup-dropbear.sh "${BASE_URL}/ssh/setup-dropbear.sh" 2>/dev/null || curl -sL "${BASE_URL}/ssh/setup-dropbear.sh" -o setup-dropbear.sh
 wget -q -O setup-stunnel.sh "${BASE_URL}/ssh/setup-stunnel.sh" 2>/dev/null || curl -sL "${BASE_URL}/ssh/setup-stunnel.sh" -o setup-stunnel.sh
 wget -q -O setup-squid.sh "${BASE_URL}/ssh/setup-squid.sh" 2>/dev/null || curl -sL "${BASE_URL}/ssh/setup-squid.sh" -o setup-squid.sh
