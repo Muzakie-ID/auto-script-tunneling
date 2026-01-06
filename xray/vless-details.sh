@@ -13,6 +13,20 @@ echo -e "${GREEN}        VLESS ACCOUNT DETAILS           ${NC}"
 echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
 echo ""
 
+# Show existing accounts
+echo -e "${YELLOW}Existing VLESS Accounts:${NC}"
+echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+if [ -d /etc/tunneling/vless ] && [ "$(ls -A /etc/tunneling/vless/*.json 2>/dev/null)" ]; then
+    for user_json in /etc/tunneling/vless/*.json; do
+        username_list=$(jq -r '.username' $user_json 2>/dev/null)
+        echo -e "  • $username_list"
+    done
+else
+    echo -e "${RED}  No accounts found${NC}"
+fi
+echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+echo ""
+
 read -p "Username: " username
 
 json_file="/etc/tunneling/VLESS/${username}.json"
