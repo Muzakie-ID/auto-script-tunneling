@@ -185,6 +185,30 @@ wget -q -O setup-nginx.sh "${BASE_URL}/system/setup-nginx.sh" 2>/dev/null || cur
 # Download XRAY script
 echo -e "${CYAN}[INFO]${NC} Downloading XRAY script..."
 wget -q -O setup-xray.sh "${BASE_URL}/xray/setup-xray.sh" 2>/dev/null || curl -sL "${BASE_URL}/xray/setup-xray.sh" -o setup-xray.sh
+wget -q -O vmess-create.sh "${BASE_URL}/xray/vmess-create.sh" 2>/dev/null || curl -sL "${BASE_URL}/xray/vmess-create.sh" -o vmess-create.sh
+wget -q -O vmess-trial.sh "${BASE_URL}/xray/vmess-trial.sh" 2>/dev/null || curl -sL "${BASE_URL}/xray/vmess-trial.sh" -o vmess-trial.sh
+wget -q -O vmess-list.sh "${BASE_URL}/xray/vmess-list.sh" 2>/dev/null || curl -sL "${BASE_URL}/xray/vmess-list.sh" -o vmess-list.sh
+wget -q -O vmess-renew.sh "${BASE_URL}/xray/vmess-renew.sh" 2>/dev/null || curl -sL "${BASE_URL}/xray/vmess-renew.sh" -o vmess-renew.sh
+wget -q -O vmess-delete.sh "${BASE_URL}/xray/vmess-delete.sh" 2>/dev/null || curl -sL "${BASE_URL}/xray/vmess-delete.sh" -o vmess-delete.sh
+wget -q -O vmess-check.sh "${BASE_URL}/xray/vmess-check.sh" 2>/dev/null || curl -sL "${BASE_URL}/xray/vmess-check.sh" -o vmess-check.sh
+wget -q -O vmess-delete-expired.sh "${BASE_URL}/xray/vmess-delete-expired.sh" 2>/dev/null || curl -sL "${BASE_URL}/xray/vmess-delete-expired.sh" -o vmess-delete-expired.sh
+wget -q -O vmess-lock.sh "${BASE_URL}/xray/vmess-lock.sh" 2>/dev/null || curl -sL "${BASE_URL}/xray/vmess-lock.sh" -o vmess-lock.sh
+wget -q -O vmess-unlock.sh "${BASE_URL}/xray/vmess-unlock.sh" 2>/dev/null || curl -sL "${BASE_URL}/xray/vmess-unlock.sh" -o vmess-unlock.sh
+wget -q -O vmess-details.sh "${BASE_URL}/xray/vmess-details.sh" 2>/dev/null || curl -sL "${BASE_URL}/xray/vmess-details.sh" -o vmess-details.sh
+wget -q -O vmess-limit-ip.sh "${BASE_URL}/xray/vmess-limit-ip.sh" 2>/dev/null || curl -sL "${BASE_URL}/xray/vmess-limit-ip.sh" -o vmess-limit-ip.sh
+wget -q -O vmess-limit-quota.sh "${BASE_URL}/xray/vmess-limit-quota.sh" 2>/dev/null || curl -sL "${BASE_URL}/xray/vmess-limit-quota.sh" -o vmess-limit-quota.sh
+
+# VLESS scripts (same pattern)
+for script in create trial list renew delete check delete-expired lock unlock details limit-ip limit-quota; do
+    wget -q -O vless-${script}.sh "${BASE_URL}/xray/vless-${script}.sh" 2>/dev/null || curl -sL "${BASE_URL}/xray/vless-${script}.sh" -o vless-${script}.sh
+done
+
+# TROJAN scripts (same pattern)
+for script in create trial list renew delete check delete-expired lock unlock details limit-ip limit-quota; do
+    wget -q -O trojan-${script}.sh "${BASE_URL}/xray/trojan-${script}.sh" 2>/dev/null || curl -sL "${BASE_URL}/xray/trojan-${script}.sh" -o trojan-${script}.sh
+done
+
+wget -q -O placeholder.sh "${BASE_URL}/xray/placeholder.sh" 2>/dev/null || curl -sL "${BASE_URL}/xray/placeholder.sh" -o placeholder.sh
 
 # Set permissions
 chmod +x /usr/local/sbin/tunneling/*.sh

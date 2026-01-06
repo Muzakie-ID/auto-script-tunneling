@@ -57,11 +57,24 @@ wget -q -O auto-backup.sh "${BASE_URL}/system/auto-backup.sh"
 wget -q -O delete-expired.sh "${BASE_URL}/system/delete-expired.sh"
 wget -q -O setup-nginx.sh "${BASE_URL}/system/setup-nginx.sh"
 
-echo -e "${CYAN}[4/4]${NC} Downloading XRAY scripts..."
+echo -e "${CYAN}[4/5]${NC} Downloading XRAY scripts..."
 wget -q -O setup-xray.sh "${BASE_URL}/xray/setup-xray.sh"
-wget -q -O vmess-create.sh "${BASE_URL}/xray/vmess-create.sh"
-wget -q -O vmess-trial.sh "${BASE_URL}/xray/vmess-trial.sh"
-wget -q -O vmess-list.sh "${BASE_URL}/xray/vmess-list.sh"
+
+# VMESS
+for script in create trial list renew delete check delete-expired lock unlock details limit-ip limit-quota; do
+    wget -q -O vmess-${script}.sh "${BASE_URL}/xray/vmess-${script}.sh"
+done
+
+# VLESS
+for script in create trial list renew delete check delete-expired lock unlock details limit-ip limit-quota; do
+    wget -q -O vless-${script}.sh "${BASE_URL}/xray/vless-${script}.sh"
+done
+
+# TROJAN
+for script in create trial list renew delete check delete-expired lock unlock details limit-ip limit-quota; do
+    wget -q -O trojan-${script}.sh "${BASE_URL}/xray/trojan-${script}.sh"
+done
+
 wget -q -O placeholder.sh "${BASE_URL}/xray/placeholder.sh"
 
 echo ""
