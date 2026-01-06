@@ -31,40 +31,52 @@ read -p "Select Menu [0-12]: " menu
 
 case $menu in
     1)
-        /usr/local/sbin/tunneling/vless-create.sh
+        /usr/local/sbin/tunneling/VLESS-create.sh
+        /usr/local/sbin/tunneling/VLESS-menu.sh
         ;;
     2)
-        /usr/local/sbin/tunneling/vless-trial.sh
+        /usr/local/sbin/tunneling/VLESS-trial.sh
+        /usr/local/sbin/tunneling/VLESS-menu.sh
         ;;
     3)
-        /usr/local/sbin/tunneling/vless-renew.sh
+        /usr/local/sbin/tunneling/VLESS-renew.sh
+        /usr/local/sbin/tunneling/VLESS-menu.sh
         ;;
     4)
-        /usr/local/sbin/tunneling/vless-delete.sh
+        /usr/local/sbin/tunneling/VLESS-delete.sh
+        /usr/local/sbin/tunneling/VLESS-menu.sh
         ;;
     5)
-        /usr/local/sbin/tunneling/vless-check.sh
+        /usr/local/sbin/tunneling/VLESS-check.sh
+        /usr/local/sbin/tunneling/VLESS-menu.sh
         ;;
     6)
-        /usr/local/sbin/tunneling/vless-list.sh
+        /usr/local/sbin/tunneling/VLESS-list.sh
+        /usr/local/sbin/tunneling/VLESS-menu.sh
         ;;
     7)
-        /usr/local/sbin/tunneling/vless-delete-expired.sh
+        /usr/local/sbin/tunneling/VLESS-delete-expired.sh
+        /usr/local/sbin/tunneling/VLESS-menu.sh
         ;;
     8)
-        /usr/local/sbin/tunneling/vless-lock.sh
+        /usr/local/sbin/tunneling/VLESS-lock.sh
+        /usr/local/sbin/tunneling/VLESS-menu.sh
         ;;
     9)
-        /usr/local/sbin/tunneling/vless-unlock.sh
+        /usr/local/sbin/tunneling/VLESS-unlock.sh
+        /usr/local/sbin/tunneling/VLESS-menu.sh
         ;;
     10)
-        /usr/local/sbin/tunneling/vless-detail.sh
+        /usr/local/sbin/tunneling/VLESS-details.sh
+        /usr/local/sbin/tunneling/VLESS-menu.sh
         ;;
     11)
-        /usr/local/sbin/tunneling/vless-limit-ip.sh
+        /usr/local/sbin/tunneling/VLESS-limit-ip.sh
+        /usr/local/sbin/tunneling/VLESS-menu.sh
         ;;
     12)
-        /usr/local/sbin/tunneling/vless-limit-quota.sh
+        /usr/local/sbin/tunneling/VLESS-limit-quota.sh
+        /usr/local/sbin/tunneling/VLESS-menu.sh
         ;;
     0)
         /usr/local/sbin/tunneling/main-menu.sh
@@ -72,6 +84,7 @@ case $menu in
     *)
         echo -e "${RED}Invalid option!${NC}"
         sleep 1
-        /usr/local/sbin/tunneling/vless-menu.sh
+        /usr/local/sbin/tunneling/VLESS-menu.sh
         ;;
 esac
+

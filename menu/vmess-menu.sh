@@ -38,15 +38,52 @@ case $menu in
         /usr/local/sbin/tunneling/vmess-trial.sh
         /usr/local/sbin/tunneling/vmess-menu.sh
         ;;
+    3)
+        /usr/local/sbin/tunneling/vmess-renew.sh
+        /usr/local/sbin/tunneling/vmess-menu.sh
+        ;;
+    4)
+        /usr/local/sbin/tunneling/vmess-delete.sh
+        /usr/local/sbin/tunneling/vmess-menu.sh
+        ;;
+    5)
+        /usr/local/sbin/tunneling/vmess-check.sh
+        /usr/local/sbin/tunneling/vmess-menu.sh
+        ;;
     6)
         /usr/local/sbin/tunneling/vmess-list.sh
+        /usr/local/sbin/tunneling/vmess-menu.sh
+        ;;
+    7)
+        /usr/local/sbin/tunneling/vmess-delete-expired.sh
+        /usr/local/sbin/tunneling/vmess-menu.sh
+        ;;
+    8)
+        /usr/local/sbin/tunneling/vmess-lock.sh
+        /usr/local/sbin/tunneling/vmess-menu.sh
+        ;;
+    9)
+        /usr/local/sbin/tunneling/vmess-unlock.sh
+        /usr/local/sbin/tunneling/vmess-menu.sh
+        ;;
+    10)
+        /usr/local/sbin/tunneling/vmess-details.sh
+        /usr/local/sbin/tunneling/vmess-menu.sh
+        ;;
+    11)
+        /usr/local/sbin/tunneling/vmess-limit-ip.sh
+        /usr/local/sbin/tunneling/vmess-menu.sh
+        ;;
+    12)
+        /usr/local/sbin/tunneling/vmess-limit-quota.sh
         /usr/local/sbin/tunneling/vmess-menu.sh
         ;;
     0)
         /usr/local/sbin/tunneling/main-menu.sh
         ;;
     *)
-        /usr/local/sbin/tunneling/placeholder.sh
+        echo -e "${RED}Invalid option!${NC}"
+        sleep 1
         /usr/local/sbin/tunneling/vmess-menu.sh
         ;;
 esac
