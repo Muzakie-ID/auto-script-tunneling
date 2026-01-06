@@ -85,6 +85,19 @@ done
 
 wget -q -O placeholder.sh "${BASE_URL}/xray/placeholder.sh"
 
+echo -e "${CYAN}[5/5]${NC} Downloading bot scripts..."
+wget -q -O telegram_bot.py "${BASE_URL}/bot/telegram_bot.py"
+wget -q -O bot-setup.sh "${BASE_URL}/bot/bot-setup.sh"
+wget -q -O bot-start.sh "${BASE_URL}/bot/bot-start.sh"
+wget -q -O bot-stop.sh "${BASE_URL}/bot/bot-stop.sh"
+wget -q -O bot-restart.sh "${BASE_URL}/bot/bot-restart.sh"
+wget -q -O bot-status.sh "${BASE_URL}/bot/bot-status.sh"
+wget -q -O bot-auto-order.sh "${BASE_URL}/bot/bot-auto-order.sh"
+wget -q -O bot-payment.sh "${BASE_URL}/bot/bot-payment.sh"
+wget -q -O bot-price.sh "${BASE_URL}/bot/bot-price.sh"
+wget -q -O bot-notification.sh "${BASE_URL}/bot/bot-notification.sh"
+wget -q -O bot-test.sh "${BASE_URL}/bot/bot-test.sh"
+
 echo ""
 echo -e "${CYAN}[INFO]${NC} Setting permissions..."
 chmod +x $INSTALL_DIR/*.sh

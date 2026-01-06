@@ -218,6 +218,20 @@ done
 
 wget -q -O placeholder.sh "${BASE_URL}/xray/placeholder.sh" 2>/dev/null || curl -sL "${BASE_URL}/xray/placeholder.sh" -o placeholder.sh
 
+# Download bot scripts
+echo -e "${CYAN}[INFO]${NC} Downloading bot scripts..."
+wget -q -O telegram_bot.py "${BASE_URL}/bot/telegram_bot.py" 2>/dev/null || curl -sL "${BASE_URL}/bot/telegram_bot.py" -o telegram_bot.py
+wget -q -O bot-setup.sh "${BASE_URL}/bot/bot-setup.sh" 2>/dev/null || curl -sL "${BASE_URL}/bot/bot-setup.sh" -o bot-setup.sh
+wget -q -O bot-start.sh "${BASE_URL}/bot/bot-start.sh" 2>/dev/null || curl -sL "${BASE_URL}/bot/bot-start.sh" -o bot-start.sh
+wget -q -O bot-stop.sh "${BASE_URL}/bot/bot-stop.sh" 2>/dev/null || curl -sL "${BASE_URL}/bot/bot-stop.sh" -o bot-stop.sh
+wget -q -O bot-restart.sh "${BASE_URL}/bot/bot-restart.sh" 2>/dev/null || curl -sL "${BASE_URL}/bot/bot-restart.sh" -o bot-restart.sh
+wget -q -O bot-status.sh "${BASE_URL}/bot/bot-status.sh" 2>/dev/null || curl -sL "${BASE_URL}/bot/bot-status.sh" -o bot-status.sh
+wget -q -O bot-auto-order.sh "${BASE_URL}/bot/bot-auto-order.sh" 2>/dev/null || curl -sL "${BASE_URL}/bot/bot-auto-order.sh" -o bot-auto-order.sh
+wget -q -O bot-payment.sh "${BASE_URL}/bot/bot-payment.sh" 2>/dev/null || curl -sL "${BASE_URL}/bot/bot-payment.sh" -o bot-payment.sh
+wget -q -O bot-price.sh "${BASE_URL}/bot/bot-price.sh" 2>/dev/null || curl -sL "${BASE_URL}/bot/bot-price.sh" -o bot-price.sh
+wget -q -O bot-notification.sh "${BASE_URL}/bot/bot-notification.sh" 2>/dev/null || curl -sL "${BASE_URL}/bot/bot-notification.sh" -o bot-notification.sh
+wget -q -O bot-test.sh "${BASE_URL}/bot/bot-test.sh" 2>/dev/null || curl -sL "${BASE_URL}/bot/bot-test.sh" -o bot-test.sh
+
 # Set permissions
 chmod +x /usr/local/sbin/tunneling/*.sh
 
