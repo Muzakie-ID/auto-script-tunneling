@@ -18,18 +18,25 @@ for user_json in /etc/tunneling/ssh/*.json; do
     if [ -f "$user_json" ]; then
         username=$(jq -r '.username' $user_json)
         expired=$(jq -r '.expired' $user_json)
-        limit_ip=$(jq -r '.limit_ip // "Unlimited"' $user_json)
+        limit_ip=$(jq -r '.limit_ip // 0' $user_json)
+        
+        # Convert to proper format
+        if [ "$limit_ip" == "0" ] || [ "$limit_ip" == "null" ]; then
+            limit_ip="Unlimited"
+        fi
         
         exp_date=$(date -d @$expired +"%Y-%m-%d" 2>/dev/null || echo "Invalid")
         
         now=$(date +%s)
-        if [ $expired -lt $now ]; then
-            status="${RED}Expired${NC}"
+        if [ "$expired" != "Invalid" ] && [ $expired -lt $now ]; then
+            status="Expired"
+            status_color="${RED}"
         else
-            status="${GREEN}Active${NC}"
+            status="Active"
+            status_color="${GREEN}"
         fi
         
-        printf "%-15s %-15s %-20s %-10s\n" "$username" "$exp_date" "$status" "$limit_ip"
+        printf "${status_color}%-15s${NC} %-15s %-12s %-10s\n" "$username" "$exp_date" "$status" "$limit_ip"
     fi
 done
 
