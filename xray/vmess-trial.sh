@@ -38,6 +38,29 @@ cat > /etc/tunneling/vmess/${username}.json << EOF
 }
 EOF
 
+# TODO: Add to XRAY config (will be implemented)
+
+# Generate vmess:// link
+vmess_json=$(cat <<EOF
+{
+  "v": "2",
+  "ps": "TRIAL-$username-$domain",
+  "add": "$domain",
+  "port": "443",
+  "id": "$uuid",
+  "aid": "0",
+  "net": "ws",
+  "type": "none",
+  "host": "$domain",
+  "path": "/vmess",
+  "tls": "tls",
+  "sni": "$domain"
+}
+EOF
+)
+
+vmess_link="vmess://$(echo -n $vmess_json | base64 -w 0)"
+
 echo ""
 echo -e "${GREEN}✓ VMESS Trial created successfully!${NC}"
 echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
@@ -48,5 +71,11 @@ echo -e "${YELLOW}Expired:${NC} $exp_date (1 Hour)"
 echo -e "${YELLOW}Path:${NC} /vmess"
 echo -e "${YELLOW}Limit:${NC} 1 IP, 1 GB"
 echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+echo -e "${GREEN}VMESS Link (Copy below):${NC}"
+echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+echo -e "${YELLOW}$vmess_link${NC}"
+echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+echo ""
+echo -e "${YELLOW}Note: Import link above to V2RayNG/V2RayN/Clash${NC}"
 echo ""
 read -n 1 -s -r -p "Press any key to continue..."
