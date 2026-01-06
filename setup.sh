@@ -138,13 +138,43 @@ EOF
 echo -e "${CYAN}[INFO]${NC} Downloading components..."
 cd /usr/local/sbin/tunneling
 
-# Base URL for scripts (will be updated)
+# Base URL for scripts
 BASE_URL="https://raw.githubusercontent.com/Muzakie-ID/auto-script-tunneling/main"
 
-# Download all scripts
-wget -q -O ssh-menu.sh "${BASE_URL}/menu/ssh-menu.sh" 2>/dev/null || curl -sL "${BASE_URL}/menu/ssh-menu.sh" -o ssh-menu.sh
-wget -q -O xray-menu.sh "${BASE_URL}/menu/xray-menu.sh" 2>/dev/null || curl -sL "${BASE_URL}/menu/xray-menu.sh" -o xray-menu.sh
+# Download all menu scripts
+echo -e "${CYAN}[INFO]${NC} Downloading menu scripts..."
 wget -q -O main-menu.sh "${BASE_URL}/menu/main-menu.sh" 2>/dev/null || curl -sL "${BASE_URL}/menu/main-menu.sh" -o main-menu.sh
+wget -q -O ssh-menu.sh "${BASE_URL}/menu/ssh-menu.sh" 2>/dev/null || curl -sL "${BASE_URL}/menu/ssh-menu.sh" -o ssh-menu.sh
+wget -q -O vmess-menu.sh "${BASE_URL}/menu/vmess-menu.sh" 2>/dev/null || curl -sL "${BASE_URL}/menu/vmess-menu.sh" -o vmess-menu.sh
+wget -q -O vless-menu.sh "${BASE_URL}/menu/vless-menu.sh" 2>/dev/null || curl -sL "${BASE_URL}/menu/vless-menu.sh" -o vless-menu.sh
+wget -q -O trojan-menu.sh "${BASE_URL}/menu/trojan-menu.sh" 2>/dev/null || curl -sL "${BASE_URL}/menu/trojan-menu.sh" -o trojan-menu.sh
+wget -q -O system-menu.sh "${BASE_URL}/menu/system-menu.sh" 2>/dev/null || curl -sL "${BASE_URL}/menu/system-menu.sh" -o system-menu.sh
+wget -q -O backup-menu.sh "${BASE_URL}/menu/backup-menu.sh" 2>/dev/null || curl -sL "${BASE_URL}/menu/backup-menu.sh" -o backup-menu.sh
+wget -q -O bot-menu.sh "${BASE_URL}/menu/bot-menu.sh" 2>/dev/null || curl -sL "${BASE_URL}/menu/bot-menu.sh" -o bot-menu.sh
+wget -q -O settings-menu.sh "${BASE_URL}/menu/settings-menu.sh" 2>/dev/null || curl -sL "${BASE_URL}/menu/settings-menu.sh" -o settings-menu.sh
+wget -q -O info-menu.sh "${BASE_URL}/menu/info-menu.sh" 2>/dev/null || curl -sL "${BASE_URL}/menu/info-menu.sh" -o info-menu.sh
+
+# Download SSH scripts
+echo -e "${CYAN}[INFO]${NC} Downloading SSH scripts..."
+wget -q -O ssh-create.sh "${BASE_URL}/ssh/ssh-create.sh" 2>/dev/null || curl -sL "${BASE_URL}/ssh/ssh-create.sh" -o ssh-create.sh
+wget -q -O ssh-trial.sh "${BASE_URL}/ssh/ssh-trial.sh" 2>/dev/null || curl -sL "${BASE_URL}/ssh/ssh-trial.sh" -o ssh-trial.sh
+wget -q -O setup-dropbear.sh "${BASE_URL}/ssh/setup-dropbear.sh" 2>/dev/null || curl -sL "${BASE_URL}/ssh/setup-dropbear.sh" -o setup-dropbear.sh
+wget -q -O setup-stunnel.sh "${BASE_URL}/ssh/setup-stunnel.sh" 2>/dev/null || curl -sL "${BASE_URL}/ssh/setup-stunnel.sh" -o setup-stunnel.sh
+wget -q -O setup-squid.sh "${BASE_URL}/ssh/setup-squid.sh" 2>/dev/null || curl -sL "${BASE_URL}/ssh/setup-squid.sh" -o setup-squid.sh
+
+# Download system scripts
+echo -e "${CYAN}[INFO]${NC} Downloading system scripts..."
+wget -q -O check-services.sh "${BASE_URL}/system/check-services.sh" 2>/dev/null || curl -sL "${BASE_URL}/system/check-services.sh" -o check-services.sh
+wget -q -O monitor-vps.sh "${BASE_URL}/system/monitor-vps.sh" 2>/dev/null || curl -sL "${BASE_URL}/system/monitor-vps.sh" -o monitor-vps.sh
+wget -q -O backup-now.sh "${BASE_URL}/system/backup-now.sh" 2>/dev/null || curl -sL "${BASE_URL}/system/backup-now.sh" -o backup-now.sh
+wget -q -O restore-backup.sh "${BASE_URL}/system/restore-backup.sh" 2>/dev/null || curl -sL "${BASE_URL}/system/restore-backup.sh" -o restore-backup.sh
+wget -q -O auto-backup.sh "${BASE_URL}/system/auto-backup.sh" 2>/dev/null || curl -sL "${BASE_URL}/system/auto-backup.sh" -o auto-backup.sh
+wget -q -O delete-expired.sh "${BASE_URL}/system/delete-expired.sh" 2>/dev/null || curl -sL "${BASE_URL}/system/delete-expired.sh" -o delete-expired.sh
+wget -q -O setup-nginx.sh "${BASE_URL}/system/setup-nginx.sh" 2>/dev/null || curl -sL "${BASE_URL}/system/setup-nginx.sh" -o setup-nginx.sh
+
+# Download XRAY script
+echo -e "${CYAN}[INFO]${NC} Downloading XRAY script..."
+wget -q -O setup-xray.sh "${BASE_URL}/xray/setup-xray.sh" 2>/dev/null || curl -sL "${BASE_URL}/xray/setup-xray.sh" -o setup-xray.sh
 
 # Set permissions
 chmod +x /usr/local/sbin/tunneling/*.sh
