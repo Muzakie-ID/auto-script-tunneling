@@ -181,6 +181,14 @@ wget -q -O restore-backup.sh "${BASE_URL}/system/restore-backup.sh" 2>/dev/null 
 wget -q -O auto-backup.sh "${BASE_URL}/system/auto-backup.sh" 2>/dev/null || curl -sL "${BASE_URL}/system/auto-backup.sh" -o auto-backup.sh
 wget -q -O delete-expired.sh "${BASE_URL}/system/delete-expired.sh" 2>/dev/null || curl -sL "${BASE_URL}/system/delete-expired.sh" -o delete-expired.sh
 wget -q -O setup-nginx.sh "${BASE_URL}/system/setup-nginx.sh" 2>/dev/null || curl -sL "${BASE_URL}/system/setup-nginx.sh" -o setup-nginx.sh
+wget -q -O restart-all.sh "${BASE_URL}/system/restart-all.sh" 2>/dev/null || curl -sL "${BASE_URL}/system/restart-all.sh" -o restart-all.sh
+wget -q -O restart-service.sh "${BASE_URL}/system/restart-service.sh" 2>/dev/null || curl -sL "${BASE_URL}/system/restart-service.sh" -o restart-service.sh
+wget -q -O speedtest.sh "${BASE_URL}/system/speedtest.sh" 2>/dev/null || curl -sL "${BASE_URL}/system/speedtest.sh" -o speedtest.sh
+wget -q -O delete-all-expired.sh "${BASE_URL}/system/delete-all-expired.sh" 2>/dev/null || curl -sL "${BASE_URL}/system/delete-all-expired.sh" -o delete-all-expired.sh
+wget -q -O limit-speed.sh "${BASE_URL}/system/limit-speed.sh" 2>/dev/null || curl -sL "${BASE_URL}/system/limit-speed.sh" -o limit-speed.sh
+wget -q -O monitor-service.sh "${BASE_URL}/system/monitor-service.sh" 2>/dev/null || curl -sL "${BASE_URL}/system/monitor-service.sh" -o monitor-service.sh
+wget -q -O check-logs.sh "${BASE_URL}/system/check-logs.sh" 2>/dev/null || curl -sL "${BASE_URL}/system/check-logs.sh" -o check-logs.sh
+wget -q -O auto-reboot-settings.sh "${BASE_URL}/system/auto-reboot-settings.sh" 2>/dev/null || curl -sL "${BASE_URL}/system/auto-reboot-settings.sh" -o auto-reboot-settings.sh
 
 # Download XRAY script
 echo -e "${CYAN}[INFO]${NC} Downloading XRAY script..."
