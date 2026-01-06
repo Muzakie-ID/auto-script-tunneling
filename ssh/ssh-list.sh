@@ -25,18 +25,30 @@ for user_json in /etc/tunneling/ssh/*.json; do
             limit_ip="Unlimited"
         fi
         
-        exp_date=$(date -d @$expired +"%Y-%m-%d" 2>/dev/null || echo "Invalid")
-        
-        now=$(date +%s)
-        if [ "$expired" != "Invalid" ] && [ $expired -lt $now ]; then
-            status="Expired"
-            status_color="${RED}"
+        # Handle both timestamp and date string format
+        if [[ "$expired" =~ ^[0-9]+$ ]]; then
+            # Unix timestamp
+            exp_date=$(date -d @$expired +"%Y-%m-%d" 2>/dev/null || echo "Invalid")
+            exp_timestamp=$expired
         else
-            status="Active"
-            status_color="${GREEN}"
+            # Date string
+            exp_date=$expired
+            exp_timestamp=$(date -d "$expired" +%s 2>/dev/null || echo "0")
         fi
         
-        printf "${status_color}%-15s${NC} %-15s %-12s %-10s\n" "$username" "$exp_date" "$status" "$limit_ip"
+        now=$(date +%s)
+        if [ "$exp_timestamp" != "0" ] && [ $exp_timestamp -lt $now ]; then
+            status="Expired"
+        else
+            status="Active"
+        fi
+        
+        # Print with color
+        if [ "$status" == "Expired" ]; then
+            printf "%-15s %-15s ${RED}%-12s${NC} %-10s\n" "$username" "$exp_date" "$status" "$limit_ip"
+        else
+            printf "%-15s %-15s ${GREEN}%-12s${NC} %-10s\n" "$username" "$exp_date" "$status" "$limit_ip"
+        fi
     fi
 done
 
