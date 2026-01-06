@@ -25,12 +25,33 @@ fi
 username=$(jq -r '.username' $json_file)
 password=$(jq -r '.password' $json_file)
 expired=$(jq -r '.expired' $json_file)
-created=$(jq -r '.created' $json_file)
+created=$(jq -r '.created // empty' $json_file)
 limit_ip=$(jq -r '.limit_ip // "Unlimited"' $json_file)
 limit_quota=$(jq -r '.limit_quota // "Unlimited"' $json_file)
 
-exp_date=$(date -d @$expired +"%Y-%m-%d %H:%M" 2>/dev/null)
-created_date=$(date -d @$created +"%Y-%m-%d %H:%M" 2>/dev/null)
+# Format dates
+if [[ "$expired" =~ ^[0-9]+$ ]]; then
+    exp_date=$(date -d @$expired +"%Y-%m-%d %H:%M" 2>/dev/null || echo "Invalid")
+else
+    exp_date=$expired
+fi
+
+if [ -n "$created" ] && [[ "$created" =~ ^[0-9]+$ ]]; then
+    created_date=$(date -d @$created +"%Y-%m-%d %H:%M" 2>/dev/null || echo "N/A")
+elif [ -n "$created" ]; then
+    created_date=$created
+else
+    created_date="N/A"
+fi
+
+# Convert numeric limits
+if [ "$limit_ip" == "0" ] || [ "$limit_ip" == "null" ]; then
+    limit_ip="Unlimited"
+fi
+
+if [ "$limit_quota" == "0" ] || [ "$limit_quota" == "null" ]; then
+    limit_quota="Unlimited"
+fi
 
 # Check active sessions
 active=$(ps aux | grep -i "sshd: $username" | grep -v grep | wc -l)
