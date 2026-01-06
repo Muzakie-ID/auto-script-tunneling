@@ -71,7 +71,28 @@ case $option in
         echo ""
         echo -e "${YELLOW}Current traffic control settings:${NC}"
         echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
-        tc qdisc show dev $IFACE
+        
+        # Check if TBF (Token Bucket Filter) is applied
+        CURRENT_QDISC=$(tc qdisc show dev $IFACE | grep "qdisc tbf")
+        
+        if [ -n "$CURRENT_QDISC" ]; then
+            # Extract rate from tbf settings
+            RATE=$(echo "$CURRENT_QDISC" | grep -oP 'rate \K[0-9]+[A-Za-z]+')
+            echo -e "${GREEN}✓ Speed Limit Active${NC}"
+            echo -e "  Interface : $IFACE"
+            echo -e "  Limit     : $RATE"
+            echo ""
+            echo -e "${YELLOW}Full settings:${NC}"
+            echo "$CURRENT_QDISC"
+        else
+            echo -e "${YELLOW}✓ No Speed Limit Applied${NC}"
+            echo -e "  Interface : $IFACE"
+            echo -e "  Status    : Using default qdisc (no bandwidth limit)"
+            echo ""
+            echo -e "${YELLOW}Current qdisc:${NC}"
+            tc qdisc show dev $IFACE
+        fi
+        
         echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
         ;;
     0)
