@@ -20,7 +20,16 @@ for user_json in /etc/tunneling/ssh/*.json; do
         username=$(jq -r '.username' $user_json)
         expired=$(jq -r '.expired' $user_json)
         
-        if [ $expired -lt $now ]; then
+        # Handle both timestamp and date string format
+        if [[ "$expired" =~ ^[0-9]+$ ]]; then
+            # Unix timestamp
+            exp_timestamp=$expired
+        else
+            # Date string - convert to timestamp
+            exp_timestamp=$(date -d "$expired" +%s 2>/dev/null || echo "0")
+        fi
+        
+        if [ "$exp_timestamp" != "0" ] && [ "$exp_timestamp" -lt "$now" ]; then
             echo -e "${RED}Deleting:${NC} $username"
             killall -u $username 2>/dev/null
             userdel -r $username 2>/dev/null
