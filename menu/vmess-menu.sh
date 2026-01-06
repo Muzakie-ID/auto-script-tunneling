@@ -32,46 +32,21 @@ read -p "Select Menu [0-12]: " menu
 case $menu in
     1)
         /usr/local/sbin/tunneling/vmess-create.sh
+        /usr/local/sbin/tunneling/vmess-menu.sh
         ;;
     2)
         /usr/local/sbin/tunneling/vmess-trial.sh
-        ;;
-    3)
-        /usr/local/sbin/tunneling/vmess-renew.sh
-        ;;
-    4)
-        /usr/local/sbin/tunneling/vmess-delete.sh
-        ;;
-    5)
-        /usr/local/sbin/tunneling/vmess-check.sh
+        /usr/local/sbin/tunneling/vmess-menu.sh
         ;;
     6)
         /usr/local/sbin/tunneling/vmess-list.sh
-        ;;
-    7)
-        /usr/local/sbin/tunneling/vmess-delete-expired.sh
-        ;;
-    8)
-        /usr/local/sbin/tunneling/vmess-lock.sh
-        ;;
-    9)
-        /usr/local/sbin/tunneling/vmess-unlock.sh
-        ;;
-    10)
-        /usr/local/sbin/tunneling/vmess-detail.sh
-        ;;
-    11)
-        /usr/local/sbin/tunneling/vmess-limit-ip.sh
-        ;;
-    12)
-        /usr/local/sbin/tunneling/vmess-limit-quota.sh
+        /usr/local/sbin/tunneling/vmess-menu.sh
         ;;
     0)
         /usr/local/sbin/tunneling/main-menu.sh
         ;;
     *)
-        echo -e "${RED}Invalid option!${NC}"
-        sleep 1
+        /usr/local/sbin/tunneling/placeholder.sh
         /usr/local/sbin/tunneling/vmess-menu.sh
         ;;
 esac

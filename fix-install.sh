@@ -57,8 +57,12 @@ wget -q -O auto-backup.sh "${BASE_URL}/system/auto-backup.sh"
 wget -q -O delete-expired.sh "${BASE_URL}/system/delete-expired.sh"
 wget -q -O setup-nginx.sh "${BASE_URL}/system/setup-nginx.sh"
 
-echo -e "${CYAN}[4/4]${NC} Downloading XRAY script..."
+echo -e "${CYAN}[4/4]${NC} Downloading XRAY scripts..."
 wget -q -O setup-xray.sh "${BASE_URL}/xray/setup-xray.sh"
+wget -q -O vmess-create.sh "${BASE_URL}/xray/vmess-create.sh"
+wget -q -O vmess-trial.sh "${BASE_URL}/xray/vmess-trial.sh"
+wget -q -O vmess-list.sh "${BASE_URL}/xray/vmess-list.sh"
+wget -q -O placeholder.sh "${BASE_URL}/xray/placeholder.sh"
 
 echo ""
 echo -e "${CYAN}[INFO]${NC} Setting permissions..."
