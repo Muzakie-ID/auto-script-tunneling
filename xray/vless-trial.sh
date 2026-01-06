@@ -38,6 +38,11 @@ cat > /etc/tunneling/VLESS/${username}.json << EOF
 }
 EOF
 
+# TODO: Add to XRAY config (will be implemented)
+
+# Generate vless:// link
+vless_link="vless://$uuid@$domain:443?path=/vless&security=tls&encryption=none&type=ws&host=$domain&sni=$domain#TRIAL-$username-$domain"
+
 echo ""
 echo -e "${GREEN}✓ VLESS Trial created successfully!${NC}"
 echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
@@ -45,9 +50,15 @@ echo -e "${YELLOW}Username:${NC} $username"
 echo -e "${YELLOW}UUID:${NC} $uuid"
 echo -e "${YELLOW}Domain:${NC} $domain"
 echo -e "${YELLOW}Expired:${NC} $exp_date (1 Hour)"
-echo -e "${YELLOW}Path:${NC} /VLESS"
+echo -e "${YELLOW}Path:${NC} /vless"
 echo -e "${YELLOW}Limit:${NC} 1 IP, 1 GB"
 echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+echo -e "${GREEN}VLESS Link (Copy below):${NC}"
+echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+echo -e "${YELLOW}$vless_link${NC}"
+echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+echo ""
+echo -e "${YELLOW}Note: Import link above to V2RayNG/V2RayN/Clash${NC}"
 echo ""
 read -n 1 -s -r -p "Press any key to continue..."
 

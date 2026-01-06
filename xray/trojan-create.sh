@@ -40,21 +40,27 @@ EOF
 
 # TODO: Add to XRAY config (will be implemented)
 
+# Generate trojan:// link
+trojan_link="trojan://$uuid@$domain:443?security=tls&type=ws&host=$domain&path=/trojan&sni=$domain#$username-$domain"
+
 echo ""
 echo -e "${GREEN}✓ TROJAN Account created successfully!${NC}"
 echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
 echo -e "${YELLOW}Username:${NC} $username"
-echo -e "${YELLOW}UUID:${NC} $uuid"
+echo -e "${YELLOW}UUID/Password:${NC} $uuid"
 echo -e "${YELLOW}Domain:${NC} $domain"
 echo -e "${YELLOW}Expired:${NC} $exp_date"
-echo -e "${YELLOW}Path:${NC} /TROJAN"
 echo -e "${YELLOW}Port TLS:${NC} 443"
-echo -e "${YELLOW}Port HTTP:${NC} 80"
-echo -e "${YELLOW}Network:${NC} WebSocket"
-echo -e "${YELLOW}Security:${NC} auto"
+echo -e "${YELLOW}Network:${NC} WebSocket (ws)"
+echo -e "${YELLOW}Path:${NC} /trojan"
+echo -e "${YELLOW}Security:${NC} TLS"
+echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+echo -e "${GREEN}TROJAN Link (Copy below):${NC}"
+echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+echo -e "${YELLOW}$trojan_link${NC}"
 echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
 echo ""
-echo -e "${YELLOW}Note: XRAY config auto-reload required${NC}"
+echo -e "${YELLOW}Note: Import link above to V2RayNG/V2RayN/Clash${NC}"
 echo ""
 read -n 1 -s -r -p "Press any key to continue..."
 
