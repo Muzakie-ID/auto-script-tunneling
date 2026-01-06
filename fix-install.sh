@@ -6,6 +6,7 @@
 
 RED='\033[0;31m'
 GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
 CYAN='\033[0;36m'
 NC='\033[0m'
 
@@ -16,10 +17,31 @@ echo ""
 
 BASE_URL="https://raw.githubusercontent.com/Muzakie-ID/auto-script-tunneling/main"
 INSTALL_DIR="/usr/local/sbin/tunneling"
+BACKUP_DIR="/usr/local/sbin/tunneling/backup_$(date +%Y%m%d_%H%M%S)"
 
 cd $INSTALL_DIR || exit 1
 
-echo -e "${CYAN}[1/4]${NC} Downloading menu scripts..."
+# Ask for backup
+echo -e "${YELLOW}Existing files will be replaced.${NC}"
+read -p "Create backup before replacing? (y/n): " do_backup
+echo ""
+
+if [[ "$do_backup" == "y" ]]; then
+    echo -e "${CYAN}Creating backup...${NC}"
+    mkdir -p $BACKUP_DIR
+    
+    # Backup existing files
+    for file in *.sh *.py; do
+        if [ -f "$file" ]; then
+            cp "$file" "$BACKUP_DIR/" 2>/dev/null
+        fi
+    done
+    
+    echo -e "${GREEN}✓ Backup created at: $BACKUP_DIR${NC}"
+    echo ""
+fi
+
+echo -e "${CYAN}[1/5]${NC} Downloading menu scripts..."
 wget -q -O main-menu.sh "${BASE_URL}/menu/main-menu.sh"
 wget -q -O ssh-menu.sh "${BASE_URL}/menu/ssh-menu.sh"
 wget -q -O vmess-menu.sh "${BASE_URL}/menu/vmess-menu.sh"
@@ -104,6 +126,13 @@ chmod +x $INSTALL_DIR/*.sh
 
 echo ""
 echo -e "${GREEN}✓ All scripts downloaded successfully!${NC}"
+
+if [[ "$do_backup" == "y" ]]; then
+    echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+    echo -e "${YELLOW}Backup location: $BACKUP_DIR${NC}"
+    echo -e "${YELLOW}To restore backup: cp $BACKUP_DIR/* $INSTALL_DIR/${NC}"
+fi
+
 echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
 echo -e "${GREEN}You can now run: menu${NC}"
 echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
