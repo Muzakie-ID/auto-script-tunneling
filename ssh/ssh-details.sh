@@ -51,6 +51,8 @@ fi
 
 if [ "$limit_quota" == "0" ] || [ "$limit_quota" == "null" ]; then
     limit_quota="Unlimited"
+else
+    limit_quota="${limit_quota} GB"
 fi
 
 # Check active sessions
