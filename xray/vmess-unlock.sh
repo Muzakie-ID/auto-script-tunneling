@@ -12,6 +12,20 @@ echo -e "${GREEN}         UNLOCK VMESS ACCOUNT           ${NC}"
 echo -e "${GREEN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
 echo ""
 
+# Show existing accounts
+echo -e "${YELLOW}Existing VMESS Accounts:${NC}"
+echo -e "${GREEN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+if [ -d /etc/tunneling/vmess ] && [ "$(ls -A /etc/tunneling/vmess/*.json 2>/dev/null)" ]; then
+    for user_json in /etc/tunneling/vmess/*.json; do
+        username_list=$(jq -r '.username' $user_json 2>/dev/null)
+        echo -e "  • $username_list"
+    done
+else
+    echo -e "${RED}  No accounts found${NC}"
+fi
+echo -e "${GREEN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+echo ""
+
 read -p "Username to unlock: " username
 
 json_file="/etc/tunneling/vmess/${username}.json"

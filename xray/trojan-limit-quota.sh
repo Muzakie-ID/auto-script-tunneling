@@ -12,6 +12,20 @@ echo -e "${GREEN}        SET QUOTA LIMIT (TROJAN)         ${NC}"
 echo -e "${YELLOW}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
 echo ""
 
+# Show existing accounts
+echo -e "${YELLOW}Existing TROJAN Accounts:${NC}"
+echo -e "${YELLOW}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+if [ -d /etc/tunneling/trojan ] && [ "$(ls -A /etc/tunneling/trojan/*.json 2>/dev/null)" ]; then
+    for user_json in /etc/tunneling/trojan/*.json; do
+        username_list=$(jq -r '.username' $user_json 2>/dev/null)
+        echo -e "  • $username_list"
+    done
+else
+    echo -e "${RED}  No accounts found${NC}"
+fi
+echo -e "${YELLOW}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+echo ""
+
 read -p "Username: " username
 
 json_file="/etc/tunneling/TROJAN/${username}.json"
