@@ -29,34 +29,34 @@ read -p "Select Menu [0-10]: " menu
 
 case $menu in
     1)
-        /usr/local/sbin/tunneling/change-domain.sh
+        bash /usr/local/sbin/tunneling/system/change-domain.sh
         ;;
     2)
-        /usr/local/sbin/tunneling/change-banner.sh
+        bash /usr/local/sbin/tunneling/system/change-banner.sh
         ;;
     3)
-        /usr/local/sbin/tunneling/change-port.sh
+        bash /usr/local/sbin/tunneling/system/change-port.sh
         ;;
     4)
-        /usr/local/sbin/tunneling/change-timezone.sh
+        bash /usr/local/sbin/tunneling/system/change-timezone.sh
         ;;
     5)
-        /usr/local/sbin/tunneling/fix-domain.sh
+        bash /usr/local/sbin/tunneling/system/fix-error-domain.sh
         ;;
     6)
-        /usr/local/sbin/tunneling/fix-proxy.sh
+        bash /usr/local/sbin/tunneling/system/fix-error-proxy.sh
         ;;
     7)
-        /usr/local/sbin/tunneling/renew-ssl.sh
+        bash /usr/local/sbin/tunneling/system/renew-ssl.sh
         ;;
     8)
-        /usr/local/sbin/tunneling/auto-record-domain.sh
+        bash /usr/local/sbin/tunneling/system/auto-record-wildcard.sh
         ;;
     9)
-        /usr/local/sbin/tunneling/limit-speed-settings.sh
+        bash /usr/local/sbin/tunneling/system/limit-speed-settings.sh
         ;;
     10)
-        /usr/local/sbin/tunneling/reset-settings.sh
+        bash /usr/local/sbin/tunneling/system/reset-settings.sh
         ;;
     0)
         /usr/local/sbin/tunneling/main-menu.sh
