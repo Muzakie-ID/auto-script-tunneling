@@ -171,6 +171,7 @@ wget -q -O ssh-limit-quota.sh "${BASE_URL}/ssh/ssh-limit-quota.sh" 2>/dev/null |
 wget -q -O setup-dropbear.sh "${BASE_URL}/ssh/setup-dropbear.sh" 2>/dev/null || curl -sL "${BASE_URL}/ssh/setup-dropbear.sh" -o setup-dropbear.sh
 wget -q -O setup-stunnel.sh "${BASE_URL}/ssh/setup-stunnel.sh" 2>/dev/null || curl -sL "${BASE_URL}/ssh/setup-stunnel.sh" -o setup-stunnel.sh
 wget -q -O setup-squid.sh "${BASE_URL}/ssh/setup-squid.sh" 2>/dev/null || curl -sL "${BASE_URL}/ssh/setup-squid.sh" -o setup-squid.sh
+wget -q -O setup-tuntap.sh "${BASE_URL}/ssh/setup-tuntap.sh" 2>/dev/null || curl -sL "${BASE_URL}/ssh/setup-tuntap.sh" -o setup-tuntap.sh
 
 # Download system scripts
 echo -e "${CYAN}[INFO]${NC} Downloading system scripts..."
@@ -247,6 +248,12 @@ wget -q -O bot-test.sh "${BASE_URL}/bot/bot-test.sh" 2>/dev/null || curl -sL "${
 
 # Set permissions
 chmod +x /usr/local/sbin/tunneling/*.sh
+
+# Setup TUN/TAP device and IP forwarding
+echo -e "${CYAN}[INFO]${NC} Setting up TUN/TAP device for SSH tunneling..."
+wget -q -O setup-tuntap.sh "${BASE_URL}/ssh/setup-tuntap.sh" 2>/dev/null || curl -sL "${BASE_URL}/ssh/setup-tuntap.sh" -o setup-tuntap.sh
+chmod +x setup-tuntap.sh
+bash setup-tuntap.sh
 
 # Install XRAY
 echo -e "${CYAN}[INFO]${NC} Installing XRAY..."

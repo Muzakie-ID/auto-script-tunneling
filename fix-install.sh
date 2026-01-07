@@ -69,6 +69,7 @@ wget -q -O ssh-limit-quota.sh "${BASE_URL}/ssh/ssh-limit-quota.sh"
 wget -q -O setup-dropbear.sh "${BASE_URL}/ssh/setup-dropbear.sh"
 wget -q -O setup-stunnel.sh "${BASE_URL}/ssh/setup-stunnel.sh"
 wget -q -O setup-squid.sh "${BASE_URL}/ssh/setup-squid.sh"
+wget -q -O setup-tuntap.sh "${BASE_URL}/ssh/setup-tuntap.sh"
 
 echo -e "${CYAN}[3/4]${NC} Downloading system scripts..."
 # System monitoring and management

@@ -70,6 +70,9 @@ done
 wget -q -O setup-dropbear.sh "${BASE_URL}/ssh/setup-dropbear.sh"
 wget -q -O setup-stunnel.sh "${BASE_URL}/ssh/setup-stunnel.sh"
 wget -q -O setup-squid.sh "${BASE_URL}/ssh/setup-squid.sh"
+wget -q -O setup-tuntap.sh "${BASE_URL}/ssh/setup-tuntap.sh"
+
+# Download system scripts
 
 # Download system scripts
 echo -e "${CYAN}[3/5]${NC} Downloading system scripts..."
