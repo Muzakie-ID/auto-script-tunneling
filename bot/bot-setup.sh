@@ -48,9 +48,24 @@ cat > /etc/tunneling/bot/config.json << EOF
 }
 EOF
 
+# Install Python and pip if not installed
+echo -e "${CYAN}[INFO]${NC} Checking Python dependencies..."
+apt-get update > /dev/null 2>&1
+apt-get install -y python3 python3-pip > /dev/null 2>&1
+
 # Install Python dependencies
-echo -e "${CYAN}[INFO]${NC} Installing Python dependencies..."
-pip3 install pytelegrambotapi requests
+echo -e "${CYAN}[INFO]${NC} Installing Python packages..."
+pip3 install --upgrade pip > /dev/null 2>&1
+pip3 install pytelegrambotapi requests > /dev/null 2>&1
+
+# Verify installation
+if python3 -c "import telebot" 2>/dev/null; then
+    echo -e "${GREEN}✓ Python packages installed successfully${NC}"
+else
+    echo -e "${RED}✗ Failed to install Python packages${NC}"
+    echo -e "${YELLOW}Trying alternative installation method...${NC}"
+    python3 -m pip install pytelegrambotapi requests
+fi
 
 # Copy bot script
 cp /usr/local/sbin/tunneling/telegram_bot.py /etc/tunneling/bot/

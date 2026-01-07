@@ -23,6 +23,24 @@ if [ ! -f "/etc/tunneling/bot/config.json" ]; then
     exit 1
 fi
 
+# Check Python dependencies
+echo -e "${CYAN}Checking Python dependencies...${NC}"
+if ! python3 -c "import telebot" 2>/dev/null; then
+    echo -e "${YELLOW}Installing missing Python packages...${NC}"
+    pip3 install pytelegrambotapi requests > /dev/null 2>&1
+    
+    if ! python3 -c "import telebot" 2>/dev/null; then
+        echo -e "${RED}✗ Failed to install Python packages${NC}"
+        echo -e "${YELLOW}Please run Setup Bot Telegram first (option 1)${NC}"
+        echo ""
+        read -p "Press [Enter] to continue..."
+        /usr/local/sbin/tunneling/bot-menu.sh
+        exit 1
+    fi
+    echo -e "${GREEN}✓ Dependencies installed${NC}"
+fi
+echo ""
+
 # Check if bot is already running
 if systemctl is-active --quiet telegram-bot; then
     echo -e "${YELLOW}Bot is already running!${NC}"
