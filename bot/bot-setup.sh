@@ -49,9 +49,11 @@ cat > /etc/tunneling/bot/config.json << EOF
 EOF
 
 # Install Python and pip if not installed
-echo -e "${CYAN}[INFO]${NC} Checking Python dependencies..."
-apt-get update > /dev/null 2>&1
-apt-get install -y python3 python3-pip python3-venv python3-full > /dev/null 2>&1
+echo -e "${CYAN}[INFO]${NC} Updating package list..."
+apt-get update -qq 2>&1 | grep -v "^Hit:" | grep -v "^Get:"
+
+echo -e "${CYAN}[INFO]${NC} Installing Python packages (this may take a moment)..."
+apt-get install -y python3 python3-pip python3-venv python3-full -qq
 
 # Create virtual environment for bot
 BOT_VENV="/opt/telegram-bot-venv"
@@ -62,9 +64,9 @@ fi
 python3 -m venv "$BOT_VENV"
 
 # Install Python dependencies in virtual environment
-echo -e "${CYAN}[INFO]${NC} Installing Python packages in virtual environment..."
-"$BOT_VENV/bin/pip" install --upgrade pip > /dev/null 2>&1
-"$BOT_VENV/bin/pip" install pytelegrambotapi requests > /dev/null 2>&1
+echo -e "${CYAN}[INFO]${NC} Installing pytelegrambotapi and requests..."
+"$BOT_VENV/bin/pip" install --upgrade pip -q
+"$BOT_VENV/bin/pip" install pytelegrambotapi requests -q
 
 # Verify installation
 if "$BOT_VENV/bin/python" -c "import telebot" 2>/dev/null; then
