@@ -186,9 +186,16 @@ def handle_approve(call):
     
     order_id = call.data.replace('approve_', '')
     
-    # Check if this is from payment proof (message has photo)
+    # Check if this is from payment proof (message has photo or caption with "BUKTI PEMBAYARAN")
+    is_payment_proof = False
     if call.message.photo:
-        # Direct approve from payment proof notification
+        is_payment_proof = True
+    elif call.message.caption and "BUKTI PEMBAYARAN" in call.message.caption:
+        is_payment_proof = True
+    
+    if is_payment_proof:
+        # Direct approve from payment proof notification - no confirmation needed
+        bot.answer_callback_query(call.id, "Processing...")
         confirm_approve_order(call)
         return
     
