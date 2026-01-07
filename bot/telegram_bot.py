@@ -267,9 +267,60 @@ Thank you for your order! 🎉
     try:
         bot.send_message(order['user_id'], user_text, parse_mode='Markdown')
         bot.answer_callback_query(call.id, "✅ Order approved!")
+        
+        # Delete the approval message to remove buttons
+        try:
+            bot.delete_message(call.message.chat.id, call.message.message_id)
+        except:
+            pass
+        
+        # Send success message
         bot.send_message(call.message.chat.id, f"✅ Order {order_id} approved and sent to user!")
     except Exception as e:
-        bot.send_message(call.message.chat.id, f"✅ Approved but failed to notify user: {str(e)}")
+        bot.answer_callback_query(call.id, "❌ Failed!")
+        bot.send_message(call.message.chat.id, f"❌ Failed to send to user: {str(e)}")
+
+# Reject order
+@bot.callback_query_handler(func=lambda call: call.data.startswith('reject_'))
+def reject_order(call):
+    if call.from_user.id != ADMIN_ID:
+        bot.answer_callback_query(call.id, "⛔️ Access denied!")
+        return
+    
+    order_id = call.data.replace('reject_', '')
+    order_file = f'/etc/tunneling/bot/orders/{order_id}.json'
+    
+    if not os.path.exists(order_file):
+        bot.answer_callback_query(call.id, "❌ Order not found!")
+        return
+    
+    with open(order_file, 'r') as f:
+        order = json.load(f)
+    
+    # Update order status
+    order['status'] = 'rejected'
+    order['rejected_at'] = datetime.now().isoformat()
+    with open(order_file, 'w') as f:
+        json.dump(order, f, indent=2)
+    
+    # Notify user
+    try:
+        bot.send_message(
+            order['user_id'],
+            "❌ *ORDER REJECTED*\n\nYour order has been rejected. Please contact admin for more information.",
+            parse_mode='Markdown'
+        )
+    except:
+        pass
+    
+    # Delete the approval message
+    try:
+        bot.delete_message(call.message.chat.id, call.message.message_id)
+    except:
+        pass
+    
+    bot.answer_callback_query(call.id, "❌ Order rejected!")
+    bot.send_message(call.message.chat.id, f"❌ Order {order_id} rejected.")
 
 # Admin Manage Users
 @bot.message_handler(func=lambda message: message.text == '👥 Manage Users')
