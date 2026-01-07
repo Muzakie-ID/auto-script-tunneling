@@ -40,16 +40,50 @@ PRICES = {
 # Start command
 @bot.message_handler(commands=['start'])
 def start(message):
-    markup = types.ReplyKeyboardMarkup(resize_keyboard=True, row_width=2)
-    btn1 = types.KeyboardButton('📦 Order')
-    btn2 = types.KeyboardButton('✅ Trial')
-    btn3 = types.KeyboardButton('🔍 Check Account')
-    btn4 = types.KeyboardButton('🔄 Renew')
-    btn5 = types.KeyboardButton('ℹ️ Info Server')
-    btn6 = types.KeyboardButton('💰 Price List')
-    markup.add(btn1, btn2, btn3, btn4, btn5, btn6)
+    user_id = str(message.from_user.id)
     
-    welcome_text = f"""
+    # Check if user is admin
+    if user_id == str(ADMIN_ID):
+        # Admin menu
+        markup = types.ReplyKeyboardMarkup(resize_keyboard=True, row_width=2)
+        btn1 = types.KeyboardButton('📊 Dashboard')
+        btn2 = types.KeyboardButton('✅ Approve Orders')
+        btn3 = types.KeyboardButton('👥 Manage Users')
+        btn4 = types.KeyboardButton('⚙️ Settings')
+        btn5 = types.KeyboardButton('📦 Create Account')
+        btn6 = types.KeyboardButton('💰 Price List')
+        btn7 = types.KeyboardButton('📈 Statistics')
+        btn8 = types.KeyboardButton('🔔 Broadcast')
+        markup.add(btn1, btn2, btn3, btn4, btn5, btn6, btn7, btn8)
+        
+        welcome_text = f"""
+👑 *ADMIN PANEL* 👑
+
+Hi {message.from_user.first_name}!
+
+You have full access to admin controls.
+
+*Available Commands:*
+• Dashboard - View system status
+• Approve Orders - Manage pending orders
+• Manage Users - View/Edit user accounts
+• Settings - Bot configuration
+• Create Account - Manual account creation
+• Statistics - View sales & usage stats
+• Broadcast - Send message to all users
+        """
+    else:
+        # User menu
+        markup = types.ReplyKeyboardMarkup(resize_keyboard=True, row_width=2)
+        btn1 = types.KeyboardButton('📦 Order')
+        btn2 = types.KeyboardButton('✅ Trial')
+        btn3 = types.KeyboardButton('🔍 Check Account')
+        btn4 = types.KeyboardButton('🔄 Renew')
+        btn5 = types.KeyboardButton('ℹ️ Info Server')
+        btn6 = types.KeyboardButton('💰 Price List')
+        markup.add(btn1, btn2, btn3, btn4, btn5, btn6)
+        
+        welcome_text = f"""
 🎉 *Welcome to VPN Bot!* 🎉
 
 Hi {message.from_user.first_name}!
@@ -65,8 +99,176 @@ Hi {message.from_user.first_name}!
 • TROJAN
 
 Choose an option from the menu below:
-    """
+        """
+    
     bot.send_message(message.chat.id, welcome_text, parse_mode='Markdown', reply_markup=markup)
+
+# Admin Dashboard
+@bot.message_handler(func=lambda message: message.text == '📊 Dashboard')
+def admin_dashboard(message):
+    if str(message.from_user.id) != str(ADMIN_ID):
+        bot.send_message(message.chat.id, "⛔️ Access denied!")
+        return
+    
+    # Count active accounts
+    ssh_count = len([f for f in os.listdir('/etc/tunneling/ssh') if f.endswith('.json')]) if os.path.exists('/etc/tunneling/ssh') else 0
+    vmess_count = len([f for f in os.listdir('/etc/tunneling/vmess') if f.endswith('.json')]) if os.path.exists('/etc/tunneling/vmess') else 0
+    vless_count = len([f for f in os.listdir('/etc/tunneling/vless') if f.endswith('.json')]) if os.path.exists('/etc/tunneling/vless') else 0
+    trojan_count = len([f for f in os.listdir('/etc/tunneling/trojan') if f.endswith('.json')]) if os.path.exists('/etc/tunneling/trojan') else 0
+    
+    # Count pending orders
+    pending_orders = len([f for f in os.listdir('/etc/tunneling/bot/orders') if f.endswith('.json') and json.load(open(f'/etc/tunneling/bot/orders/{f}'))['status'] == 'pending']) if os.path.exists('/etc/tunneling/bot/orders') else 0
+    
+    dashboard_text = f"""
+📊 *ADMIN DASHBOARD*
+
+*Active Accounts:*
+• SSH: {ssh_count}
+• VMESS: {vmess_count}
+• VLESS: {vless_count}
+• TROJAN: {trojan_count}
+• Total: {ssh_count + vmess_count + vless_count + trojan_count}
+
+*Pending Orders:* {pending_orders}
+
+*Bot Status:* ✅ Running
+    """
+    
+    bot.send_message(message.chat.id, dashboard_text, parse_mode='Markdown')
+
+# Admin Approve Orders
+@bot.message_handler(func=lambda message: message.text == '✅ Approve Orders')
+def approve_orders_menu(message):
+    if str(message.from_user.id) != str(ADMIN_ID):
+        bot.send_message(message.chat.id, "⛔️ Access denied!")
+        return
+    
+    orders_dir = '/etc/tunneling/bot/orders'
+    if not os.path.exists(orders_dir):
+        bot.send_message(message.chat.id, "No pending orders.")
+        return
+    
+    pending = []
+    for f in os.listdir(orders_dir):
+        if f.endswith('.json'):
+            with open(f'{orders_dir}/{f}', 'r') as file:
+                order = json.load(file)
+                if order['status'] == 'pending':
+                    pending.append(order)
+    
+    if not pending:
+        bot.send_message(message.chat.id, "No pending orders.")
+        return
+    
+    markup = types.InlineKeyboardMarkup()
+    for order in pending:
+        pkg_info = PRICES.get(order['package'], {})
+        btn = types.InlineKeyboardButton(
+            f"Order {order['order_id']} - {pkg_info.get('name', 'Unknown')} - Rp{order['price']:,}",
+            callback_data=f"approve_{order['order_id']}"
+        )
+        markup.add(btn)
+    
+    bot.send_message(
+        message.chat.id,
+        f"📋 *PENDING ORDERS* ({len(pending)})\n\nClick to approve:",
+        parse_mode='Markdown',
+        reply_markup=markup
+    )
+
+# Handle approve callback
+@bot.callback_query_handler(func=lambda call: call.data.startswith('approve_'))
+def handle_approve(call):
+    if str(call.from_user.id) != str(ADMIN_ID):
+        bot.answer_callback_query(call.id, "⛔️ Access denied!")
+        return
+    
+    order_id = call.data.replace('approve_', '')
+    
+    markup = types.InlineKeyboardMarkup(row_width=2)
+    btn_yes = types.InlineKeyboardButton("✅ Approve", callback_data=f"confirm_approve_{order_id}")
+    btn_no = types.InlineKeyboardButton("❌ Reject", callback_data=f"reject_{order_id}")
+    markup.add(btn_yes, btn_no)
+    
+    bot.send_message(
+        call.message.chat.id,
+        f"Confirm action for order `{order_id}`?",
+        parse_mode='Markdown',
+        reply_markup=markup
+    )
+
+# Confirm approve
+@bot.callback_query_handler(func=lambda call: call.data.startswith('confirm_approve_'))
+def confirm_approve_order(call):
+    if str(call.from_user.id) != str(ADMIN_ID):
+        bot.answer_callback_query(call.id, "⛔️ Access denied!")
+        return
+    
+    order_id = call.data.replace('confirm_approve_', '')
+    order_file = f'/etc/tunneling/bot/orders/{order_id}.json'
+    
+    if not os.path.exists(order_file):
+        bot.answer_callback_query(call.id, "❌ Order not found!")
+        return
+    
+    with open(order_file, 'r') as f:
+        order = json.load(f)
+    
+    # Create account
+    import random
+    import string
+    username = f"user{''.join(random.choices(string.ascii_lowercase + string.digits, k=6))}"
+    password = ''.join(random.choices(string.ascii_letters + string.digits, k=10))
+    
+    protocol = order['type']
+    days = order['days']
+    
+    # Call create script
+    if protocol == 'ssh':
+        os.system(f"/usr/local/sbin/tunneling/ssh-create.sh {username} {password} {days} >/dev/null 2>&1")
+    elif protocol == 'vmess':
+        os.system(f"/usr/local/sbin/tunneling/vmess-create.sh {username} {days} >/dev/null 2>&1")
+    elif protocol == 'vless':
+        os.system(f"/usr/local/sbin/tunneling/vless-create.sh {username} {days} >/dev/null 2>&1")
+    elif protocol == 'trojan':
+        os.system(f"/usr/local/sbin/tunneling/trojan-create.sh {username} {password} {days} >/dev/null 2>&1")
+    
+    # Update order
+    order['status'] = 'approved'
+    order['username'] = username
+    order['approved_at'] = datetime.now().isoformat()
+    with open(order_file, 'w') as f:
+        json.dump(order, f, indent=2)
+    
+    # Get domain
+    domain = 'your-domain.com'
+    if os.path.exists('/root/domain.txt'):
+        with open('/root/domain.txt', 'r') as f:
+            domain = f.read().strip()
+    
+    # Send to user
+    pkg_info = PRICES[order['package']]
+    user_text = f"""
+✅ *PAYMENT APPROVED*
+
+Your order has been approved!
+
+📦 Package: {pkg_info['name']}
+🔐 Protocol: {protocol.upper()}
+👤 Username: `{username}`
+🔑 Password: `{password if protocol in ['ssh', 'trojan'] else 'N/A (UUID-based)'}`
+🌐 Domain: `{domain}`
+⏰ Expired: {days} Days
+
+Thank you for your order! 🎉
+    """
+    
+    try:
+        bot.send_message(order['user_id'], user_text, parse_mode='Markdown')
+        bot.answer_callback_query(call.id, "✅ Order approved!")
+        bot.send_message(call.message.chat.id, f"✅ Order {order_id} approved and sent to user!")
+    except Exception as e:
+        bot.send_message(call.message.chat.id, f"✅ Approved but failed to notify user: {str(e)}")
 
 # Order command
 @bot.message_handler(func=lambda message: message.text == '📦 Order')
