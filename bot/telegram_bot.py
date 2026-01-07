@@ -186,6 +186,13 @@ def handle_approve(call):
     
     order_id = call.data.replace('approve_', '')
     
+    # Check if this is from payment proof (message has photo)
+    if call.message.photo:
+        # Direct approve from payment proof notification
+        confirm_approve_order(call)
+        return
+    
+    # Otherwise, ask for confirmation
     markup = types.InlineKeyboardMarkup(row_width=2)
     btn_yes = types.InlineKeyboardButton("✅ Approve", callback_data=f"confirm_approve_{order_id}")
     btn_no = types.InlineKeyboardButton("❌ Reject", callback_data=f"reject_{order_id}")
@@ -205,7 +212,12 @@ def confirm_approve_order(call):
         bot.answer_callback_query(call.id, "⛔️ Access denied!")
         return
     
-    order_id = call.data.replace('confirm_approve_', '')
+    # Extract order_id (handle both confirm_approve_ and approve_ prefix)
+    if call.data.startswith('confirm_approve_'):
+        order_id = call.data.replace('confirm_approve_', '')
+    else:
+        order_id = call.data.replace('approve_', '')
+    
     order_file = f'/etc/tunneling/bot/orders/{order_id}.json'
     
     if not os.path.exists(order_file):
