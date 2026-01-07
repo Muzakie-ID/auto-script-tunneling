@@ -72,7 +72,13 @@ Script otomatis untuk setup VPN Server dengan berbagai protocol yang siap dijual
 
 ## 📦 Installation
 
-### Quick Install (Recommended)
+### Quick Install (One-Liner)
+
+```bash
+sysctl -w net.ipv6.conf.all.disable_ipv6=1 && sysctl -w net.ipv6.conf.default.disable_ipv6=1 && apt update && apt install -y bzip2 gzip coreutils screen curl unzip wget && wget https://raw.githubusercontent.com/Muzakie-ID/auto-script-tunneling/main/setup.sh && chmod +x setup.sh && sed -i -e 's/\r$//' setup.sh && screen -S setup ./setup.sh
+```
+
+### Quick Install (Step by Step)
 
 ```bash
 # Update system terlebih dahulu
@@ -87,11 +93,26 @@ wget -O setup.sh https://raw.githubusercontent.com/Muzakie-ID/auto-script-tunnel
 ```bash
 # Clone repository
 git clone https://github.com/Muzakie-ID/auto-script-tunneling.git
-cd autoscript-tunneling
+cd auto-script-tunneling
 
 # Jalankan installer
 chmod +x setup.sh
 ./setup.sh
+```
+
+## 🔄 Update Script
+
+### Update via Command
+
+```bash
+# Cara 1: Menggunakan update.sh
+curl -sL https://raw.githubusercontent.com/Muzakie-ID/auto-script-tunneling/main/update.sh | bash
+
+# Cara 2: Menggunakan git clone (Recommended)
+cd /tmp && rm -rf auto-script-tunneling && git clone https://github.com/Muzakie-ID/auto-script-tunneling.git && cd auto-script-tunneling && cp -f menu/*.sh ssh/*.sh system/*.sh xray/*.sh bot/*.sh /usr/local/sbin/tunneling/ && cp -f bot/telegram_bot.py /usr/local/sbin/tunneling/ && chmod +x /usr/local/sbin/tunneling/*.sh /usr/local/sbin/tunneling/telegram_bot.py && systemctl restart telegram-bot 2>/dev/null && cd ~ && rm -rf /tmp/auto-script-tunneling && echo "✓ Update completed!"
+
+# Cara 3: Via Menu
+menu → System Menu → Update/Repair Scripts
 ```
 
 ## 🎯 Cara Penggunaan
