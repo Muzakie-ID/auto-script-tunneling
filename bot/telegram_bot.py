@@ -271,6 +271,217 @@ Thank you for your order! 🎉
     except Exception as e:
         bot.send_message(call.message.chat.id, f"✅ Approved but failed to notify user: {str(e)}")
 
+# Admin Manage Users
+@bot.message_handler(func=lambda message: message.text == '👥 Manage Users')
+def manage_users(message):
+    if message.from_user.id != ADMIN_ID:
+        bot.send_message(message.chat.id, "⛔️ Access denied!")
+        return
+    
+    markup = types.InlineKeyboardMarkup(row_width=2)
+    btn1 = types.InlineKeyboardButton("SSH Users", callback_data="users_ssh")
+    btn2 = types.InlineKeyboardButton("VMESS Users", callback_data="users_vmess")
+    btn3 = types.InlineKeyboardButton("VLESS Users", callback_data="users_vless")
+    btn4 = types.InlineKeyboardButton("TROJAN Users", callback_data="users_trojan")
+    markup.add(btn1, btn2, btn3, btn4)
+    
+    bot.send_message(
+        message.chat.id,
+        "👥 *MANAGE USERS*\n\nSelect protocol:",
+        parse_mode='Markdown',
+        reply_markup=markup
+    )
+
+# Admin Settings
+@bot.message_handler(func=lambda message: message.text == '⚙️ Settings')
+def admin_settings(message):
+    if message.from_user.id != ADMIN_ID:
+        bot.send_message(message.chat.id, "⛔️ Access denied!")
+        return
+    
+    # Get current config
+    auto_approve = config.get('auto_approve', False)
+    trial_enabled = config.get('trial_enabled', True)
+    
+    settings_text = f"""
+⚙️ *BOT SETTINGS*
+
+*Current Configuration:*
+• Auto Approve Orders: {"✅ ON" if auto_approve else "❌ OFF"}
+• Trial Accounts: {"✅ Enabled" if trial_enabled else "❌ Disabled"}
+• Admin ID: `{ADMIN_ID}`
+
+Use buttons below to toggle settings:
+    """
+    
+    markup = types.InlineKeyboardMarkup()
+    btn1 = types.InlineKeyboardButton(
+        f"Auto Approve: {'✅' if auto_approve else '❌'}",
+        callback_data="toggle_auto_approve"
+    )
+    btn2 = types.InlineKeyboardButton(
+        f"Trial Accounts: {'✅' if trial_enabled else '❌'}",
+        callback_data="toggle_trial"
+    )
+    btn3 = types.InlineKeyboardButton("💳 Payment Settings", callback_data="payment_settings")
+    btn4 = types.InlineKeyboardButton("💰 Edit Price List", callback_data="edit_prices")
+    markup.add(btn1)
+    markup.add(btn2)
+    markup.add(btn3, btn4)
+    
+    bot.send_message(message.chat.id, settings_text, parse_mode='Markdown', reply_markup=markup)
+
+# Handle settings callbacks
+@bot.callback_query_handler(func=lambda call: call.data == 'toggle_auto_approve')
+def toggle_auto_approve(call):
+    if call.from_user.id != ADMIN_ID:
+        bot.answer_callback_query(call.id, "⛔️ Access denied!")
+        return
+    
+    config['auto_approve'] = not config.get('auto_approve', False)
+    
+    with open(CONFIG_FILE, 'w') as f:
+        json.dump(config, f, indent=2)
+    
+    bot.answer_callback_query(call.id, f"Auto approve: {'ON' if config['auto_approve'] else 'OFF'}")
+    admin_settings(call.message)
+
+@bot.callback_query_handler(func=lambda call: call.data == 'toggle_trial')
+def toggle_trial(call):
+    if call.from_user.id != ADMIN_ID:
+        bot.answer_callback_query(call.id, "⛔️ Access denied!")
+        return
+    
+    config['trial_enabled'] = not config.get('trial_enabled', True)
+    
+    with open(CONFIG_FILE, 'w') as f:
+        json.dump(config, f, indent=2)
+    
+    bot.answer_callback_query(call.id, f"Trial accounts: {'Enabled' if config['trial_enabled'] else 'Disabled'}")
+    admin_settings(call.message)
+
+# Admin Create Account
+@bot.message_handler(func=lambda message: message.text == '📦 Create Account')
+def create_account_menu(message):
+    if message.from_user.id != ADMIN_ID:
+        bot.send_message(message.chat.id, "⛔️ Access denied!")
+        return
+    
+    markup = types.InlineKeyboardMarkup(row_width=2)
+    btn1 = types.InlineKeyboardButton("SSH Account", callback_data="create_ssh")
+    btn2 = types.InlineKeyboardButton("VMESS Account", callback_data="create_vmess")
+    btn3 = types.InlineKeyboardButton("VLESS Account", callback_data="create_vless")
+    btn4 = types.InlineKeyboardButton("TROJAN Account", callback_data="create_trojan")
+    markup.add(btn1, btn2, btn3, btn4)
+    
+    bot.send_message(
+        message.chat.id,
+        "📦 *CREATE ACCOUNT*\n\nSelect protocol:",
+        parse_mode='Markdown',
+        reply_markup=markup
+    )
+
+# Admin Statistics
+@bot.message_handler(func=lambda message: message.text == '📈 Statistics')
+def admin_statistics(message):
+    if message.from_user.id != ADMIN_ID:
+        bot.send_message(message.chat.id, "⛔️ Access denied!")
+        return
+    
+    # Count total accounts
+    ssh_count = len([f for f in os.listdir('/etc/tunneling/ssh') if f.endswith('.json')]) if os.path.exists('/etc/tunneling/ssh') else 0
+    vmess_count = len([f for f in os.listdir('/etc/tunneling/vmess') if f.endswith('.json')]) if os.path.exists('/etc/tunneling/vmess') else 0
+    vless_count = len([f for f in os.listdir('/etc/tunneling/vless') if f.endswith('.json')]) if os.path.exists('/etc/tunneling/vless') else 0
+    trojan_count = len([f for f in os.listdir('/etc/tunneling/trojan') if f.endswith('.json')]) if os.path.exists('/etc/tunneling/trojan') else 0
+    
+    # Count orders
+    orders_dir = '/etc/tunneling/bot/orders'
+    total_orders = 0
+    pending_orders = 0
+    approved_orders = 0
+    total_revenue = 0
+    
+    if os.path.exists(orders_dir):
+        for f in os.listdir(orders_dir):
+            if f.endswith('.json'):
+                with open(f'{orders_dir}/{f}', 'r') as file:
+                    order = json.load(file)
+                    total_orders += 1
+                    if order['status'] == 'pending':
+                        pending_orders += 1
+                    elif order['status'] == 'approved':
+                        approved_orders += 1
+                        total_revenue += order['price']
+    
+    stats_text = f"""
+📈 *STATISTICS*
+
+*Active Accounts:*
+• SSH: {ssh_count}
+• VMESS: {vmess_count}
+• VLESS: {vless_count}
+• TROJAN: {trojan_count}
+• Total: {ssh_count + vmess_count + vless_count + trojan_count}
+
+*Orders:*
+• Total Orders: {total_orders}
+• Pending: {pending_orders}
+• Approved: {approved_orders}
+
+*Revenue:*
+• Total: Rp{total_revenue:,}
+    """
+    
+    bot.send_message(message.chat.id, stats_text, parse_mode='Markdown')
+
+# Admin Broadcast
+@bot.message_handler(func=lambda message: message.text == '🔔 Broadcast')
+def broadcast_menu(message):
+    if message.from_user.id != ADMIN_ID:
+        bot.send_message(message.chat.id, "⛔️ Access denied!")
+        return
+    
+    msg = bot.send_message(
+        message.chat.id,
+        "🔔 *BROADCAST MESSAGE*\n\nSend the message you want to broadcast to all users:",
+        parse_mode='Markdown'
+    )
+    bot.register_next_step_handler(msg, broadcast_process)
+
+def broadcast_process(message):
+    if message.from_user.id != ADMIN_ID:
+        return
+    
+    broadcast_text = message.text
+    
+    # Get all user IDs from orders
+    user_ids = set()
+    orders_dir = '/etc/tunneling/bot/orders'
+    
+    if os.path.exists(orders_dir):
+        for f in os.listdir(orders_dir):
+            if f.endswith('.json'):
+                with open(f'{orders_dir}/{f}', 'r') as file:
+                    order = json.load(file)
+                    user_ids.add(order['user_id'])
+    
+    success = 0
+    failed = 0
+    
+    bot.send_message(message.chat.id, f"📤 Broadcasting to {len(user_ids)} users...")
+    
+    for user_id in user_ids:
+        try:
+            bot.send_message(user_id, f"📢 *ANNOUNCEMENT*\n\n{broadcast_text}", parse_mode='Markdown')
+            success += 1
+        except:
+            failed += 1
+    
+    bot.send_message(
+        message.chat.id,
+        f"✅ Broadcast complete!\n\nSuccess: {success}\nFailed: {failed}"
+    )
+
 # Order command
 @bot.message_handler(func=lambda message: message.text == '📦 Order')
 @bot.message_handler(commands=['order'])
