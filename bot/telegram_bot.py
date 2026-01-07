@@ -344,7 +344,44 @@ def toggle_auto_approve(call):
         json.dump(config, f, indent=2)
     
     bot.answer_callback_query(call.id, f"Auto approve: {'ON' if config['auto_approve'] else 'OFF'}")
-    admin_settings(call.message)
+    
+    # Update settings display
+    auto_approve = config.get('auto_approve', False)
+    trial_enabled = config.get('trial_enabled', True)
+    
+    settings_text = f"""
+⚙️ *BOT SETTINGS*
+
+*Current Configuration:*
+• Auto Approve Orders: {"✅ ON" if auto_approve else "❌ OFF"}
+• Trial Accounts: {"✅ Enabled" if trial_enabled else "❌ Disabled"}
+• Admin ID: `{ADMIN_ID}`
+
+Use buttons below to toggle settings:
+    """
+    
+    markup = types.InlineKeyboardMarkup()
+    btn1 = types.InlineKeyboardButton(
+        f"Auto Approve: {'✅' if auto_approve else '❌'}",
+        callback_data="toggle_auto_approve"
+    )
+    btn2 = types.InlineKeyboardButton(
+        f"Trial Accounts: {'✅' if trial_enabled else '❌'}",
+        callback_data="toggle_trial"
+    )
+    btn3 = types.InlineKeyboardButton("💳 Payment Settings", callback_data="payment_settings")
+    btn4 = types.InlineKeyboardButton("💰 Edit Price List", callback_data="edit_prices")
+    markup.add(btn1)
+    markup.add(btn2)
+    markup.add(btn3, btn4)
+    
+    bot.edit_message_text(
+        settings_text,
+        call.message.chat.id,
+        call.message.message_id,
+        parse_mode='Markdown',
+        reply_markup=markup
+    )
 
 @bot.callback_query_handler(func=lambda call: call.data == 'toggle_trial')
 def toggle_trial(call):
@@ -358,7 +395,44 @@ def toggle_trial(call):
         json.dump(config, f, indent=2)
     
     bot.answer_callback_query(call.id, f"Trial accounts: {'Enabled' if config['trial_enabled'] else 'Disabled'}")
-    admin_settings(call.message)
+    
+    # Update settings display
+    auto_approve = config.get('auto_approve', False)
+    trial_enabled = config.get('trial_enabled', True)
+    
+    settings_text = f"""
+⚙️ *BOT SETTINGS*
+
+*Current Configuration:*
+• Auto Approve Orders: {"✅ ON" if auto_approve else "❌ OFF"}
+• Trial Accounts: {"✅ Enabled" if trial_enabled else "❌ Disabled"}
+• Admin ID: `{ADMIN_ID}`
+
+Use buttons below to toggle settings:
+    """
+    
+    markup = types.InlineKeyboardMarkup()
+    btn1 = types.InlineKeyboardButton(
+        f"Auto Approve: {'✅' if auto_approve else '❌'}",
+        callback_data="toggle_auto_approve"
+    )
+    btn2 = types.InlineKeyboardButton(
+        f"Trial Accounts: {'✅' if trial_enabled else '❌'}",
+        callback_data="toggle_trial"
+    )
+    btn3 = types.InlineKeyboardButton("💳 Payment Settings", callback_data="payment_settings")
+    btn4 = types.InlineKeyboardButton("💰 Edit Price List", callback_data="edit_prices")
+    markup.add(btn1)
+    markup.add(btn2)
+    markup.add(btn3, btn4)
+    
+    bot.edit_message_text(
+        settings_text,
+        call.message.chat.id,
+        call.message.message_id,
+        parse_mode='Markdown',
+        reply_markup=markup
+    )
 
 # Admin Create Account
 @bot.message_handler(func=lambda message: message.text == '📦 Create Account')
