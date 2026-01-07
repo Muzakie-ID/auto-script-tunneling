@@ -21,20 +21,25 @@ echo ""
 
 # Backup before update
 echo -e "${CYAN}[INFO]${NC} Creating backup before update..."
-BACKUP_FILE="/etc/tunneling/backup/pre-update-$(date +%Y%m%d-%H%M%S).tar.gz"
-tar -czf $BACKUP_FILE \
-    /etc/tunneling \
-    /usr/local/sbin/tunneling \
-    2>/dev/null
 
-if [ $? -eq 0 ]; then
-    echo -e "${GREEN}[✓]${NC} Backup created: $(basename $BACKUP_FILE)"
-else
-    echo -e "${RED}[✗]${NC} Backup failed!"
-    read -p "Continue without backup? (yes/no): " confirm
-    if [[ $confirm != "yes" ]]; then
-        exit 1
+# Create backup directory if not exists
+mkdir -p /etc/tunneling/backup
+
+BACKUP_FILE="/etc/tunneling/backup/pre-update-$(date +%Y%m%d-%H%M%S).tar.gz"
+
+# Backup with error handling
+if [ -d "/usr/local/sbin/tunneling" ]; then
+    tar -czf "$BACKUP_FILE" \
+        -C /usr/local/sbin tunneling \
+        2>/dev/null
+    
+    if [ $? -eq 0 ] && [ -f "$BACKUP_FILE" ]; then
+        echo -e "${GREEN}[✓]${NC} Backup created: $(basename $BACKUP_FILE)"
+    else
+        echo -e "${YELLOW}[!]${NC} Backup skipped (optional)"
     fi
+else
+    echo -e "${YELLOW}[!]${NC} No existing installation found, skipping backup"
 fi
 
 echo ""
