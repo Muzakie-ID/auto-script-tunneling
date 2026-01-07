@@ -237,6 +237,9 @@ def confirm_approve_order(call):
     # Create account
     import random
     import string
+    import uuid as uuid_lib
+    import base64
+    
     username = f"user{''.join(random.choices(string.ascii_lowercase + string.digits, k=6))}"
     password = ''.join(random.choices(string.ascii_letters + string.digits, k=10))
     
@@ -253,6 +256,14 @@ def confirm_approve_order(call):
     elif protocol == 'trojan':
         os.system(f"/usr/local/sbin/tunneling/trojan-create.sh {username} {password} {days} >/dev/null 2>&1")
     
+    # Read account details from JSON
+    account_data = {}
+    if protocol in ['vmess', 'vless', 'trojan']:
+        account_file = f'/etc/tunneling/{protocol}/{username}.json'
+        if os.path.exists(account_file):
+            with open(account_file, 'r') as f:
+                account_data = json.load(f)
+    
     # Update order
     order['status'] = 'approved'
     order['username'] = username
@@ -265,10 +276,170 @@ def confirm_approve_order(call):
     if os.path.exists('/root/domain.txt'):
         with open('/root/domain.txt', 'r') as f:
             domain = f.read().strip()
+    elif os.path.exists('/etc/xray/domain'):
+        with open('/etc/xray/domain', 'r') as f:
+            domain = f.read().strip()
     
-    # Send to user
+    # Build user message based on protocol
     pkg_info = PRICES[order['package']]
-    user_text = f"""
+    
+    if protocol == 'ssh':
+        user_text = f"""
+✅ *PESANAN DISETUJUI*
+
+Pesanan Anda telah disetujui!
+
+📦 Paket: {pkg_info['name']}
+🔐 Protokol: SSH/OpenVPN
+👤 Username: `{username}`
+🔑 Password: `{password}`
+🌐 Domain: `{domain}`
+⏰ Expired: {days} Hari
+
+*Port SSH:*
+• OpenSSH: 22
+• Dropbear: 109, 143
+• SSL/TLS: 442, 443
+• Squid Proxy: 3128, 8080
+
+*WebSocket:*
+• WS HTTP: `ws://{domain}:80/ssh`
+• WS HTTPS: `wss://{domain}:443/ssh`
+
+*Payload Config:*
+```
+GET / HTTP/1.1[crlf]Host: {domain}[crlf]Upgrade: websocket[crlf][crlf]
+```
+
+Terima kasih! 🎉
+        """
+    
+    elif protocol == 'vmess':
+        uuid = account_data.get('uuid', 'N/A')
+        
+        # Generate vmess:// link
+        vmess_config = {
+            "v": "2",
+            "ps": f"{username}",
+            "add": domain,
+            "port": "443",
+            "id": uuid,
+            "aid": "0",
+            "net": "ws",
+            "path": "/vmess",
+            "type": "none",
+            "host": domain,
+            "tls": "tls"
+        }
+        vmess_json = json.dumps(vmess_config)
+        vmess_link = "vmess://" + base64.b64encode(vmess_json.encode()).decode()
+        
+        user_text = f"""
+✅ *PESANAN DISETUJUI*
+
+Pesanan Anda telah disetujui!
+
+📦 Paket: {pkg_info['name']}
+🔐 Protokol: VMESS
+👤 Username: `{username}`
+🆔 UUID: `{uuid}`
+🌐 Domain: `{domain}`
+⏰ Expired: {days} Hari
+
+*Detail Koneksi:*
+• Address: `{domain}`
+• Port: 443 (TLS) / 80 (HTTP)
+• ID/UUID: `{uuid}`
+• AlterID: 0
+• Security: auto
+• Network: WebSocket
+• Path: `/vmess`
+• TLS: ON
+
+*Import Config:*
+```
+{vmess_link}
+```
+
+Copy link di atas ke aplikasi V2Ray/V2RayNG!
+
+Terima kasih! 🎉
+        """
+    
+    elif protocol == 'vless':
+        uuid = account_data.get('uuid', 'N/A')
+        
+        # Generate vless:// link
+        vless_link = f"vless://{uuid}@{domain}:443?type=ws&security=tls&path=/vless&host={domain}#{username}"
+        
+        user_text = f"""
+✅ *PESANAN DISETUJUI*
+
+Pesanan Anda telah disetujui!
+
+📦 Paket: {pkg_info['name']}
+🔐 Protokol: VLESS
+👤 Username: `{username}`
+🆔 UUID: `{uuid}`
+🌐 Domain: `{domain}`
+⏰ Expired: {days} Hari
+
+*Detail Koneksi:*
+• Address: `{domain}`
+• Port: 443 (TLS) / 80 (HTTP)
+• ID/UUID: `{uuid}`
+• Encryption: none
+• Network: WebSocket
+• Path: `/vless`
+• TLS: ON
+
+*Import Config:*
+```
+{vless_link}
+```
+
+Copy link di atas ke aplikasi V2Ray/V2RayNG!
+
+Terima kasih! 🎉
+        """
+    
+    elif protocol == 'trojan':
+        trojan_password = account_data.get('password', password)
+        
+        # Generate trojan:// link
+        trojan_link = f"trojan://{trojan_password}@{domain}:443?type=ws&security=tls&path=/trojan&host={domain}#{username}"
+        
+        user_text = f"""
+✅ *PESANAN DISETUJUI*
+
+Pesanan Anda telah disetujui!
+
+📦 Paket: {pkg_info['name']}
+🔐 Protokol: TROJAN
+👤 Username: `{username}`
+🔑 Password: `{trojan_password}`
+🌐 Domain: `{domain}`
+⏰ Expired: {days} Hari
+
+*Detail Koneksi:*
+• Address: `{domain}`
+• Port: 443 (TLS)
+• Password: `{trojan_password}`
+• Network: WebSocket
+• Path: `/trojan`
+• TLS: ON
+
+*Import Config:*
+```
+{trojan_link}
+```
+
+Copy link di atas ke aplikasi V2Ray/V2RayNG!
+
+Terima kasih! 🎉
+        """
+    else:
+        user_text = f"""
 ✅ *PAYMENT APPROVED*
 
 Your order has been approved!
@@ -276,12 +447,12 @@ Your order has been approved!
 📦 Package: {pkg_info['name']}
 🔐 Protocol: {protocol.upper()}
 👤 Username: `{username}`
-🔑 Password: `{password if protocol in ['ssh', 'trojan'] else 'N/A (UUID-based)'}`
+🔑 Password: `{password}`
 🌐 Domain: `{domain}`
 ⏰ Expired: {days} Days
 
 Thank you for your order! 🎉
-    """
+        """
     
     try:
         bot.send_message(order['user_id'], user_text, parse_mode='Markdown')
