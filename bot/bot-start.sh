@@ -23,56 +23,26 @@ if [ ! -f "/etc/tunneling/bot/config.json" ]; then
     exit 1
 fi
 
-# Check virtual environment
-BOT_VENV="/opt/telegram-bot-venv"
-echo -e "${CYAN}Checking Python virtual environment...${NC}"
-
-if [ ! -d "$BOT_VENV" ]; then
-    echo -e "${YELLOW}Virtual environment not found. Creating...${NC}"
+# Check if bot is already running
+if systemctl is-active --quiet telegram-bot; then
+    echo -e "${GREEN}✓ Bot is already running!${NC}"
+    echo ""
+    systemctl status telegram-bot --no-pager
+else
+    # Bot not running, check virtual environment
+    BOT_VENV="/opt/telegram-bot-venv"
     
-    # Install required packages
-    apt-get update > /dev/null 2>&1
-    apt-get install -y python3 python3-pip python3-venv python3-full > /dev/null 2>&1
-    
-    # Create virtual environment
-    python3 -m venv "$BOT_VENV"
-    
-    # Install packages
-    echo -e "${YELLOW}Installing Python packages in virtual environment...${NC}"
-    "$BOT_VENV/bin/pip" install --upgrade pip > /dev/null 2>&1
-    "$BOT_VENV/bin/pip" install pytelegrambotapi requests > /dev/null 2>&1
-    
-    sleep 2
-fi
-
-# Check if packages are installed in venv
-if ! "$BOT_VENV/bin/python" -c "import telebot" 2>/dev/null; then
-    echo -e "${YELLOW}Installing missing packages in virtual environment...${NC}"
-    "$BOT_VENV/bin/pip" install pytelegrambotapi requests > /dev/null 2>&1
-    
-    # Verify installation
-    if ! "$BOT_VENV/bin/python" -c "import telebot" 2>/dev/null; then
-        echo -e "${RED}✗ Failed to install Python packages${NC}"
-        echo ""
-        echo -e "${YELLOW}Please try manual installation:${NC}"
-        echo "  sudo apt-get install -y python3-venv python3-full"
-        echo "  sudo python3 -m venv $BOT_VENV"
-        echo "  sudo $BOT_VENV/bin/pip install pytelegrambotapi requests"
+    # Check if venv and packages exist
+    if [ ! -d "$BOT_VENV" ] || ! "$BOT_VENV/bin/python" -c "import telebot" 2>/dev/null; then
+        echo -e "${RED}✗ Virtual environment not properly configured!${NC}"
+        echo -e "${YELLOW}Please run Setup Bot Telegram first (option 1)${NC}"
         echo ""
         read -p "Press [Enter] to continue..."
         /usr/local/sbin/tunneling/bot-menu.sh
         exit 1
     fi
-fi
-echo -e "${GREEN}✓ Virtual environment ready${NC}"
-echo ""
-
-# Check if bot is already running
-if systemctl is-active --quiet telegram-bot; then
-    echo -e "${YELLOW}Bot is already running!${NC}"
-    echo ""
-    systemctl status telegram-bot --no-pager
-else
+    
+    # Start bot
     echo -e "${YELLOW}Starting bot...${NC}"
     systemctl start telegram-bot
     sleep 2
