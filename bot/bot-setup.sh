@@ -51,20 +51,29 @@ EOF
 # Install Python and pip if not installed
 echo -e "${CYAN}[INFO]${NC} Checking Python dependencies..."
 apt-get update > /dev/null 2>&1
-apt-get install -y python3 python3-pip > /dev/null 2>&1
+apt-get install -y python3 python3-pip python3-venv python3-full > /dev/null 2>&1
 
-# Install Python dependencies
-echo -e "${CYAN}[INFO]${NC} Installing Python packages..."
-pip3 install --upgrade pip > /dev/null 2>&1
-pip3 install pytelegrambotapi requests > /dev/null 2>&1
+# Create virtual environment for bot
+BOT_VENV="/opt/telegram-bot-venv"
+echo -e "${CYAN}[INFO]${NC} Creating virtual environment..."
+if [ -d "$BOT_VENV" ]; then
+    rm -rf "$BOT_VENV"
+fi
+python3 -m venv "$BOT_VENV"
+
+# Install Python dependencies in virtual environment
+echo -e "${CYAN}[INFO]${NC} Installing Python packages in virtual environment..."
+"$BOT_VENV/bin/pip" install --upgrade pip > /dev/null 2>&1
+"$BOT_VENV/bin/pip" install pytelegrambotapi requests > /dev/null 2>&1
 
 # Verify installation
-if python3 -c "import telebot" 2>/dev/null; then
+if "$BOT_VENV/bin/python" -c "import telebot" 2>/dev/null; then
     echo -e "${GREEN}✓ Python packages installed successfully${NC}"
 else
     echo -e "${RED}✗ Failed to install Python packages${NC}"
-    echo -e "${YELLOW}Trying alternative installation method...${NC}"
-    python3 -m pip install pytelegrambotapi requests
+    echo -e "${YELLOW}Please install manually:${NC}"
+    echo "  sudo $BOT_VENV/bin/pip install pytelegrambotapi requests"
+    exit 1
 fi
 
 # Copy bot script
@@ -80,7 +89,7 @@ After=network.target
 Type=simple
 User=root
 WorkingDirectory=/etc/tunneling/bot
-ExecStart=/usr/bin/python3 /etc/tunneling/bot/telegram_bot.py
+ExecStart=/opt/telegram-bot-venv/bin/python /etc/tunneling/bot/telegram_bot.py
 Restart=always
 RestartSec=10
 
