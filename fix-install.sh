@@ -71,6 +71,7 @@ wget -q -O setup-stunnel.sh "${BASE_URL}/ssh/setup-stunnel.sh"
 wget -q -O setup-squid.sh "${BASE_URL}/ssh/setup-squid.sh"
 
 echo -e "${CYAN}[3/4]${NC} Downloading system scripts..."
+# System monitoring and management
 wget -q -O check-services.sh "${BASE_URL}/system/check-services.sh"
 wget -q -O monitor-vps.sh "${BASE_URL}/system/monitor-vps.sh"
 wget -q -O backup-now.sh "${BASE_URL}/system/backup-now.sh"
@@ -86,6 +87,18 @@ wget -q -O limit-speed.sh "${BASE_URL}/system/limit-speed.sh"
 wget -q -O monitor-service.sh "${BASE_URL}/system/monitor-service.sh"
 wget -q -O check-logs.sh "${BASE_URL}/system/check-logs.sh"
 wget -q -O auto-reboot-settings.sh "${BASE_URL}/system/auto-reboot-settings.sh"
+
+# Settings menu scripts
+wget -q -O change-domain.sh "${BASE_URL}/system/change-domain.sh"
+wget -q -O change-banner.sh "${BASE_URL}/system/change-banner.sh"
+wget -q -O change-port.sh "${BASE_URL}/system/change-port.sh"
+wget -q -O change-timezone.sh "${BASE_URL}/system/change-timezone.sh"
+wget -q -O fix-error-domain.sh "${BASE_URL}/system/fix-error-domain.sh"
+wget -q -O fix-error-proxy.sh "${BASE_URL}/system/fix-error-proxy.sh"
+wget -q -O renew-ssl.sh "${BASE_URL}/system/renew-ssl.sh"
+wget -q -O auto-record-wildcard.sh "${BASE_URL}/system/auto-record-wildcard.sh"
+wget -q -O limit-speed-settings.sh "${BASE_URL}/system/limit-speed-settings.sh"
+wget -q -O reset-settings.sh "${BASE_URL}/system/reset-settings.sh"
 
 echo -e "${CYAN}[4/5]${NC} Downloading XRAY scripts..."
 wget -q -O setup-xray.sh "${BASE_URL}/xray/setup-xray.sh"
