@@ -23,7 +23,8 @@ if not config.get('token'):
     sys.exit(1)
 
 bot = telebot.TeleBot(config['token'])
-ADMIN_ID = config.get('admin_id', '')
+# Convert admin_id to integer for proper comparison
+ADMIN_ID = int(config.get('admin_id', 0))
 
 # Price list
 PRICES = {
@@ -40,10 +41,10 @@ PRICES = {
 # Start command
 @bot.message_handler(commands=['start'])
 def start(message):
-    user_id = str(message.from_user.id)
+    user_id = message.from_user.id
     
     # Check if user is admin
-    if user_id == str(ADMIN_ID):
+    if user_id == ADMIN_ID:
         # Admin menu
         markup = types.ReplyKeyboardMarkup(resize_keyboard=True, row_width=2)
         btn1 = types.KeyboardButton('📊 Dashboard')
@@ -106,7 +107,7 @@ Choose an option from the menu below:
 # Admin Dashboard
 @bot.message_handler(func=lambda message: message.text == '📊 Dashboard')
 def admin_dashboard(message):
-    if str(message.from_user.id) != str(ADMIN_ID):
+    if message.from_user.id != ADMIN_ID:
         bot.send_message(message.chat.id, "⛔️ Access denied!")
         return
     
@@ -139,7 +140,7 @@ def admin_dashboard(message):
 # Admin Approve Orders
 @bot.message_handler(func=lambda message: message.text == '✅ Approve Orders')
 def approve_orders_menu(message):
-    if str(message.from_user.id) != str(ADMIN_ID):
+    if message.from_user.id != ADMIN_ID:
         bot.send_message(message.chat.id, "⛔️ Access denied!")
         return
     
@@ -179,7 +180,7 @@ def approve_orders_menu(message):
 # Handle approve callback
 @bot.callback_query_handler(func=lambda call: call.data.startswith('approve_'))
 def handle_approve(call):
-    if str(call.from_user.id) != str(ADMIN_ID):
+    if call.from_user.id != ADMIN_ID:
         bot.answer_callback_query(call.id, "⛔️ Access denied!")
         return
     
@@ -200,7 +201,7 @@ def handle_approve(call):
 # Confirm approve
 @bot.callback_query_handler(func=lambda call: call.data.startswith('confirm_approve_'))
 def confirm_approve_order(call):
-    if str(call.from_user.id) != str(ADMIN_ID):
+    if call.from_user.id != ADMIN_ID:
         bot.answer_callback_query(call.id, "⛔️ Access denied!")
         return
     
@@ -515,7 +516,7 @@ def price_list(message):
 # Admin commands
 @bot.message_handler(commands=['approve'])
 def approve_order(message):
-    if str(message.from_user.id) != str(ADMIN_ID):
+    if message.from_user.id != ADMIN_ID:
         bot.send_message(message.chat.id, "⛔️ Access denied!")
         return
     
