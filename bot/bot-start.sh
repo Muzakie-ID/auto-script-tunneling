@@ -27,11 +27,31 @@ fi
 echo -e "${CYAN}Checking Python dependencies...${NC}"
 if ! python3 -c "import telebot" 2>/dev/null; then
     echo -e "${YELLOW}Installing missing Python packages...${NC}"
-    pip3 install pytelegrambotapi requests > /dev/null 2>&1
     
+    # Update package manager
+    apt-get update > /dev/null 2>&1
+    
+    # Install pip if not exists
+    if ! command -v pip3 &> /dev/null; then
+        echo -e "${YELLOW}Installing pip3...${NC}"
+        apt-get install -y python3-pip > /dev/null 2>&1
+    fi
+    
+    # Try multiple installation methods
+    pip3 install pytelegrambotapi requests 2>&1 | grep -v "WARNING" || \
+    python3 -m pip install pytelegrambotapi requests 2>&1 | grep -v "WARNING" || \
+    apt-get install -y python3-pip && pip3 install pytelegrambotapi requests 2>&1 | grep -v "WARNING"
+    
+    sleep 2
+    
+    # Verify installation
     if ! python3 -c "import telebot" 2>/dev/null; then
         echo -e "${RED}✗ Failed to install Python packages${NC}"
-        echo -e "${YELLOW}Please run Setup Bot Telegram first (option 1)${NC}"
+        echo ""
+        echo -e "${YELLOW}Please try manual installation:${NC}"
+        echo "  sudo apt-get update"
+        echo "  sudo apt-get install -y python3-pip"
+        echo "  sudo pip3 install pytelegrambotapi requests"
         echo ""
         read -p "Press [Enter] to continue..."
         /usr/local/sbin/tunneling/bot-menu.sh
