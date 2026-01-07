@@ -72,6 +72,24 @@ Script otomatis untuk setup VPN Server dengan berbagai protocol yang siap dijual
 
 ## 📦 Installation
 
+### ⚙️ Pre-Installation (Optional - Enable SSH Root Login)
+
+Jika VPS Anda belum enable SSH root login dengan password, jalankan script ini terlebih dahulu:
+
+```bash
+wget https://raw.githubusercontent.com/Muzakie-ID/auto-script-tunneling/main/system/enable-ssh-root.sh && chmod +x enable-ssh-root.sh && ./enable-ssh-root.sh
+```
+
+Script ini akan:
+- ✅ Enable SSH root login
+- ✅ Set password untuk root user
+- ✅ Display IP, username, password untuk login
+- ✅ Auto restart SSH service
+
+**⚠️ Note:** Lewati step ini jika Anda sudah bisa login sebagai root dengan password.
+
+---
+
 ### Quick Install (One-Liner)
 
 ```bash
