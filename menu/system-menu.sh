@@ -21,11 +21,12 @@ echo -e "${GREEN}  [7]${NC} Limit Speed VPS"
 echo -e "${GREEN}  [8]${NC} Monitor Service Status"
 echo -e "${GREEN}  [9]${NC} Check Logs"
 echo -e "${GREEN} [10]${NC} Auto Reboot Settings"
+echo -e "${GREEN} [11]${NC} Update/Repair Scripts"
 echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
 echo -e "${RED}  [0]${NC} Back to Main Menu"
 echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
 echo ""
-read -p "Select Menu [0-10]: " menu
+read -p "Select Menu [0-11]: " menu
 
 case $menu in
     1)
@@ -57,6 +58,9 @@ case $menu in
         ;;
     10)
         /usr/local/sbin/tunneling/auto-reboot-settings.sh
+        ;;
+    11)
+        /usr/local/sbin/tunneling/fix-install.sh
         ;;
     0)
         /usr/local/sbin/tunneling/main-menu.sh
