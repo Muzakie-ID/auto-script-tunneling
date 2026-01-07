@@ -863,12 +863,13 @@ Scan QRIS below to pay:
     
     # Ask for proof
     markup = types.InlineKeyboardMarkup()
-    btn = types.InlineKeyboardButton("✅ Upload Proof", callback_data=f"proof_{order_id}")
+    btn = types.InlineKeyboardButton("💸 Upload Pembayaran", callback_data=f"proof_{order_id}")
     markup.add(btn)
     
     bot.send_message(
         call.message.chat.id,
-        "After payment, please upload your payment proof:",
+        "💸 *UPLOAD BUKTI PEMBAYARAN*\n\nSetelah melakukan pembayaran, klik tombol di bawah untuk upload bukti transfer:",
+        parse_mode='Markdown',
         reply_markup=markup
     )
     
@@ -878,6 +879,87 @@ Scan QRIS below to pay:
             ADMIN_ID,
             f"🆕 NEW ORDER\n\nOrder ID: {order_id}\nUser: @{call.from_user.username}\nPackage: {info['name']}\nPrice: Rp{info['price']:,}"
         )
+
+# Handle upload proof callback
+@bot.callback_query_handler(func=lambda call: call.data.startswith('proof_'))
+def upload_proof_prompt(call):
+    order_id = call.data.replace('proof_', '')
+    
+    bot.answer_callback_query(call.id)
+    msg = bot.send_message(
+        call.message.chat.id,
+        "💸 *UPLOAD BUKTI PEMBAYARAN*\n\nSilakan kirim foto/gambar bukti transfer Anda sekarang:",
+        parse_mode='Markdown'
+    )
+    bot.register_next_step_handler(msg, lambda m: process_payment_proof(m, order_id))
+
+def process_payment_proof(message, order_id):
+    if not message.photo:
+        bot.send_message(message.chat.id, "❌ Mohon kirim gambar bukti pembayaran!")
+        return
+    
+    order_file = f'/etc/tunneling/bot/orders/{order_id}.json'
+    
+    if not os.path.exists(order_file):
+        bot.send_message(message.chat.id, "❌ Order tidak ditemukan!")
+        return
+    
+    # Download photo
+    file_info = bot.get_file(message.photo[-1].file_id)
+    downloaded_file = bot.download_file(file_info.file_path)
+    
+    # Save proof
+    proof_path = f'/etc/tunneling/bot/orders/{order_id}_proof.jpg'
+    with open(proof_path, 'wb') as f:
+        f.write(downloaded_file)
+    
+    # Update order
+    with open(order_file, 'r') as f:
+        order = json.load(f)
+    
+    order['proof_uploaded'] = True
+    order['proof_path'] = proof_path
+    order['proof_uploaded_at'] = datetime.now().isoformat()
+    
+    with open(order_file, 'w') as f:
+        json.dump(order, f, indent=2)
+    
+    bot.send_message(
+        message.chat.id,
+        "✅ *BUKTI PEMBAYARAN DITERIMA*\n\nTerima kasih! Bukti pembayaran Anda sudah kami terima.\nPesanan akan diproses segera oleh admin.",
+        parse_mode='Markdown'
+    )
+    
+    # Notify admin with proof
+    if ADMIN_ID:
+        pkg_info = PRICES.get(order['package'], {})
+        admin_text = f"""
+💸 *BUKTI PEMBAYARAN DITERIMA*
+
+Order ID: `{order_id}`
+User: @{message.from_user.username}
+Package: {pkg_info.get('name', 'Unknown')}
+Price: Rp{order['price']:,}
+
+Bukti pembayaran:
+        """
+        
+        try:
+            with open(proof_path, 'rb') as photo:
+                markup = types.InlineKeyboardMarkup()
+                btn_approve = types.InlineKeyboardButton("✅ Approve", callback_data=f"approve_{order_id}")
+                btn_reject = types.InlineKeyboardButton("❌ Reject", callback_data=f"reject_{order_id}")
+                markup.add(btn_approve, btn_reject)
+                
+                bot.send_photo(
+                    ADMIN_ID,
+                    photo,
+                    caption=admin_text,
+                    parse_mode='Markdown',
+                    reply_markup=markup
+                )
+        except Exception as e:
+            bot.send_message(ADMIN_ID, f"{admin_text}\nGagal mengirim foto: {str(e)}")
 
 # Trial command
 @bot.message_handler(func=lambda message: message.text == '✅ Trial')
