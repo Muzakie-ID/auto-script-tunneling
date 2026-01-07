@@ -434,6 +434,193 @@ Use buttons below to toggle settings:
         reply_markup=markup
     )
 
+# Handle payment settings callback
+@bot.callback_query_handler(func=lambda call: call.data == 'payment_settings')
+def payment_settings(call):
+    if call.from_user.id != ADMIN_ID:
+        bot.answer_callback_query(call.id, "⛔️ Access denied!")
+        return
+    
+    bot.answer_callback_query(call.id)
+    
+    qris_path = '/etc/tunneling/bot/qris.jpg'
+    qris_exists = os.path.exists(qris_path)
+    
+    payment_text = f"""
+💳 *PAYMENT SETTINGS*
+
+*QRIS Status:* {"✅ Uploaded" if qris_exists else "❌ Not uploaded"}
+
+{"Current QRIS image:" if qris_exists else "No QRIS image yet. Please upload your QRIS payment image."}
+
+Use buttons below to manage payment:
+    """
+    
+    if qris_exists:
+        with open(qris_path, 'rb') as photo:
+            markup = types.InlineKeyboardMarkup()
+            btn1 = types.InlineKeyboardButton("🔄 Replace QRIS", callback_data="upload_qris")
+            btn2 = types.InlineKeyboardButton("🗑 Delete QRIS", callback_data="delete_qris")
+            btn3 = types.InlineKeyboardButton("« Back", callback_data="back_to_settings")
+            markup.add(btn1, btn2)
+            markup.add(btn3)
+            bot.send_photo(call.message.chat.id, photo, caption=payment_text, parse_mode='Markdown', reply_markup=markup)
+    else:
+        markup = types.InlineKeyboardMarkup()
+        btn1 = types.InlineKeyboardButton("📤 Upload QRIS", callback_data="upload_qris")
+        btn2 = types.InlineKeyboardButton("« Back", callback_data="back_to_settings")
+        markup.add(btn1)
+        markup.add(btn2)
+        bot.send_message(call.message.chat.id, payment_text, parse_mode='Markdown', reply_markup=markup)
+
+@bot.callback_query_handler(func=lambda call: call.data == 'upload_qris')
+def upload_qris_prompt(call):
+    if call.from_user.id != ADMIN_ID:
+        bot.answer_callback_query(call.id, "⛔️ Access denied!")
+        return
+    
+    bot.answer_callback_query(call.id)
+    msg = bot.send_message(
+        call.message.chat.id,
+        "📤 *UPLOAD QRIS IMAGE*\n\nPlease send your QRIS payment image now:",
+        parse_mode='Markdown'
+    )
+    bot.register_next_step_handler(msg, process_qris_upload)
+
+def process_qris_upload(message):
+    if message.from_user.id != ADMIN_ID:
+        return
+    
+    if not message.photo:
+        bot.send_message(message.chat.id, "❌ Please send an image file!")
+        return
+    
+    # Download photo
+    file_info = bot.get_file(message.photo[-1].file_id)
+    downloaded_file = bot.download_file(file_info.file_path)
+    
+    # Save to bot directory
+    qris_path = '/etc/tunneling/bot/qris.jpg'
+    with open(qris_path, 'wb') as f:
+        f.write(downloaded_file)
+    
+    bot.send_message(message.chat.id, "✅ QRIS image uploaded successfully!")
+
+@bot.callback_query_handler(func=lambda call: call.data == 'delete_qris')
+def delete_qris(call):
+    if call.from_user.id != ADMIN_ID:
+        bot.answer_callback_query(call.id, "⛔️ Access denied!")
+        return
+    
+    qris_path = '/etc/tunneling/bot/qris.jpg'
+    if os.path.exists(qris_path):
+        os.remove(qris_path)
+        bot.answer_callback_query(call.id, "QRIS deleted!")
+        bot.send_message(call.message.chat.id, "✅ QRIS image deleted successfully!")
+    else:
+        bot.answer_callback_query(call.id, "No QRIS found!")
+
+# Handle edit prices callback
+@bot.callback_query_handler(func=lambda call: call.data == 'edit_prices')
+def edit_prices_menu(call):
+    if call.from_user.id != ADMIN_ID:
+        bot.answer_callback_query(call.id, "⛔️ Access denied!")
+        return
+    
+    bot.answer_callback_query(call.id)
+    
+    price_text = """
+💰 *PRICE LIST*
+
+Select package to edit:
+    """
+    
+    markup = types.InlineKeyboardMarkup(row_width=1)
+    for key, value in PRICES.items():
+        btn = types.InlineKeyboardButton(
+            f"{value['name']} - Rp{value['price']:,}",
+            callback_data=f"editprice_{key}"
+        )
+        markup.add(btn)
+    
+    btn_back = types.InlineKeyboardButton("« Back", callback_data="back_to_settings")
+    markup.add(btn_back)
+    
+    bot.send_message(call.message.chat.id, price_text, parse_mode='Markdown', reply_markup=markup)
+
+@bot.callback_query_handler(func=lambda call: call.data.startswith('editprice_'))
+def edit_price_prompt(call):
+    if call.from_user.id != ADMIN_ID:
+        bot.answer_callback_query(call.id, "⛔️ Access denied!")
+        return
+    
+    package = call.data.replace('editprice_', '')
+    pkg_info = PRICES[package]
+    
+    bot.answer_callback_query(call.id)
+    msg = bot.send_message(
+        call.message.chat.id,
+        f"💰 *EDIT PRICE*\n\nPackage: {pkg_info['name']}\nCurrent Price: Rp{pkg_info['price']:,}\n\nSend new price (number only):",
+        parse_mode='Markdown'
+    )
+    bot.register_next_step_handler(msg, lambda m: process_price_edit(m, package))
+
+def process_price_edit(message, package):
+    if message.from_user.id != ADMIN_ID:
+        return
+    
+    try:
+        new_price = int(message.text.strip())
+        PRICES[package]['price'] = new_price
+        
+        # Save to config file (optional - you can save to a separate prices.json)
+        bot.send_message(
+            message.chat.id,
+            f"✅ Price updated!\n\n{PRICES[package]['name']}: Rp{new_price:,}"
+        )
+    except ValueError:
+        bot.send_message(message.chat.id, "❌ Invalid price! Please send numbers only.")
+
+@bot.callback_query_handler(func=lambda call: call.data == 'back_to_settings')
+def back_to_settings(call):
+    if call.from_user.id != ADMIN_ID:
+        bot.answer_callback_query(call.id, "⛔️ Access denied!")
+        return
+    
+    bot.answer_callback_query(call.id)
+    
+    # Show settings menu again
+    auto_approve = config.get('auto_approve', False)
+    trial_enabled = config.get('trial_enabled', True)
+    
+    settings_text = f"""
+⚙️ *BOT SETTINGS*
+
+*Current Configuration:*
+• Auto Approve Orders: {"✅ ON" if auto_approve else "❌ OFF"}
+• Trial Accounts: {"✅ Enabled" if trial_enabled else "❌ Disabled"}
+• Admin ID: `{ADMIN_ID}`
+
+Use buttons below to toggle settings:
+    """
+    
+    markup = types.InlineKeyboardMarkup()
+    btn1 = types.InlineKeyboardButton(
+        f"Auto Approve: {'✅' if auto_approve else '❌'}",
+        callback_data="toggle_auto_approve"
+    )
+    btn2 = types.InlineKeyboardButton(
+        f"Trial Accounts: {'✅' if trial_enabled else '❌'}",
+        callback_data="toggle_trial"
+    )
+    btn3 = types.InlineKeyboardButton("💳 Payment Settings", callback_data="payment_settings")
+    btn4 = types.InlineKeyboardButton("💰 Edit Price List", callback_data="edit_prices")
+    markup.add(btn1)
+    markup.add(btn2)
+    markup.add(btn3, btn4)
+    
+    bot.send_message(call.message.chat.id, settings_text, parse_mode='Markdown', reply_markup=markup)
+
 # Admin Create Account
 @bot.message_handler(func=lambda message: message.text == '📦 Create Account')
 def create_account_menu(message):
