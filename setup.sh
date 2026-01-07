@@ -174,6 +174,7 @@ wget -q -O setup-squid.sh "${BASE_URL}/ssh/setup-squid.sh" 2>/dev/null || curl -
 
 # Download system scripts
 echo -e "${CYAN}[INFO]${NC} Downloading system scripts..."
+# System monitoring and management
 wget -q -O check-services.sh "${BASE_URL}/system/check-services.sh" 2>/dev/null || curl -sL "${BASE_URL}/system/check-services.sh" -o check-services.sh
 wget -q -O monitor-vps.sh "${BASE_URL}/system/monitor-vps.sh" 2>/dev/null || curl -sL "${BASE_URL}/system/monitor-vps.sh" -o monitor-vps.sh
 wget -q -O backup-now.sh "${BASE_URL}/system/backup-now.sh" 2>/dev/null || curl -sL "${BASE_URL}/system/backup-now.sh" -o backup-now.sh
@@ -189,6 +190,18 @@ wget -q -O limit-speed.sh "${BASE_URL}/system/limit-speed.sh" 2>/dev/null || cur
 wget -q -O monitor-service.sh "${BASE_URL}/system/monitor-service.sh" 2>/dev/null || curl -sL "${BASE_URL}/system/monitor-service.sh" -o monitor-service.sh
 wget -q -O check-logs.sh "${BASE_URL}/system/check-logs.sh" 2>/dev/null || curl -sL "${BASE_URL}/system/check-logs.sh" -o check-logs.sh
 wget -q -O auto-reboot-settings.sh "${BASE_URL}/system/auto-reboot-settings.sh" 2>/dev/null || curl -sL "${BASE_URL}/system/auto-reboot-settings.sh" -o auto-reboot-settings.sh
+
+# Settings menu scripts
+wget -q -O change-domain.sh "${BASE_URL}/system/change-domain.sh" 2>/dev/null || curl -sL "${BASE_URL}/system/change-domain.sh" -o change-domain.sh
+wget -q -O change-banner.sh "${BASE_URL}/system/change-banner.sh" 2>/dev/null || curl -sL "${BASE_URL}/system/change-banner.sh" -o change-banner.sh
+wget -q -O change-port.sh "${BASE_URL}/system/change-port.sh" 2>/dev/null || curl -sL "${BASE_URL}/system/change-port.sh" -o change-port.sh
+wget -q -O change-timezone.sh "${BASE_URL}/system/change-timezone.sh" 2>/dev/null || curl -sL "${BASE_URL}/system/change-timezone.sh" -o change-timezone.sh
+wget -q -O fix-error-domain.sh "${BASE_URL}/system/fix-error-domain.sh" 2>/dev/null || curl -sL "${BASE_URL}/system/fix-error-domain.sh" -o fix-error-domain.sh
+wget -q -O fix-error-proxy.sh "${BASE_URL}/system/fix-error-proxy.sh" 2>/dev/null || curl -sL "${BASE_URL}/system/fix-error-proxy.sh" -o fix-error-proxy.sh
+wget -q -O renew-ssl.sh "${BASE_URL}/system/renew-ssl.sh" 2>/dev/null || curl -sL "${BASE_URL}/system/renew-ssl.sh" -o renew-ssl.sh
+wget -q -O auto-record-wildcard.sh "${BASE_URL}/system/auto-record-wildcard.sh" 2>/dev/null || curl -sL "${BASE_URL}/system/auto-record-wildcard.sh" -o auto-record-wildcard.sh
+wget -q -O limit-speed-settings.sh "${BASE_URL}/system/limit-speed-settings.sh" 2>/dev/null || curl -sL "${BASE_URL}/system/limit-speed-settings.sh" -o limit-speed-settings.sh
+wget -q -O reset-settings.sh "${BASE_URL}/system/reset-settings.sh" 2>/dev/null || curl -sL "${BASE_URL}/system/reset-settings.sh" -o reset-settings.sh
 
 # Download XRAY script
 echo -e "${CYAN}[INFO]${NC} Downloading XRAY script..."
