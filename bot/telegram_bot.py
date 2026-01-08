@@ -499,6 +499,12 @@ Approved at: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}
                 except:
                     pass
         
+        # Delete confirmation message
+        try:
+            bot.delete_message(call.message.chat.id, call.message.message_id)
+        except:
+            pass
+        
         # Update pending orders list message if available
         callback_parts = call.data.replace('confirm_approve_', '').split('_msg')
         if len(callback_parts) > 1 and callback_parts[1]:
@@ -528,7 +534,7 @@ Approved at: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}
                     
                     bot.edit_message_text(
                         f"📋 *PENDING ORDERS* ({len(pending)})\n\nClick to approve:",
-                        chat_id=call.message.chat.id,
+                        chat_id=ADMIN_ID,
                         message_id=list_message_id,
                         parse_mode='Markdown',
                         reply_markup=markup
@@ -537,19 +543,21 @@ Approved at: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}
                     # No more pending orders
                     bot.edit_message_text(
                         "✅ *ALL ORDERS PROCESSED*\n\nNo pending orders.",
-                        chat_id=call.message.chat.id,
+                        chat_id=ADMIN_ID,
                         message_id=list_message_id,
                         parse_mode='Markdown',
                         reply_markup=None
                     )
             except Exception as list_err:
-                pass
+                # If can't update list, just inform admin
+                bot.send_message(ADMIN_ID, f"✅ Order {order_id} approved. (List not updated: {str(list_err)})")
+                return
         
         # Send success message
-        bot.send_message(call.message.chat.id, f"✅ Order {order_id} approved and sent to user!")
+        bot.send_message(ADMIN_ID, f"✅ Order {order_id} approved and sent to user!")
     except Exception as e:
         bot.answer_callback_query(call.id, "❌ Failed!")
-        bot.send_message(call.message.chat.id, f"❌ Failed to send to user: {str(e)}")
+        bot.send_message(ADMIN_ID, f"❌ Failed to send to user: {str(e)}")
 
 # Reject order
 @bot.callback_query_handler(func=lambda call: call.data.startswith('reject_'))
@@ -618,6 +626,12 @@ Rejected at: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}
             except:
                 pass
     
+    # Delete confirmation message
+    try:
+        bot.delete_message(call.message.chat.id, call.message.message_id)
+    except:
+        pass
+    
     # Update pending orders list message if available
     if len(callback_parts) > 1 and callback_parts[1]:
         list_message_id = int(callback_parts[1])
@@ -646,7 +660,7 @@ Rejected at: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}
                 
                 bot.edit_message_text(
                     f"📋 *PENDING ORDERS* ({len(pending)})\n\nClick to approve:",
-                    chat_id=call.message.chat.id,
+                    chat_id=ADMIN_ID,
                     message_id=list_message_id,
                     parse_mode='Markdown',
                     reply_markup=markup
@@ -655,16 +669,18 @@ Rejected at: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}
                 # No more pending orders
                 bot.edit_message_text(
                     "✅ *ALL ORDERS PROCESSED*\n\nNo pending orders.",
-                    chat_id=call.message.chat.id,
+                    chat_id=ADMIN_ID,
                     message_id=list_message_id,
                     parse_mode='Markdown',
                     reply_markup=None
                 )
         except Exception as list_err:
-            pass
+            # If can't update list, just inform admin
+            bot.send_message(ADMIN_ID, f"❌ Order {order_id} rejected. (List not updated: {str(list_err)})")
+            return
     
     bot.answer_callback_query(call.id, "❌ Order rejected!")
-    bot.send_message(call.message.chat.id, f"❌ Order {order_id} rejected.")
+    bot.send_message(ADMIN_ID, f"❌ Order {order_id} rejected.")
 
 # Admin Manage Users
 @bot.message_handler(func=lambda message: message.text == '👥 Manage Users')
