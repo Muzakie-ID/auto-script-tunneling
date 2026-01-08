@@ -257,9 +257,7 @@ chmod +x /usr/local/sbin/tunneling/*.sh
 
 # Setup TUN/TAP device and IP forwarding
 echo -e "${CYAN}[INFO]${NC} Setting up TUN/TAP device for SSH tunneling..."
-wget -q -O setup-tuntap.sh "${BASE_URL}/ssh/setup-tuntap.sh" 2>/dev/null || curl -sL "${BASE_URL}/ssh/setup-tuntap.sh" -o setup-tuntap.sh
-chmod +x setup-tuntap.sh
-bash setup-tuntap.sh
+bash /usr/local/sbin/tunneling/setup-tuntap.sh
 
 # Install XRAY
 echo -e "${CYAN}[INFO]${NC} Installing XRAY..."
