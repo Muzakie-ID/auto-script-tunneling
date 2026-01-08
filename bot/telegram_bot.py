@@ -162,18 +162,27 @@ def approve_orders_menu(message):
         return
     
     markup = types.InlineKeyboardMarkup()
+    
+    # Send message first to get message_id
+    sent_msg = bot.send_message(
+        message.chat.id,
+        f"📋 *PENDING ORDERS* ({len(pending)})\n\nClick to approve:",
+        parse_mode='Markdown'
+    )
+    
+    # Build buttons with message_id in callback data
     for order in pending:
         pkg_info = PRICES.get(order['package'], {})
         btn = types.InlineKeyboardButton(
             f"Order {order['order_id']} - {pkg_info.get('name', 'Unknown')} - Rp{order['price']:,}",
-            callback_data=f"approve_{order['order_id']}"
+            callback_data=f"approve_{order['order_id']}_msg{sent_msg.message_id}"
         )
         markup.add(btn)
     
-    bot.send_message(
-        message.chat.id,
-        f"📋 *PENDING ORDERS* ({len(pending)})\n\nClick to approve:",
-        parse_mode='Markdown',
+    # Edit message to add buttons
+    bot.edit_message_reply_markup(
+        chat_id=message.chat.id,
+        message_id=sent_msg.message_id,
         reply_markup=markup
     )
 
@@ -184,7 +193,10 @@ def handle_approve(call):
         bot.answer_callback_query(call.id, "⛔️ Access denied!")
         return
     
-    order_id = call.data.replace('approve_', '')
+    # Extract order_id and list_message_id from callback data
+    callback_parts = call.data.replace('approve_', '').split('_msg')
+    order_id = callback_parts[0]
+    list_message_id = int(callback_parts[1]) if len(callback_parts) > 1 else None
     
     # Check if this is from payment proof (message has photo or caption with "BUKTI PEMBAYARAN")
     is_payment_proof = False
@@ -201,8 +213,8 @@ def handle_approve(call):
     
     # Otherwise, ask for confirmation
     markup = types.InlineKeyboardMarkup(row_width=2)
-    btn_yes = types.InlineKeyboardButton("✅ Approve", callback_data=f"confirm_approve_{order_id}")
-    btn_no = types.InlineKeyboardButton("❌ Reject", callback_data=f"reject_{order_id}")
+    btn_yes = types.InlineKeyboardButton("✅ Approve", callback_data=f"confirm_approve_{order_id}_msg{list_message_id if list_message_id else ''}")
+    btn_no = types.InlineKeyboardButton("❌ Reject", callback_data=f"reject_{order_id}_msg{list_message_id if list_message_id else ''}")
     markup.add(btn_yes, btn_no)
     
     bot.send_message(
@@ -487,6 +499,52 @@ Approved at: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}
                 except:
                     pass
         
+        # Update pending orders list message if available
+        callback_parts = call.data.replace('confirm_approve_', '').split('_msg')
+        if len(callback_parts) > 1 and callback_parts[1]:
+            list_message_id = int(callback_parts[1])
+            try:
+                # Refresh the pending orders list
+                orders_dir = '/etc/tunneling/bot/orders'
+                pending = []
+                if os.path.exists(orders_dir):
+                    for f in os.listdir(orders_dir):
+                        if f.endswith('.json'):
+                            with open(f'{orders_dir}/{f}', 'r') as file:
+                                ord_data = json.load(file)
+                                if ord_data['status'] == 'pending':
+                                    pending.append(ord_data)
+                
+                if pending:
+                    # Rebuild buttons for remaining pending orders
+                    markup = types.InlineKeyboardMarkup()
+                    for pending_order in pending:
+                        pkg_info = PRICES.get(pending_order['package'], {})
+                        btn = types.InlineKeyboardButton(
+                            f"Order {pending_order['order_id']} - {pkg_info.get('name', 'Unknown')} - Rp{pending_order['price']:,}",
+                            callback_data=f"approve_{pending_order['order_id']}_msg{list_message_id}"
+                        )
+                        markup.add(btn)
+                    
+                    bot.edit_message_text(
+                        f"📋 *PENDING ORDERS* ({len(pending)})\n\nClick to approve:",
+                        chat_id=call.message.chat.id,
+                        message_id=list_message_id,
+                        parse_mode='Markdown',
+                        reply_markup=markup
+                    )
+                else:
+                    # No more pending orders
+                    bot.edit_message_text(
+                        "✅ *ALL ORDERS PROCESSED*\n\nNo pending orders.",
+                        chat_id=call.message.chat.id,
+                        message_id=list_message_id,
+                        parse_mode='Markdown',
+                        reply_markup=None
+                    )
+            except Exception as list_err:
+                pass
+        
         # Send success message
         bot.send_message(call.message.chat.id, f"✅ Order {order_id} approved and sent to user!")
     except Exception as e:
@@ -554,6 +612,52 @@ Rejected at: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}
                 bot.delete_message(ADMIN_ID, order['payment_notification_msg_id'])
             except:
                 pass
+    
+    # Update pending orders list message if available
+    callback_parts = call.data.replace('reject_', '').split('_msg')
+    if len(callback_parts) > 1 and callback_parts[1]:
+        list_message_id = int(callback_parts[1])
+        try:
+            # Refresh the pending orders list
+            orders_dir = '/etc/tunneling/bot/orders'
+            pending = []
+            if os.path.exists(orders_dir):
+                for f in os.listdir(orders_dir):
+                    if f.endswith('.json'):
+                        with open(f'{orders_dir}/{f}', 'r') as file:
+                            ord_data = json.load(file)
+                            if ord_data['status'] == 'pending':
+                                pending.append(ord_data)
+            
+            if pending:
+                # Rebuild buttons for remaining pending orders
+                markup = types.InlineKeyboardMarkup()
+                for pending_order in pending:
+                    pkg_info = PRICES.get(pending_order['package'], {})
+                    btn = types.InlineKeyboardButton(
+                        f"Order {pending_order['order_id']} - {pkg_info.get('name', 'Unknown')} - Rp{pending_order['price']:,}",
+                        callback_data=f"approve_{pending_order['order_id']}_msg{list_message_id}"
+                    )
+                    markup.add(btn)
+                
+                bot.edit_message_text(
+                    f"📋 *PENDING ORDERS* ({len(pending)})\n\nClick to approve:",
+                    chat_id=call.message.chat.id,
+                    message_id=list_message_id,
+                    parse_mode='Markdown',
+                    reply_markup=markup
+                )
+            else:
+                # No more pending orders
+                bot.edit_message_text(
+                    "✅ *ALL ORDERS PROCESSED*\n\nNo pending orders.",
+                    chat_id=call.message.chat.id,
+                    message_id=list_message_id,
+                    parse_mode='Markdown',
+                    reply_markup=None
+                )
+        except Exception as list_err:
+            pass
     
     bot.answer_callback_query(call.id, "❌ Order rejected!")
     bot.send_message(call.message.chat.id, f"❌ Order {order_id} rejected.")
