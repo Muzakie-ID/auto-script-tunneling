@@ -458,11 +458,34 @@ Thank you for your order! 🎉
         bot.send_message(order['user_id'], user_text, parse_mode='Markdown')
         bot.answer_callback_query(call.id, "✅ Order approved!")
         
-        # Delete the approval message to remove buttons
-        try:
-            bot.delete_message(call.message.chat.id, call.message.message_id)
-        except:
-            pass
+        # Edit payment proof message to remove buttons and update status
+        if 'payment_notification_msg_id' in order:
+            try:
+                pkg_info = PRICES.get(order['package'], {})
+                updated_caption = f"""
+💸 *BUKTI PEMBAYARAN DITERIMA*
+
+Order ID: `{order_id}`
+User: @{order.get('username_telegram', 'N/A')}
+Package: {pkg_info.get('name', 'Unknown')}
+Price: Rp{order['price']:,}
+
+✅ *STATUS: APPROVED*
+Approved at: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}
+                """
+                bot.edit_message_caption(
+                    caption=updated_caption,
+                    chat_id=ADMIN_ID,
+                    message_id=order['payment_notification_msg_id'],
+                    parse_mode='Markdown',
+                    reply_markup=None
+                )
+            except Exception as edit_err:
+                # If edit fails, try to delete the message
+                try:
+                    bot.delete_message(ADMIN_ID, order['payment_notification_msg_id'])
+                except:
+                    pass
         
         # Send success message
         bot.send_message(call.message.chat.id, f"✅ Order {order_id} approved and sent to user!")
@@ -503,11 +526,34 @@ def reject_order(call):
     except:
         pass
     
-    # Delete the approval message
-    try:
-        bot.delete_message(call.message.chat.id, call.message.message_id)
-    except:
-        pass
+    # Edit payment proof message to remove buttons and update status
+    if 'payment_notification_msg_id' in order:
+        try:
+            pkg_info = PRICES.get(order['package'], {})
+            updated_caption = f"""
+💸 *BUKTI PEMBAYARAN DITERIMA*
+
+Order ID: `{order_id}`
+User: @{order.get('username_telegram', 'N/A')}
+Package: {pkg_info.get('name', 'Unknown')}
+Price: Rp{order['price']:,}
+
+❌ *STATUS: REJECTED*
+Rejected at: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}
+            """
+            bot.edit_message_caption(
+                caption=updated_caption,
+                chat_id=ADMIN_ID,
+                message_id=order['payment_notification_msg_id'],
+                parse_mode='Markdown',
+                reply_markup=None
+            )
+        except Exception as edit_err:
+            # If edit fails, try to delete the message
+            try:
+                bot.delete_message(ADMIN_ID, order['payment_notification_msg_id'])
+            except:
+                pass
     
     bot.answer_callback_query(call.id, "❌ Order rejected!")
     bot.send_message(call.message.chat.id, f"❌ Order {order_id} rejected.")
@@ -1110,6 +1156,7 @@ def process_payment_proof(message, order_id):
     order['proof_uploaded'] = True
     order['proof_path'] = proof_path
     order['proof_uploaded_at'] = datetime.now().isoformat()
+    order['username_telegram'] = message.from_user.username if message.from_user.username else f"User{message.from_user.id}"
     
     with open(order_file, 'w') as f:
         json.dump(order, f, indent=2)
@@ -1141,13 +1188,18 @@ Bukti pembayaran:
                 btn_reject = types.InlineKeyboardButton("❌ Reject", callback_data=f"reject_{order_id}")
                 markup.add(btn_approve, btn_reject)
                 
-                bot.send_photo(
+                sent_msg = bot.send_photo(
                     ADMIN_ID,
                     photo,
                     caption=admin_text,
                     parse_mode='Markdown',
                     reply_markup=markup
                 )
+                
+                # Save message_id for later editing
+                order['payment_notification_msg_id'] = sent_msg.message_id
+                with open(order_file, 'w') as f:
+                    json.dump(order, f, indent=2)
         except Exception as e:
             bot.send_message(ADMIN_ID, f"{admin_text}\nGagal mengirim foto: {str(e)}")
 
