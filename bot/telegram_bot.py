@@ -231,11 +231,11 @@ def confirm_approve_order(call):
         bot.answer_callback_query(call.id, "⛔️ Access denied!")
         return
     
-    # Extract order_id (handle both confirm_approve_ and approve_ prefix)
-    if call.data.startswith('confirm_approve_'):
-        order_id = call.data.replace('confirm_approve_', '')
-    else:
-        order_id = call.data.replace('approve_', '')
+    # Extract order_id and list_message_id from callback data
+    # Format: confirm_approve_{order_id}_msg{list_message_id} or approve_{order_id}
+    callback_data = call.data.replace('confirm_approve_', '').replace('approve_', '')
+    callback_parts = callback_data.split('_msg')
+    order_id = callback_parts[0]
     
     order_file = f'/etc/tunneling/bot/orders/{order_id}.json'
     
@@ -558,7 +558,12 @@ def reject_order(call):
         bot.answer_callback_query(call.id, "⛔️ Access denied!")
         return
     
-    order_id = call.data.replace('reject_', '')
+    # Extract order_id from callback data
+    # Format: reject_{order_id}_msg{list_message_id}
+    callback_data = call.data.replace('reject_', '')
+    callback_parts = callback_data.split('_msg')
+    order_id = callback_parts[0]
+    
     order_file = f'/etc/tunneling/bot/orders/{order_id}.json'
     
     if not os.path.exists(order_file):
@@ -614,7 +619,6 @@ Rejected at: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}
                 pass
     
     # Update pending orders list message if available
-    callback_parts = call.data.replace('reject_', '').split('_msg')
     if len(callback_parts) > 1 and callback_parts[1]:
         list_message_id = int(callback_parts[1])
         try:
