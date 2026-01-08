@@ -246,6 +246,12 @@ wget -q -O bot-price.sh "${BASE_URL}/bot/bot-price.sh" 2>/dev/null || curl -sL "
 wget -q -O bot-notification.sh "${BASE_URL}/bot/bot-notification.sh" 2>/dev/null || curl -sL "${BASE_URL}/bot/bot-notification.sh" -o bot-notification.sh
 wget -q -O bot-test.sh "${BASE_URL}/bot/bot-test.sh" 2>/dev/null || curl -sL "${BASE_URL}/bot/bot-test.sh" -o bot-test.sh
 
+# Download maintenance scripts
+echo -e "${CYAN}[INFO]${NC} Downloading maintenance scripts..."
+wget -q -O fix-install.sh "${BASE_URL}/fix-install.sh" 2>/dev/null || curl -sL "${BASE_URL}/fix-install.sh" -o fix-install.sh
+wget -q -O update.sh "${BASE_URL}/update.sh" 2>/dev/null || curl -sL "${BASE_URL}/update.sh" -o update.sh
+wget -q -O make-executable.sh "${BASE_URL}/make-executable.sh" 2>/dev/null || curl -sL "${BASE_URL}/make-executable.sh" -o make-executable.sh
+
 # Set permissions
 chmod +x /usr/local/sbin/tunneling/*.sh
 
