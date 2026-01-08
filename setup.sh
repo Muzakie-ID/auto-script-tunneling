@@ -284,6 +284,14 @@ echo "0 2 * * * root /usr/local/sbin/tunneling/auto-backup.sh" > /etc/cron.d/aut
 
 # Configure firewall
 echo -e "${CYAN}[INFO]${NC} Configuring firewall..."
+
+# Install UFW if not installed
+if ! command -v ufw &> /dev/null; then
+    echo -e "${CYAN}[INFO]${NC} Installing UFW..."
+    apt-get install -y ufw
+fi
+
+# Configure UFW
 ufw --force enable
 ufw allow 22/tcp
 ufw allow 80/tcp
