@@ -42,6 +42,7 @@ if [[ "$do_backup" == "y" ]]; then
 fi
 
 echo -e "${CYAN}[1/5]${NC} Downloading menu scripts..."
+rm -f main-menu.sh ssh-menu.sh vmess-menu.sh vless-menu.sh trojan-menu.sh system-menu.sh backup-menu.sh bot-menu.sh settings-menu.sh info-menu.sh
 wget -q -O main-menu.sh "${BASE_URL}/menu/main-menu.sh"
 wget -q -O ssh-menu.sh "${BASE_URL}/menu/ssh-menu.sh"
 wget -q -O vmess-menu.sh "${BASE_URL}/menu/vmess-menu.sh"
@@ -54,6 +55,7 @@ wget -q -O settings-menu.sh "${BASE_URL}/menu/settings-menu.sh"
 wget -q -O info-menu.sh "${BASE_URL}/menu/info-menu.sh"
 
 echo -e "${CYAN}[2/4]${NC} Downloading SSH scripts..."
+rm -f ssh-create.sh ssh-trial.sh ssh-renew.sh ssh-delete.sh ssh-check.sh ssh-list.sh ssh-delete-expired.sh ssh-lock.sh ssh-unlock.sh ssh-details.sh ssh-limit-ip.sh ssh-limit-quota.sh setup-dropbear.sh setup-stunnel.sh setup-squid.sh setup-tuntap.sh
 wget -q -O ssh-create.sh "${BASE_URL}/ssh/ssh-create.sh"
 wget -q -O ssh-trial.sh "${BASE_URL}/ssh/ssh-trial.sh"
 wget -q -O ssh-renew.sh "${BASE_URL}/ssh/ssh-renew.sh"
@@ -73,6 +75,7 @@ wget -q -O setup-tuntap.sh "${BASE_URL}/ssh/setup-tuntap.sh"
 
 echo -e "${CYAN}[3/4]${NC} Downloading system scripts..."
 # System monitoring and management
+rm -f check-services.sh monitor-vps.sh backup-now.sh restore-backup.sh auto-backup.sh delete-expired.sh setup-nginx.sh restart-all.sh restart-service.sh speedtest.sh delete-all-expired.sh limit-speed.sh monitor-service.sh check-logs.sh auto-reboot-settings.sh
 wget -q -O check-services.sh "${BASE_URL}/system/check-services.sh"
 wget -q -O monitor-vps.sh "${BASE_URL}/system/monitor-vps.sh"
 wget -q -O backup-now.sh "${BASE_URL}/system/backup-now.sh"
@@ -90,6 +93,7 @@ wget -q -O check-logs.sh "${BASE_URL}/system/check-logs.sh"
 wget -q -O auto-reboot-settings.sh "${BASE_URL}/system/auto-reboot-settings.sh"
 
 # Settings menu scripts
+rm -f change-domain.sh change-banner.sh change-port.sh change-timezone.sh fix-error-domain.sh fix-error-proxy.sh renew-ssl.sh auto-record-wildcard.sh limit-speed-settings.sh reset-settings.sh
 wget -q -O change-domain.sh "${BASE_URL}/system/change-domain.sh"
 wget -q -O change-banner.sh "${BASE_URL}/system/change-banner.sh"
 wget -q -O change-port.sh "${BASE_URL}/system/change-port.sh"
@@ -102,26 +106,31 @@ wget -q -O limit-speed-settings.sh "${BASE_URL}/system/limit-speed-settings.sh"
 wget -q -O reset-settings.sh "${BASE_URL}/system/reset-settings.sh"
 
 echo -e "${CYAN}[4/5]${NC} Downloading XRAY scripts..."
+rm -f setup-xray.sh placeholder.sh
 wget -q -O setup-xray.sh "${BASE_URL}/xray/setup-xray.sh"
 
 # VMESS
 for script in create trial list renew delete check delete-expired lock unlock details limit-ip limit-quota; do
+    rm -f vmess-${script}.sh
     wget -q -O vmess-${script}.sh "${BASE_URL}/xray/vmess-${script}.sh"
 done
 
 # VLESS
 for script in create trial list renew delete check delete-expired lock unlock details limit-ip limit-quota; do
+    rm -f vless-${script}.sh
     wget -q -O vless-${script}.sh "${BASE_URL}/xray/vless-${script}.sh"
 done
 
 # TROJAN
 for script in create trial list renew delete check delete-expired lock unlock details limit-ip limit-quota; do
+    rm -f trojan-${script}.sh
     wget -q -O trojan-${script}.sh "${BASE_URL}/xray/trojan-${script}.sh"
 done
 
 wget -q -O placeholder.sh "${BASE_URL}/xray/placeholder.sh"
 
 echo -e "${CYAN}[5/5]${NC} Downloading bot scripts..."
+rm -f telegram_bot.py bot-setup.sh bot-start.sh bot-stop.sh bot-restart.sh bot-status.sh bot-auto-order.sh bot-payment.sh bot-price.sh bot-notification.sh bot-test.sh
 wget -q -O telegram_bot.py "${BASE_URL}/bot/telegram_bot.py"
 wget -q -O bot-setup.sh "${BASE_URL}/bot/bot-setup.sh"
 wget -q -O bot-start.sh "${BASE_URL}/bot/bot-start.sh"
