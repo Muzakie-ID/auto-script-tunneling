@@ -255,6 +255,16 @@ wget -q -O make-executable.sh "${BASE_URL}/make-executable.sh" 2>/dev/null || cu
 # Set permissions
 chmod +x /usr/local/sbin/tunneling/*.sh
 
+# Setup SSH Services
+echo -e "${CYAN}[INFO]${NC} Setting up Dropbear SSH..."
+bash /usr/local/sbin/tunneling/setup-dropbear.sh
+
+echo -e "${CYAN}[INFO]${NC} Setting up Stunnel4 SSL/TLS..."
+bash /usr/local/sbin/tunneling/setup-stunnel.sh
+
+echo -e "${CYAN}[INFO]${NC} Setting up Squid Proxy..."
+bash /usr/local/sbin/tunneling/setup-squid.sh
+
 # Setup TUN/TAP device and IP forwarding
 echo -e "${CYAN}[INFO]${NC} Setting up TUN/TAP device for SSH tunneling..."
 bash /usr/local/sbin/tunneling/setup-tuntap.sh
@@ -273,6 +283,10 @@ systemctl start nginx
 mkdir -p /etc/xray/certs
 ln -s /etc/letsencrypt/live/$domain/fullchain.pem /etc/xray/certs/fullchain.pem
 ln -s /etc/letsencrypt/live/$domain/privkey.pem /etc/xray/certs/privkey.pem
+
+# Configure XRAY
+echo -e "${CYAN}[INFO]${NC} Configuring XRAY..."
+bash /usr/local/sbin/tunneling/setup-xray.sh
 
 # Configure cron for SSL renewal
 echo "0 3 * * * root certbot renew --quiet --post-hook 'systemctl reload nginx'" > /etc/cron.d/ssl-renewal
