@@ -29,41 +29,41 @@ read -p "Select Menu [0-10]: " menu
 
 case $menu in
     1)
-        /usr/local/sbin/tunneling/bot-setup.sh
+        /usr/local/sbin/tunneling/bot/bot-setup.sh
         ;;
     2)
-        /usr/local/sbin/tunneling/bot-start.sh
+        /usr/local/sbin/tunneling/bot/bot-start.sh
         ;;
     3)
-        /usr/local/sbin/tunneling/bot-stop.sh
+        /usr/local/sbin/tunneling/bot/bot-stop.sh
         ;;
     4)
-        /usr/local/sbin/tunneling/bot-restart.sh
+        /usr/local/sbin/tunneling/bot/bot-restart.sh
         ;;
     5)
-        /usr/local/sbin/tunneling/bot-status.sh
+        /usr/local/sbin/tunneling/bot/bot-status.sh
         ;;
     6)
-        /usr/local/sbin/tunneling/bot-auto-order.sh
+        /usr/local/sbin/tunneling/bot/bot-auto-order.sh
         ;;
     7)
-        /usr/local/sbin/tunneling/bot-payment.sh
+        /usr/local/sbin/tunneling/bot/bot-payment.sh
         ;;
     8)
-        /usr/local/sbin/tunneling/bot-price.sh
+        /usr/local/sbin/tunneling/bot/bot-price.sh
         ;;
     9)
-        /usr/local/sbin/tunneling/bot-notification.sh
+        /usr/local/sbin/tunneling/bot/bot-notification.sh
         ;;
     10)
-        /usr/local/sbin/tunneling/bot-test.sh
+        /usr/local/sbin/tunneling/bot/bot-test.sh
         ;;
     0)
-        /usr/local/sbin/tunneling/main-menu.sh
+        /usr/local/sbin/tunneling/menu/main-menu.sh
         ;;
     *)
         echo -e "${RED}Invalid option!${NC}"
         sleep 1
-        /usr/local/sbin/tunneling/bot-menu.sh
+        /usr/local/sbin/tunneling/menu/bot-menu.sh
         ;;
 esac

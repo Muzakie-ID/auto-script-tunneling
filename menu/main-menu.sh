@@ -48,31 +48,31 @@ read -p "Select Menu [0-9]: " menu
 
 case $menu in
     1)
-        /usr/local/sbin/tunneling/ssh-menu.sh
+        /usr/local/sbin/tunneling/menu/ssh-menu.sh
         ;;
     2)
-        /usr/local/sbin/tunneling/vmess-menu.sh
+        /usr/local/sbin/tunneling/menu/vmess-menu.sh
         ;;
     3)
-        /usr/local/sbin/tunneling/vless-menu.sh
+        /usr/local/sbin/tunneling/menu/vless-menu.sh
         ;;
     4)
-        /usr/local/sbin/tunneling/trojan-menu.sh
+        /usr/local/sbin/tunneling/menu/trojan-menu.sh
         ;;
     5)
-        /usr/local/sbin/tunneling/system-menu.sh
+        /usr/local/sbin/tunneling/menu/system-menu.sh
         ;;
     6)
-        /usr/local/sbin/tunneling/backup-menu.sh
+        /usr/local/sbin/tunneling/menu/backup-menu.sh
         ;;
     7)
-        /usr/local/sbin/tunneling/bot-menu.sh
+        /usr/local/sbin/tunneling/menu/bot-menu.sh
         ;;
     8)
-        /usr/local/sbin/tunneling/settings-menu.sh
+        /usr/local/sbin/tunneling/menu/settings-menu.sh
         ;;
     9)
-        /usr/local/sbin/tunneling/info-menu.sh
+        /usr/local/sbin/tunneling/menu/info-menu.sh
         ;;
     0)
         clear
@@ -82,6 +82,6 @@ case $menu in
     *)
         echo -e "${RED}Invalid option!${NC}"
         sleep 1
-        /usr/local/sbin/tunneling/main-menu.sh
+        /usr/local/sbin/tunneling/menu/main-menu.sh
         ;;
 esac

@@ -25,29 +25,29 @@ read -p "Select Menu [0-6]: " menu
 
 case $menu in
     1)
-        /usr/local/sbin/tunneling/backup-now.sh
+        /usr/local/sbin/tunneling/system/backup-now.sh
         ;;
     2)
-        /usr/local/sbin/tunneling/restore-backup.sh
+        /usr/local/sbin/tunneling/system/restore-backup.sh
         ;;
     3)
-        /usr/local/sbin/tunneling/list-backups.sh
+        /usr/local/sbin/tunneling/system/list-backups.sh
         ;;
     4)
-        /usr/local/sbin/tunneling/delete-backup.sh
+        /usr/local/sbin/tunneling/system/delete-backup.sh
         ;;
     5)
-        /usr/local/sbin/tunneling/auto-backup-settings.sh
+        /usr/local/sbin/tunneling/system/auto-backup-settings.sh
         ;;
     6)
-        /usr/local/sbin/tunneling/download-backup.sh
+        /usr/local/sbin/tunneling/system/download-backup.sh
         ;;
     0)
-        /usr/local/sbin/tunneling/main-menu.sh
+        /usr/local/sbin/tunneling/menu/main-menu.sh
         ;;
     *)
         echo -e "${RED}Invalid option!${NC}"
         sleep 1
-        /usr/local/sbin/tunneling/backup-menu.sh
+        /usr/local/sbin/tunneling/menu/backup-menu.sh
         ;;
 esac

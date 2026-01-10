@@ -113,4 +113,4 @@ fi
 echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
 echo ""
 read -n 1 -s -r -p "Press any key to back to menu"
-/usr/local/sbin/tunneling/main-menu.sh
+/usr/local/sbin/tunneling/menu/main-menu.sh

@@ -30,44 +30,44 @@ read -p "Select Menu [0-11]: " menu
 
 case $menu in
     1)
-        /usr/local/sbin/tunneling/check-services.sh
+        /usr/local/sbin/tunneling/system/check-services.sh
         ;;
     2)
-        /usr/local/sbin/tunneling/restart-all.sh
+        /usr/local/sbin/tunneling/system/restart-all.sh
         ;;
     3)
-        /usr/local/sbin/tunneling/restart-service.sh
+        /usr/local/sbin/tunneling/system/restart-service.sh
         ;;
     4)
-        /usr/local/sbin/tunneling/monitor-vps.sh
+        /usr/local/sbin/tunneling/system/monitor-vps.sh
         ;;
     5)
-        /usr/local/sbin/tunneling/speedtest.sh
+        /usr/local/sbin/tunneling/system/speedtest.sh
         ;;
     6)
-        /usr/local/sbin/tunneling/delete-all-expired.sh
+        /usr/local/sbin/tunneling/system/delete-all-expired.sh
         ;;
     7)
-        /usr/local/sbin/tunneling/limit-speed.sh
+        /usr/local/sbin/tunneling/system/limit-speed.sh
         ;;
     8)
-        /usr/local/sbin/tunneling/monitor-service.sh
+        /usr/local/sbin/tunneling/system/monitor-service.sh
         ;;
     9)
-        /usr/local/sbin/tunneling/check-logs.sh
+        /usr/local/sbin/tunneling/system/check-logs.sh
         ;;
     10)
-        /usr/local/sbin/tunneling/auto-reboot-settings.sh
+        /usr/local/sbin/tunneling/system/auto-reboot-settings.sh
         ;;
     11)
         /usr/local/sbin/tunneling/fix-install.sh
         ;;
     0)
-        /usr/local/sbin/tunneling/main-menu.sh
+        /usr/local/sbin/tunneling/menu/main-menu.sh
         ;;
     *)
         echo -e "${RED}Invalid option!${NC}"
         sleep 1
-        /usr/local/sbin/tunneling/system-menu.sh
+        /usr/local/sbin/tunneling/menu/system-menu.sh
         ;;
 esac
