@@ -99,21 +99,15 @@ sysctl -w net.ipv6.conf.all.disable_ipv6=1 && sysctl -w net.ipv6.conf.default.di
 ### Quick Install (Step by Step)
 
 ```bash
-# Update system terlebih dahulu
 apt update && apt upgrade -y
-
-# Download dan jalankan installer
 wget -O setup.sh https://raw.githubusercontent.com/Muzakie-ID/auto-script-tunneling/main/setup.sh && chmod +x setup.sh && ./setup.sh
 ```
 
 ### Manual Installation
 
 ```bash
-# Clone repository
 git clone https://github.com/Muzakie-ID/auto-script-tunneling.git
 cd auto-script-tunneling
-
-# Jalankan installer
 chmod +x setup.sh
 ./setup.sh
 ```
