@@ -112,6 +112,56 @@ chmod +x setup.sh
 ./setup.sh
 ```
 
+## ☁️ DNS Configuration (PENTING!)
+
+### Cloudflare DNS Settings
+
+Jika menggunakan Cloudflare untuk DNS management, **WAJIB nonaktifkan Cloudflare Proxy**:
+
+#### ❌ **JANGAN GUNAKAN** (Orange Cloud 🟠)
+- Cloudflare Proxy aktif
+- Hanya support port 80 dan 443
+- Block semua custom ports (109, 143, 442, 777, 3128, 8080)
+- VPN protocols akan gagal connect
+
+#### ✅ **GUNAKAN INI** (Gray Cloud ☁️)
+- DNS Only mode
+- Semua port accessible
+- Direct connection ke server
+- Semua protocols work properly
+
+### Cara Setting Cloudflare:
+
+1. Login ke [Cloudflare Dashboard](https://dash.cloudflare.com)
+2. Pilih domain Anda
+3. Masuk ke menu **DNS**
+4. Cari A record untuk VPN server (contoh: `vpn.yourdomain.com`)
+5. Klik **Orange Cloud 🟠** → ubah jadi **Gray Cloud ☁️** (DNS Only)
+6. Klik **Save**
+7. Tunggu 1-5 menit untuk propagasi DNS
+
+```
+SALAH ❌:  A  vpn  123.456.789.0  🟠 Proxied
+BENAR ✅:  A  vpn  123.456.789.0  ☁️ DNS Only
+```
+
+### Verifikasi DNS
+
+Setelah setting DNS Only, verifikasi dengan:
+
+```bash
+# Cek apakah DNS sudah resolve ke IP server
+nslookup vpn.yourdomain.com
+
+# Atau menggunakan dig
+dig vpn.yourdomain.com +short
+```
+
+**⚠️ CATATAN PENTING:**
+- Jika tetap menggunakan Orange Cloud, hanya port 80 dan 443 yang bisa diakses
+- Semua protocol selain VMESS/VLESS/TROJAN via port 443 akan gagal
+- SSH, Dropbear, Stunnel, Squid tidak akan bisa diakses
+
 ## 🔄 Update Script
 
 ### Update via Command
