@@ -349,14 +349,30 @@ ufw --force enable
 | Type | Protocol | Port Range | Source | Deskripsi |
 |------|----------|------------|--------|-----------|
 | SSH | TCP | 22 | 0.0.0.0/0 | OpenSSH |
-| Custom TCP | TCP | 109 | 0.0.0.0/0 | Dropbear SSH |
-| Custom TCP | TCP | 143 | 0.0.0.0/0 | Dropbear SSH |
-| Custom TCP | TCP | 442 | 0.0.0.0/0 | Stunnel SSL |
-| HTTPS | TCP | 443 | 0.0.0.0/0 | Nginx + XRAY |
-| Custom TCP | TCP | 777 | 0.0.0.0/0 | OpenSSH SSL |
+| Custom TCP | TCP | 109-143 | 0.0.0.0/0 | Dropbear SSH (Port 109, 143) |
+| Custom TCP | TCP | 442 | 0.0.0.0/0 | Stunnel SSL (Dropbear) |
+| HTTPS | TCP | 443 | 0.0.0.0/0 | Nginx + XRAY (VMESS/VLESS/TROJAN) |
+| Custom TCP | TCP | 777 | 0.0.0.0/0 | OpenSSH SSL (Stunnel) |
 | HTTP | TCP | 80 | 0.0.0.0/0 | Nginx + XRAY |
 | Custom TCP | TCP | 3128 | 0.0.0.0/0 | Squid Proxy |
 | Custom TCP | TCP | 8080 | 0.0.0.0/0 | Squid Proxy |
+
+**Alternative: Simplified Range (Buka semua port sekaligus)**
+
+| Type | Protocol | Port Range | Source | Deskripsi |
+|------|----------|------------|--------|-----------|
+| SSH | TCP | 22 | 0.0.0.0/0 | OpenSSH |
+| HTTP | TCP | 80 | 0.0.0.0/0 | HTTP + XRAY |
+| Custom TCP | TCP | 109-143 | 0.0.0.0/0 | Dropbear SSH |
+| HTTPS | TCP | 443 | 0.0.0.0/0 | HTTPS + XRAY |
+| Custom TCP | TCP | 442 | 0.0.0.0/0 | SSL Stunnel |
+| Custom TCP | TCP | 777 | 0.0.0.0/0 | SSL Stunnel |
+| Custom TCP | TCP | 3128-8080 | 0.0.0.0/0 | Squid Proxy (Port 3128, 8080) |
+
+> **💡 Tips:** 
+> - Range `109-143` akan membuka port 109 dan 143 (Dropbear)
+> - Range `3128-8080` akan membuka port 3128 dan 8080 (Squid)
+> - Port lain di antara range tidak digunakan oleh service kita
 
 ### Arsitektur Port
 
