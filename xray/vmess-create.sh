@@ -38,7 +38,22 @@ cat > /etc/tunneling/vmess/${username}.json << EOF
 }
 EOF
 
-# TODO: Add to XRAY config (will be implemented)
+# Add to XRAY config
+CONFIG_FILE="/etc/xray/config.json"
+
+# Check if user already exists in config
+if grep -q "\"id\": \"$uuid\"" $CONFIG_FILE; then
+    echo -e "${RED}User already exists in XRAY config!${NC}"
+    exit 1
+fi
+
+# Add client to VMESS inbound
+jq --arg uuid "$uuid" --arg email "$username@$domain" \
+   '(.inbounds[] | select(.protocol=="vmess") | .settings.clients) += [{"id": $uuid, "alterId": 0, "email": $email}]' \
+   $CONFIG_FILE > /tmp/xray-config.tmp && mv /tmp/xray-config.tmp $CONFIG_FILE
+
+# Restart XRAY
+systemctl restart xray
 
 # Generate vmess:// link
 vmess_json=$(cat <<EOF

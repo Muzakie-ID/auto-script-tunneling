@@ -27,7 +27,7 @@ exp_timestamp=$(date -d "$exp_date" +%s)
 domain=$(cat /root/domain.txt)
 
 # Create JSON record
-cat > /etc/tunneling/TROJAN/${username}.json << EOF
+cat > /etc/tunneling/trojan/${username}.json << EOF
 {
     "username": "$username",
     "uuid": "$uuid",
@@ -38,7 +38,22 @@ cat > /etc/tunneling/TROJAN/${username}.json << EOF
 }
 EOF
 
-# TODO: Add to XRAY config (will be implemented)
+# Add to XRAY config
+CONFIG_FILE="/etc/xray/config.json"
+
+# Check if user already exists in config
+if grep -q "\"password\": \"$uuid\"" $CONFIG_FILE; then
+    echo -e "${RED}User already exists in XRAY config!${NC}"
+    exit 1
+fi
+
+# Add client to TROJAN inbound
+jq --arg password "$uuid" --arg email "$username@$domain" \
+   '.inbounds[] | select(.protocol=="trojan") | .settings.clients += [{"password": $password, "email": $email}]' \
+   $CONFIG_FILE > /tmp/xray-config.tmp && mv /tmp/xray-config.tmp $CONFIG_FILE
+
+# Restart XRAY
+systemctl restart xray
 
 # Generate trojan:// link
 trojan_link="trojan://$uuid@$domain:443?security=tls&type=ws&host=$domain&path=/trojan&sni=$domain#$username-$domain"

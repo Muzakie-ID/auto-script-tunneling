@@ -40,8 +40,20 @@ if [[ $confirm != "y" ]]; then
     exit 0
 fi
 
+# Get UUID before deleting
+uuid=$(jq -r '.uuid' $json_file)
+
+# Remove from XRAY config
+CONFIG_FILE="/etc/xray/config.json"
+jq --arg password "$uuid" \
+   '(.inbounds[] | select(.protocol=="trojan") | .settings.clients) |= map(select(.password != $password))' \
+   $CONFIG_FILE > /tmp/xray-config.tmp && mv /tmp/xray-config.tmp $CONFIG_FILE
+
 # Delete JSON
 rm -f $json_file
+
+# Restart XRAY
+systemctl restart xray
 
 echo ""
 echo -e "${GREEN}✓ Account deleted successfully!${NC}"

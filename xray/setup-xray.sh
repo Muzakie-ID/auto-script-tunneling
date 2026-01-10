@@ -6,6 +6,7 @@
 DOMAIN=$(cat /root/domain.txt)
 UUID=$(cat /proc/sys/kernel/random/uuid)
 
+# Create XRAY config
 cat > /etc/xray/config.json << EOF
 {
   "log": {
@@ -15,47 +16,11 @@ cat > /etc/xray/config.json << EOF
   },
   "inbounds": [
     {
-      "port": 443,
+      "port": 10001,
+      "listen": "127.0.0.1",
       "protocol": "vmess",
       "settings": {
-        "clients": [
-          {
-            "id": "$UUID",
-            "alterId": 0,
-            "email": "admin@$DOMAIN"
-          }
-        ]
-      },
-      "streamSettings": {
-        "network": "ws",
-        "security": "tls",
-        "tlsSettings": {
-          "certificates": [
-            {
-              "certificateFile": "/etc/xray/certs/fullchain.pem",
-              "keyFile": "/etc/xray/certs/privkey.pem"
-            }
-          ]
-        },
-        "wsSettings": {
-          "path": "/vmess",
-          "headers": {
-            "Host": "$DOMAIN"
-          }
-        }
-      }
-    },
-    {
-      "port": 80,
-      "protocol": "vmess",
-      "settings": {
-        "clients": [
-          {
-            "id": "$UUID",
-            "alterId": 0,
-            "email": "admin@$DOMAIN"
-          }
-        ]
+        "clients": []
       },
       "streamSettings": {
         "network": "ws",
@@ -65,55 +30,29 @@ cat > /etc/xray/config.json << EOF
       }
     },
     {
-      "port": 8443,
+      "port": 10002,
+      "listen": "127.0.0.1",
       "protocol": "vless",
       "settings": {
-        "clients": [
-          {
-            "id": "$UUID",
-            "email": "admin@$DOMAIN"
-          }
-        ],
+        "clients": [],
         "decryption": "none"
       },
       "streamSettings": {
         "network": "ws",
-        "security": "tls",
-        "tlsSettings": {
-          "certificates": [
-            {
-              "certificateFile": "/etc/xray/certs/fullchain.pem",
-              "keyFile": "/etc/xray/certs/privkey.pem"
-            }
-          ]
-        },
         "wsSettings": {
           "path": "/vless"
         }
       }
     },
     {
-      "port": 8080,
+      "port": 10003,
+      "listen": "127.0.0.1",
       "protocol": "trojan",
       "settings": {
-        "clients": [
-          {
-            "password": "$UUID",
-            "email": "admin@$DOMAIN"
-          }
-        ]
+        "clients": []
       },
       "streamSettings": {
         "network": "ws",
-        "security": "tls",
-        "tlsSettings": {
-          "certificates": [
-            {
-              "certificateFile": "/etc/xray/certs/fullchain.pem",
-              "keyFile": "/etc/xray/certs/privkey.pem"
-            }
-          ]
-        },
         "wsSettings": {
           "path": "/trojan"
         }
@@ -143,12 +82,115 @@ cat > /etc/xray/config.json << EOF
 }
 EOF
 
+# Create Nginx config for XRAY
+cat > /etc/nginx/conf.d/xray.conf << 'EOF'
+server {
+    listen 443 ssl http2;
+    listen [::]:443 ssl http2;
+    server_name _;
+
+    ssl_certificate /etc/letsencrypt/live/DOMAIN/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/DOMAIN/privkey.pem;
+    ssl_protocols TLSv1.2 TLSv1.3;
+    ssl_ciphers HIGH:!aNULL:!MD5;
+
+    location /vmess {
+        proxy_pass http://127.0.0.1:10001;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade \$http_upgrade;
+        proxy_set_header Connection "upgrade";
+        proxy_set_header Host \$host;
+        proxy_set_header X-Real-IP \$remote_addr;
+        proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
+    }
+
+    location /vless {
+        proxy_pass http://127.0.0.1:10002;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade \$http_upgrade;
+        proxy_set_header Connection "upgrade";
+        proxy_set_header Host \$host;
+        proxy_set_header X-Real-IP \$remote_addr;
+        proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
+    }
+
+    location /trojan {
+        proxy_pass http://127.0.0.1:10003;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade \$http_upgrade;
+        proxy_set_header Connection "upgrade";
+        proxy_set_header Host \$host;
+        proxy_set_header X-Real-IP \$remote_addr;
+        proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
+    }
+}
+
+server {
+    listen 80;
+    listen [::]:80;
+    server_name _;
+
+    location /vmess {
+        proxy_pass http://127.0.0.1:10001;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade \$http_upgrade;
+        proxy_set_header Connection "upgrade";
+        proxy_set_header Host \$host;
+        proxy_set_header X-Real-IP \$remote_addr;
+        proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
+    }
+
+    location /vless {
+        proxy_pass http://127.0.0.1:10002;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade \$http_upgrade;
+        proxy_set_header Connection "upgrade";
+        proxy_set_header Host \$host;
+        proxy_set_header X-Real-IP \$remote_addr;
+        proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
+    }
+
+    location /trojan {
+        proxy_pass http://127.0.0.1:10003;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade \$http_upgrade;
+        proxy_set_header Connection "upgrade";
+        proxy_set_header Host \$host;
+        proxy_set_header X-Real-IP \$remote_addr;
+        proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
+    }
+}
+EOF
+
+# Replace DOMAIN placeholder with actual domain
+sed -i "s|DOMAIN|$DOMAIN|g" /etc/nginx/conf.d/xray.conf
+
 # Create log directory
 mkdir -p /var/log/xray
 
-# Restart XRAY
-systemctl restart xray
+# Create directories for user data
+mkdir -p /etc/tunneling/vmess
+mkdir -p /etc/tunneling/vless
+mkdir -p /etc/tunneling/trojan
 
+# Restart services
+systemctl restart xray
+systemctl restart nginx
+
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 echo "XRAY configuration created successfully!"
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 echo "Domain: $DOMAIN"
-echo "UUID: $UUID"
+echo ""
+echo "Services:"
+echo "  • VMESS   → https://$DOMAIN:443/vmess"
+echo "  • VLESS   → https://$DOMAIN:443/vless"
+echo "  • TROJAN  → https://$DOMAIN:443/trojan"
+echo ""
+echo "Internal Ports:"
+echo "  • VMESS   → 127.0.0.1:10001"
+echo "  • VLESS   → 127.0.0.1:10002"
+echo "  • TROJAN  → 127.0.0.1:10003"
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+echo ""
+echo "Note: Create user accounts using the menu to start using the services."

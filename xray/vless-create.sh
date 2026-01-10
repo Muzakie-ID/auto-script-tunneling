@@ -27,7 +27,7 @@ exp_timestamp=$(date -d "$exp_date" +%s)
 domain=$(cat /root/domain.txt)
 
 # Create JSON record
-cat > /etc/tunneling/VLESS/${username}.json << EOF
+cat > /etc/tunneling/vless/${username}.json << EOF
 {
     "username": "$username",
     "uuid": "$uuid",
@@ -38,7 +38,22 @@ cat > /etc/tunneling/VLESS/${username}.json << EOF
 }
 EOF
 
-# TODO: Add to XRAY config (will be implemented)
+# Add to XRAY config
+CONFIG_FILE="/etc/xray/config.json"
+
+# Check if user already exists in config
+if grep -q "\"id\": \"$uuid\"" $CONFIG_FILE; then
+    echo -e "${RED}User already exists in XRAY config!${NC}"
+    exit 1
+fi
+
+# Add client to VLESS inbound
+jq --arg uuid "$uuid" --arg email "$username@$domain" \
+   '.inbounds[] | select(.protocol=="vless") | .settings.clients += [{"id": $uuid, "email": $email}]' \
+   $CONFIG_FILE > /tmp/xray-config.tmp && mv /tmp/xray-config.tmp $CONFIG_FILE
+
+# Restart XRAY
+systemctl restart xray
 
 # Generate vless:// link
 vless_link="vless://$uuid@$domain:443?path=/vless&security=tls&encryption=none&type=ws&host=$domain&sni=$domain#$username-$domain"
