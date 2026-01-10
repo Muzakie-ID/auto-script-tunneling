@@ -140,134 +140,86 @@ cd /usr/local/sbin/tunneling
 
 # Base URL for scripts
 BASE_URL="https://raw.githubusercontent.com/Muzakie-ID/auto-script-tunneling/main"
+INSTALL_DIR="/usr/local/sbin/tunneling"
 
-# Download all menu scripts
-echo -e "${CYAN}[INFO]${NC} Downloading menu scripts..."
-wget -q -O main-menu.sh "${BASE_URL}/menu/main-menu.sh" 2>/dev/null || curl -sL "${BASE_URL}/menu/main-menu.sh" -o main-menu.sh
-wget -q -O ssh-menu.sh "${BASE_URL}/menu/ssh-menu.sh" 2>/dev/null || curl -sL "${BASE_URL}/menu/ssh-menu.sh" -o ssh-menu.sh
-wget -q -O vmess-menu.sh "${BASE_URL}/menu/vmess-menu.sh" 2>/dev/null || curl -sL "${BASE_URL}/menu/vmess-menu.sh" -o vmess-menu.sh
-wget -q -O vless-menu.sh "${BASE_URL}/menu/vless-menu.sh" 2>/dev/null || curl -sL "${BASE_URL}/menu/vless-menu.sh" -o vless-menu.sh
-wget -q -O trojan-menu.sh "${BASE_URL}/menu/trojan-menu.sh" 2>/dev/null || curl -sL "${BASE_URL}/menu/trojan-menu.sh" -o trojan-menu.sh
-wget -q -O system-menu.sh "${BASE_URL}/menu/system-menu.sh" 2>/dev/null || curl -sL "${BASE_URL}/menu/system-menu.sh" -o system-menu.sh
-wget -q -O backup-menu.sh "${BASE_URL}/menu/backup-menu.sh" 2>/dev/null || curl -sL "${BASE_URL}/menu/backup-menu.sh" -o backup-menu.sh
-wget -q -O bot-menu.sh "${BASE_URL}/menu/bot-menu.sh" 2>/dev/null || curl -sL "${BASE_URL}/menu/bot-menu.sh" -o bot-menu.sh
-wget -q -O settings-menu.sh "${BASE_URL}/menu/settings-menu.sh" 2>/dev/null || curl -sL "${BASE_URL}/menu/settings-menu.sh" -o settings-menu.sh
-wget -q -O info-menu.sh "${BASE_URL}/menu/info-menu.sh" 2>/dev/null || curl -sL "${BASE_URL}/menu/info-menu.sh" -o info-menu.sh
+# Create installation directory
+mkdir -p "$INSTALL_DIR"
+mkdir -p "$INSTALL_DIR/menu"
+mkdir -p "$INSTALL_DIR/ssh"
+mkdir -p "$INSTALL_DIR/system"
+mkdir -p "$INSTALL_DIR/xray"
+mkdir -p "$INSTALL_DIR/bot"
 
-# Download SSH scripts
-echo -e "${CYAN}[INFO]${NC} Downloading SSH scripts..."
-wget -q -O ssh-create.sh "${BASE_URL}/ssh/ssh-create.sh" 2>/dev/null || curl -sL "${BASE_URL}/ssh/ssh-create.sh" -o ssh-create.sh
-wget -q -O ssh-trial.sh "${BASE_URL}/ssh/ssh-trial.sh" 2>/dev/null || curl -sL "${BASE_URL}/ssh/ssh-trial.sh" -o ssh-trial.sh
-wget -q -O ssh-renew.sh "${BASE_URL}/ssh/ssh-renew.sh" 2>/dev/null || curl -sL "${BASE_URL}/ssh/ssh-renew.sh" -o ssh-renew.sh
-wget -q -O ssh-delete.sh "${BASE_URL}/ssh/ssh-delete.sh" 2>/dev/null || curl -sL "${BASE_URL}/ssh/ssh-delete.sh" -o ssh-delete.sh
-wget -q -O ssh-check.sh "${BASE_URL}/ssh/ssh-check.sh" 2>/dev/null || curl -sL "${BASE_URL}/ssh/ssh-check.sh" -o ssh-check.sh
-wget -q -O ssh-list.sh "${BASE_URL}/ssh/ssh-list.sh" 2>/dev/null || curl -sL "${BASE_URL}/ssh/ssh-list.sh" -o ssh-list.sh
-wget -q -O ssh-delete-expired.sh "${BASE_URL}/ssh/ssh-delete-expired.sh" 2>/dev/null || curl -sL "${BASE_URL}/ssh/ssh-delete-expired.sh" -o ssh-delete-expired.sh
-wget -q -O ssh-lock.sh "${BASE_URL}/ssh/ssh-lock.sh" 2>/dev/null || curl -sL "${BASE_URL}/ssh/ssh-lock.sh" -o ssh-lock.sh
-wget -q -O ssh-unlock.sh "${BASE_URL}/ssh/ssh-unlock.sh" 2>/dev/null || curl -sL "${BASE_URL}/ssh/ssh-unlock.sh" -o ssh-unlock.sh
-wget -q -O ssh-details.sh "${BASE_URL}/ssh/ssh-details.sh" 2>/dev/null || curl -sL "${BASE_URL}/ssh/ssh-details.sh" -o ssh-details.sh
-wget -q -O ssh-limit-ip.sh "${BASE_URL}/ssh/ssh-limit-ip.sh" 2>/dev/null || curl -sL "${BASE_URL}/ssh/ssh-limit-ip.sh" -o ssh-limit-ip.sh
-wget -q -O ssh-limit-quota.sh "${BASE_URL}/ssh/ssh-limit-quota.sh" 2>/dev/null || curl -sL "${BASE_URL}/ssh/ssh-limit-quota.sh" -o ssh-limit-quota.sh
-wget -q -O setup-dropbear.sh "${BASE_URL}/ssh/setup-dropbear.sh" 2>/dev/null || curl -sL "${BASE_URL}/ssh/setup-dropbear.sh" -o setup-dropbear.sh
-wget -q -O setup-stunnel.sh "${BASE_URL}/ssh/setup-stunnel.sh" 2>/dev/null || curl -sL "${BASE_URL}/ssh/setup-stunnel.sh" -o setup-stunnel.sh
-wget -q -O setup-squid.sh "${BASE_URL}/ssh/setup-squid.sh" 2>/dev/null || curl -sL "${BASE_URL}/ssh/setup-squid.sh" -o setup-squid.sh
-wget -q -O setup-tuntap.sh "${BASE_URL}/ssh/setup-tuntap.sh" 2>/dev/null || curl -sL "${BASE_URL}/ssh/setup-tuntap.sh" -o setup-tuntap.sh
+# Function to install files
+install_file() {
+    local source_path="$1"
+    local dest_path="$2"
+    local filename=$(basename "$source_path")
+    
+    if [[ -f "$source_path" ]]; then
+        # Copy from local if exists (Instalasi dari git clone)
+        cp "$source_path" "$dest_path"
+    else
+        # Download if local file not found (Instalasi remote/curl)
+        echo -e "${YELLOW}[WARNING] Local file $source_path not found, downloading...${NC}"
+        wget -q -O "$dest_path" "${BASE_URL}/$source_path" 2>/dev/null || curl -sL "${BASE_URL}/$source_path" -o "$dest_path"
+    fi
+}
 
-# Download system scripts
-echo -e "${CYAN}[INFO]${NC} Downloading system scripts..."
-# System monitoring and management
-wget -q -O check-services.sh "${BASE_URL}/system/check-services.sh" 2>/dev/null || curl -sL "${BASE_URL}/system/check-services.sh" -o check-services.sh
-wget -q -O monitor-vps.sh "${BASE_URL}/system/monitor-vps.sh" 2>/dev/null || curl -sL "${BASE_URL}/system/monitor-vps.sh" -o monitor-vps.sh
-wget -q -O backup-now.sh "${BASE_URL}/system/backup-now.sh" 2>/dev/null || curl -sL "${BASE_URL}/system/backup-now.sh" -o backup-now.sh
-wget -q -O restore-backup.sh "${BASE_URL}/system/restore-backup.sh" 2>/dev/null || curl -sL "${BASE_URL}/system/restore-backup.sh" -o restore-backup.sh
-wget -q -O auto-backup.sh "${BASE_URL}/system/auto-backup.sh" 2>/dev/null || curl -sL "${BASE_URL}/system/auto-backup.sh" -o auto-backup.sh
-wget -q -O delete-expired.sh "${BASE_URL}/system/delete-expired.sh" 2>/dev/null || curl -sL "${BASE_URL}/system/delete-expired.sh" -o delete-expired.sh
-wget -q -O setup-nginx.sh "${BASE_URL}/system/setup-nginx.sh" 2>/dev/null || curl -sL "${BASE_URL}/system/setup-nginx.sh" -o setup-nginx.sh
-wget -q -O restart-all.sh "${BASE_URL}/system/restart-all.sh" 2>/dev/null || curl -sL "${BASE_URL}/system/restart-all.sh" -o restart-all.sh
-wget -q -O restart-service.sh "${BASE_URL}/system/restart-service.sh" 2>/dev/null || curl -sL "${BASE_URL}/system/restart-service.sh" -o restart-service.sh
-wget -q -O speedtest.sh "${BASE_URL}/system/speedtest.sh" 2>/dev/null || curl -sL "${BASE_URL}/system/speedtest.sh" -o speedtest.sh
-wget -q -O delete-all-expired.sh "${BASE_URL}/system/delete-all-expired.sh" 2>/dev/null || curl -sL "${BASE_URL}/system/delete-all-expired.sh" -o delete-all-expired.sh
-wget -q -O limit-speed.sh "${BASE_URL}/system/limit-speed.sh" 2>/dev/null || curl -sL "${BASE_URL}/system/limit-speed.sh" -o limit-speed.sh
-wget -q -O monitor-service.sh "${BASE_URL}/system/monitor-service.sh" 2>/dev/null || curl -sL "${BASE_URL}/system/monitor-service.sh" -o monitor-service.sh
-wget -q -O check-logs.sh "${BASE_URL}/system/check-logs.sh" 2>/dev/null || curl -sL "${BASE_URL}/system/check-logs.sh" -o check-logs.sh
-wget -q -O auto-reboot-settings.sh "${BASE_URL}/system/auto-reboot-settings.sh" 2>/dev/null || curl -sL "${BASE_URL}/system/auto-reboot-settings.sh" -o auto-reboot-settings.sh
+# Install menu scripts
+echo -e "${CYAN}[INFO]${NC} Installing menu scripts..."
+for file in menu/*.sh; do install_file "$file" "$INSTALL_DIR/menu/$(basename "$file")"; done
+install_file "menu/main-menu.sh" "$INSTALL_DIR/main-menu.sh" # Main menu di root tunneling juga oke, atau symlink
 
-# Settings menu scripts
-wget -q -O change-domain.sh "${BASE_URL}/system/change-domain.sh" 2>/dev/null || curl -sL "${BASE_URL}/system/change-domain.sh" -o change-domain.sh
-wget -q -O change-banner.sh "${BASE_URL}/system/change-banner.sh" 2>/dev/null || curl -sL "${BASE_URL}/system/change-banner.sh" -o change-banner.sh
-wget -q -O change-port.sh "${BASE_URL}/system/change-port.sh" 2>/dev/null || curl -sL "${BASE_URL}/system/change-port.sh" -o change-port.sh
-wget -q -O change-timezone.sh "${BASE_URL}/system/change-timezone.sh" 2>/dev/null || curl -sL "${BASE_URL}/system/change-timezone.sh" -o change-timezone.sh
-wget -q -O fix-error-domain.sh "${BASE_URL}/system/fix-error-domain.sh" 2>/dev/null || curl -sL "${BASE_URL}/system/fix-error-domain.sh" -o fix-error-domain.sh
-wget -q -O fix-error-proxy.sh "${BASE_URL}/system/fix-error-proxy.sh" 2>/dev/null || curl -sL "${BASE_URL}/system/fix-error-proxy.sh" -o fix-error-proxy.sh
-wget -q -O renew-ssl.sh "${BASE_URL}/system/renew-ssl.sh" 2>/dev/null || curl -sL "${BASE_URL}/system/renew-ssl.sh" -o renew-ssl.sh
-wget -q -O auto-record-wildcard.sh "${BASE_URL}/system/auto-record-wildcard.sh" 2>/dev/null || curl -sL "${BASE_URL}/system/auto-record-wildcard.sh" -o auto-record-wildcard.sh
-wget -q -O limit-speed-settings.sh "${BASE_URL}/system/limit-speed-settings.sh" 2>/dev/null || curl -sL "${BASE_URL}/system/limit-speed-settings.sh" -o limit-speed-settings.sh
-wget -q -O reset-settings.sh "${BASE_URL}/system/reset-settings.sh" 2>/dev/null || curl -sL "${BASE_URL}/system/reset-settings.sh" -o reset-settings.sh
+# Install SSH scripts
+echo -e "${CYAN}[INFO]${NC} Installing SSH scripts..."
+for file in ssh/*.sh; do install_file "$file" "$INSTALL_DIR/ssh/$(basename "$file")"; done
 
-# Download XRAY script
-echo -e "${CYAN}[INFO]${NC} Downloading XRAY script..."
-wget -q -O setup-xray.sh "${BASE_URL}/xray/setup-xray.sh" 2>/dev/null || curl -sL "${BASE_URL}/xray/setup-xray.sh" -o setup-xray.sh
-wget -q -O vmess-create.sh "${BASE_URL}/xray/vmess-create.sh" 2>/dev/null || curl -sL "${BASE_URL}/xray/vmess-create.sh" -o vmess-create.sh
-wget -q -O vmess-trial.sh "${BASE_URL}/xray/vmess-trial.sh" 2>/dev/null || curl -sL "${BASE_URL}/xray/vmess-trial.sh" -o vmess-trial.sh
-wget -q -O vmess-list.sh "${BASE_URL}/xray/vmess-list.sh" 2>/dev/null || curl -sL "${BASE_URL}/xray/vmess-list.sh" -o vmess-list.sh
-wget -q -O vmess-renew.sh "${BASE_URL}/xray/vmess-renew.sh" 2>/dev/null || curl -sL "${BASE_URL}/xray/vmess-renew.sh" -o vmess-renew.sh
-wget -q -O vmess-delete.sh "${BASE_URL}/xray/vmess-delete.sh" 2>/dev/null || curl -sL "${BASE_URL}/xray/vmess-delete.sh" -o vmess-delete.sh
-wget -q -O vmess-check.sh "${BASE_URL}/xray/vmess-check.sh" 2>/dev/null || curl -sL "${BASE_URL}/xray/vmess-check.sh" -o vmess-check.sh
-wget -q -O vmess-delete-expired.sh "${BASE_URL}/xray/vmess-delete-expired.sh" 2>/dev/null || curl -sL "${BASE_URL}/xray/vmess-delete-expired.sh" -o vmess-delete-expired.sh
-wget -q -O vmess-lock.sh "${BASE_URL}/xray/vmess-lock.sh" 2>/dev/null || curl -sL "${BASE_URL}/xray/vmess-lock.sh" -o vmess-lock.sh
-wget -q -O vmess-unlock.sh "${BASE_URL}/xray/vmess-unlock.sh" 2>/dev/null || curl -sL "${BASE_URL}/xray/vmess-unlock.sh" -o vmess-unlock.sh
-wget -q -O vmess-details.sh "${BASE_URL}/xray/vmess-details.sh" 2>/dev/null || curl -sL "${BASE_URL}/xray/vmess-details.sh" -o vmess-details.sh
-wget -q -O vmess-limit-ip.sh "${BASE_URL}/xray/vmess-limit-ip.sh" 2>/dev/null || curl -sL "${BASE_URL}/xray/vmess-limit-ip.sh" -o vmess-limit-ip.sh
-wget -q -O vmess-limit-quota.sh "${BASE_URL}/xray/vmess-limit-quota.sh" 2>/dev/null || curl -sL "${BASE_URL}/xray/vmess-limit-quota.sh" -o vmess-limit-quota.sh
-
-# VLESS scripts (same pattern)
-for script in create trial list renew delete check delete-expired lock unlock details limit-ip limit-quota; do
-    wget -q -O vless-${script}.sh "${BASE_URL}/xray/vless-${script}.sh" 2>/dev/null || curl -sL "${BASE_URL}/xray/vless-${script}.sh" -o vless-${script}.sh
+# Install system scripts
+echo -e "${CYAN}[INFO]${NC} Installing system scripts..."
+for file in system/*.sh; do install_file "$file" "$INSTALL_DIR/system/$(basename "$file")"; done
+for file in *.sh; do 
+    if [[ "$file" == "setup.sh" ]]; then continue; fi
+    install_file "$file" "$INSTALL_DIR/$(basename "$file")" 2>/dev/null
 done
 
-# TROJAN scripts (same pattern)
-for script in create trial list renew delete check delete-expired lock unlock details limit-ip limit-quota; do
-    wget -q -O trojan-${script}.sh "${BASE_URL}/xray/trojan-${script}.sh" 2>/dev/null || curl -sL "${BASE_URL}/xray/trojan-${script}.sh" -o trojan-${script}.sh
-done
+# Install XRAY scripts
+echo -e "${CYAN}[INFO]${NC} Installing XRAY scripts..."
+for file in xray/*.sh; do install_file "$file" "$INSTALL_DIR/xray/$(basename "$file")"; done
 
-wget -q -O placeholder.sh "${BASE_URL}/xray/placeholder.sh" 2>/dev/null || curl -sL "${BASE_URL}/xray/placeholder.sh" -o placeholder.sh
-
-# Download bot scripts
-echo -e "${CYAN}[INFO]${NC} Downloading bot scripts..."
-wget -q -O telegram_bot.py "${BASE_URL}/bot/telegram_bot.py" 2>/dev/null || curl -sL "${BASE_URL}/bot/telegram_bot.py" -o telegram_bot.py
-wget -q -O bot-setup.sh "${BASE_URL}/bot/bot-setup.sh" 2>/dev/null || curl -sL "${BASE_URL}/bot/bot-setup.sh" -o bot-setup.sh
-wget -q -O bot-start.sh "${BASE_URL}/bot/bot-start.sh" 2>/dev/null || curl -sL "${BASE_URL}/bot/bot-start.sh" -o bot-start.sh
-wget -q -O bot-stop.sh "${BASE_URL}/bot/bot-stop.sh" 2>/dev/null || curl -sL "${BASE_URL}/bot/bot-stop.sh" -o bot-stop.sh
-wget -q -O bot-restart.sh "${BASE_URL}/bot/bot-restart.sh" 2>/dev/null || curl -sL "${BASE_URL}/bot/bot-restart.sh" -o bot-restart.sh
-wget -q -O bot-status.sh "${BASE_URL}/bot/bot-status.sh" 2>/dev/null || curl -sL "${BASE_URL}/bot/bot-status.sh" -o bot-status.sh
-wget -q -O bot-auto-order.sh "${BASE_URL}/bot/bot-auto-order.sh" 2>/dev/null || curl -sL "${BASE_URL}/bot/bot-auto-order.sh" -o bot-auto-order.sh
-wget -q -O bot-payment.sh "${BASE_URL}/bot/bot-payment.sh" 2>/dev/null || curl -sL "${BASE_URL}/bot/bot-payment.sh" -o bot-payment.sh
-wget -q -O bot-price.sh "${BASE_URL}/bot/bot-price.sh" 2>/dev/null || curl -sL "${BASE_URL}/bot/bot-price.sh" -o bot-price.sh
-wget -q -O bot-notification.sh "${BASE_URL}/bot/bot-notification.sh" 2>/dev/null || curl -sL "${BASE_URL}/bot/bot-notification.sh" -o bot-notification.sh
-wget -q -O bot-test.sh "${BASE_URL}/bot/bot-test.sh" 2>/dev/null || curl -sL "${BASE_URL}/bot/bot-test.sh" -o bot-test.sh
-
-# Download maintenance scripts
-echo -e "${CYAN}[INFO]${NC} Downloading maintenance scripts..."
-wget -q -O fix-install.sh "${BASE_URL}/fix-install.sh" 2>/dev/null || curl -sL "${BASE_URL}/fix-install.sh" -o fix-install.sh
-wget -q -O update.sh "${BASE_URL}/update.sh" 2>/dev/null || curl -sL "${BASE_URL}/update.sh" -o update.sh
-wget -q -O make-executable.sh "${BASE_URL}/make-executable.sh" 2>/dev/null || curl -sL "${BASE_URL}/make-executable.sh" -o make-executable.sh
+# Install bot scripts
+echo -e "${CYAN}[INFO]${NC} Installing bot scripts..."
+for file in bot/*.sh; do install_file "$file" "$INSTALL_DIR/bot/$(basename "$file")"; done
+if [[ -f "bot/telegram_bot.py" ]]; then
+    cp "bot/telegram_bot.py" "$INSTALL_DIR/bot/telegram_bot.py"
+else
+     wget -q -O "$INSTALL_DIR/bot/telegram_bot.py" "${BASE_URL}/bot/telegram_bot.py" 2>/dev/null
+fi
 
 # Set permissions
-chmod +x /usr/local/sbin/tunneling/*.sh
+chmod +x "$INSTALL_DIR"/*.sh
+chmod +x "$INSTALL_DIR"/menu/*.sh
+chmod +x "$INSTALL_DIR"/ssh/*.sh
+chmod +x "$INSTALL_DIR"/system/*.sh
+chmod +x "$INSTALL_DIR"/xray/*.sh
+chmod +x "$INSTALL_DIR"/bot/*.sh
+
+# Create global symlink for menu
+ln -sf "$INSTALL_DIR/menu/main-menu.sh" /usr/bin/menu
 
 # Setup SSH Services
 echo -e "${CYAN}[INFO]${NC} Setting up Dropbear SSH..."
-bash /usr/local/sbin/tunneling/setup-dropbear.sh
+bash "$INSTALL_DIR/ssh/setup-dropbear.sh"
 
 echo -e "${CYAN}[INFO]${NC} Setting up Stunnel4 SSL/TLS..."
-bash /usr/local/sbin/tunneling/setup-stunnel.sh
+bash "$INSTALL_DIR/ssh/setup-stunnel.sh"
 
 echo -e "${CYAN}[INFO]${NC} Setting up Squid Proxy..."
-bash /usr/local/sbin/tunneling/setup-squid.sh
+bash "$INSTALL_DIR/ssh/setup-squid.sh"
 
 # Setup TUN/TAP device and IP forwarding
 echo -e "${CYAN}[INFO]${NC} Setting up TUN/TAP device for SSH tunneling..."
-bash /usr/local/sbin/tunneling/setup-tuntap.sh
+bash "$INSTALL_DIR/ssh/setup-tuntap.sh"
 
 # Install XRAY
 echo -e "${CYAN}[INFO]${NC} Installing XRAY..."
@@ -286,7 +238,7 @@ ln -s /etc/letsencrypt/live/$domain/privkey.pem /etc/xray/certs/privkey.pem
 
 # Configure XRAY
 echo -e "${CYAN}[INFO]${NC} Configuring XRAY..."
-bash /usr/local/sbin/tunneling/setup-xray.sh
+bash "$INSTALL_DIR/xray/setup-xray.sh"
 
 # Configure cron for SSL renewal
 echo "0 3 * * * root certbot renew --quiet --post-hook 'systemctl reload nginx'" > /etc/cron.d/ssl-renewal
@@ -295,10 +247,10 @@ echo "0 3 * * * root certbot renew --quiet --post-hook 'systemctl reload nginx'"
 echo "0 5 * * * root /sbin/reboot" > /etc/cron.d/auto-reboot
 
 # Setup auto delete expired accounts
-echo "0 0 * * * root /usr/local/sbin/tunneling/delete-expired.sh" > /etc/cron.d/delete-expired
+echo "0 0 * * * root $INSTALL_DIR/system/delete-expired.sh" > /etc/cron.d/delete-expired
 
 # Setup auto backup
-echo "0 2 * * * root /usr/local/sbin/tunneling/auto-backup.sh" > /etc/cron.d/auto-backup
+echo "0 2 * * * root $INSTALL_DIR/system/auto-backup.sh" > /etc/cron.d/auto-backup
 
 # Configure firewall
 echo -e "${CYAN}[INFO]${NC} Configuring firewall..."
