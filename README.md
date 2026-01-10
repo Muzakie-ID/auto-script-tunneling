@@ -278,29 +278,116 @@ menu → 5. System Menu → 2. Restart Services
 tail -f /var/log/tunneling/error.log
 ```
 
-## 📝 Port Information
+## 📝 Port Information & Firewall Configuration
 
-### Default Ports
+### Port List untuk Inbound Rules (Cloud Provider)
 
-- **SSH:**
-  - OpenSSH: 22
-  - Dropbear: 109, 143
-  - SSL: 442, 443
-  - Squid: 3128, 8080
-  - OpenVPN: 1194
-  - UDP Custom: 1-65535
+Berikut adalah **daftar lengkap port** yang perlu dibuka di firewall/security group cloud provider (AWS, GCP, Azure, Vultr, dll):
 
-- **XRAY:**
-  - VMESS: 443, 80
-  - VLESS: 443, 80
-  - TROJAN: 443, 80
-  - VMESS WS: 80, 8080
-  - VLESS WS: 80, 8080
-  - TROJAN WS: 80, 8080
+#### **SSH Services (TCP)**
+| Port | Service | Deskripsi |
+|------|---------|-----------|
+| `22` | OpenSSH | SSH standard |
+| `109` | Dropbear | SSH alternative (port 1) |
+| `143` | Dropbear | SSH alternative (port 2) |
 
-- **Other:**
-  - Nginx: 80, 443
-  - Proxy: 2082, 2086, 2087, 2095, 2096
+#### **SSL/TLS (TCP)**
+| Port | Service | Deskripsi |
+|------|---------|-----------|
+| `442` | Stunnel | Dropbear over SSL |
+| `777` | Stunnel | OpenSSH over SSL |
+
+#### **Proxy (TCP)**
+| Port | Service | Deskripsi |
+|------|---------|-----------|
+| `3128` | Squid | HTTP Proxy (port 1) |
+| `8080` | Squid | HTTP Proxy (port 2) |
+
+#### **Web Server / XRAY (TCP)**
+| Port | Service | Deskripsi |
+|------|---------|-----------|
+| `80` | Nginx | HTTP (reverse proxy untuk XRAY) |
+| `443` | Nginx | HTTPS/SSL (reverse proxy untuk VMESS/VLESS/TROJAN) |
+
+#### **Internal XRAY (Localhost Only - Tidak Perlu Dibuka)**
+| Port | Service | Deskripsi |
+|------|---------|-----------|
+| `10001` | XRAY VMESS | Internal only (127.0.0.1) |
+| `10002` | XRAY VLESS | Internal only (127.0.0.1) |
+| `10003` | XRAY TROJAN | Internal only (127.0.0.1) |
+
+### Konfigurasi UFW (Ubuntu Firewall)
+
+Script akan otomatis mengkonfigurasi UFW dengan rules berikut:
+
+```bash
+# SSH
+ufw allow 22/tcp
+ufw allow 109/tcp
+ufw allow 143/tcp
+
+# SSL/TLS
+ufw allow 442/tcp
+ufw allow 777/tcp
+
+# Proxy
+ufw allow 3128/tcp
+ufw allow 8080/tcp
+
+# Web Server
+ufw allow 80/tcp
+ufw allow 443/tcp
+
+# Enable UFW
+ufw --force enable
+```
+
+### Cloud Provider Inbound Rules
+
+**Contoh untuk AWS Security Group / GCP Firewall / Azure NSG:**
+
+| Type | Protocol | Port Range | Source | Deskripsi |
+|------|----------|------------|--------|-----------|
+| SSH | TCP | 22 | 0.0.0.0/0 | OpenSSH |
+| Custom TCP | TCP | 109 | 0.0.0.0/0 | Dropbear SSH |
+| Custom TCP | TCP | 143 | 0.0.0.0/0 | Dropbear SSH |
+| Custom TCP | TCP | 442 | 0.0.0.0/0 | Stunnel SSL |
+| HTTPS | TCP | 443 | 0.0.0.0/0 | Nginx + XRAY |
+| Custom TCP | TCP | 777 | 0.0.0.0/0 | OpenSSH SSL |
+| HTTP | TCP | 80 | 0.0.0.0/0 | Nginx + XRAY |
+| Custom TCP | TCP | 3128 | 0.0.0.0/0 | Squid Proxy |
+| Custom TCP | TCP | 8080 | 0.0.0.0/0 | Squid Proxy |
+
+### Arsitektur Port
+
+```
+┌─────────────────────────────────────────────────┐
+│                  INTERNET                        │
+└────────────────────┬────────────────────────────┘
+                     │
+         ┌───────────┼───────────┐
+         │           │           │
+    Port 443     Port 80    Port 22-8080
+         │           │           │
+    ┌────▼───────────▼───────────▼────┐
+    │         NGINX (Reverse Proxy)    │
+    │    SSL/TLS Termination Point     │
+    └────┬───────────┬───────────┬─────┘
+         │           │           │
+   /vmess      /vless      /trojan
+         │           │           │
+    ┌────▼───────────▼───────────▼────┐
+    │         XRAY CORE                │
+    │   127.0.0.1:10001 (VMESS)       │
+    │   127.0.0.1:10002 (VLESS)       │
+    │   127.0.0.1:10003 (TROJAN)      │
+    └──────────────────────────────────┘
+```
+
+**⚠️ PENTING:** 
+- Port **10001-10003** adalah internal port yang hanya diakses oleh Nginx
+- **TIDAK PERLU** membuka port 10001-10003 di firewall
+- Semua traffic XRAY di-route melalui Nginx di port 443/80
 
 ## 💡 Tips & Tricks
 
