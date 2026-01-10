@@ -44,7 +44,7 @@ fi
 uuid=$(jq -r '.uuid' $json_file)
 
 # Remove from XRAY config
-CONFIG_FILE="/etc/xray/config.json"
+CONFIG_FILE="/usr/local/etc/xray/config.json"
 jq --arg uuid "$uuid" \
    '(.inbounds[] | select(.protocol=="vmess") | .settings.clients) |= map(select(.id != $uuid))' \
    $CONFIG_FILE > /tmp/xray-config.tmp && mv /tmp/xray-config.tmp $CONFIG_FILE

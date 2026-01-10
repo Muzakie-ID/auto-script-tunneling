@@ -32,7 +32,7 @@ tar -czf $BACKUP_PATH \
     /etc/tunneling/trojan \
     /etc/tunneling/config.json \
     /etc/tunneling/bot/config.json \
-    /etc/xray/config.json \
+    /usr/local/etc/xray/config.json \
     /etc/nginx/conf.d/ \
     /root/domain.txt \
     2>/dev/null

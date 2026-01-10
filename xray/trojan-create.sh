@@ -39,7 +39,7 @@ cat > /etc/tunneling/trojan/${username}.json << EOF
 EOF
 
 # Add to XRAY config
-CONFIG_FILE="/etc/xray/config.json"
+CONFIG_FILE="/usr/local/etc/xray/config.json"
 
 # Check if user already exists in config
 if grep -q "\"password\": \"$uuid\"" $CONFIG_FILE; then

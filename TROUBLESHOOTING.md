@@ -93,7 +93,7 @@ systemctl status xray
 journalctl -u xray -n 50
 
 # Check XRAY config
-cat /etc/xray/config.json
+cat /usr/local/etc/xray/config.json
 
 # Restart XRAY
 systemctl restart xray
@@ -226,7 +226,7 @@ top
 htop
 
 # Limit XRAY workers
-nano /etc/xray/config.json
+nano /usr/local/etc/xray/config.json
 # Add: "workers": 2
 
 # Restart XRAY

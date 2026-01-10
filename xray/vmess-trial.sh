@@ -39,7 +39,7 @@ cat > /etc/tunneling/vmess/${username}.json << EOF
 EOF
 
 # Add to XRAY config
-CONFIG_FILE="/etc/xray/config.json"
+CONFIG_FILE="/usr/local/etc/xray/config.json"
 jq --arg uuid "$uuid" --arg email "TRIAL-$username@$domain" \
    '(.inbounds[] | select(.protocol=="vmess") | .settings.clients) += [{"id": $uuid, "alterId": 0, "email": $email}]' \
    $CONFIG_FILE > /tmp/xray-config.tmp && mv /tmp/xray-config.tmp $CONFIG_FILE

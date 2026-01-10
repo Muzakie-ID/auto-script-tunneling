@@ -39,7 +39,7 @@ cat > /etc/tunneling/vmess/${username}.json << EOF
 EOF
 
 # Add to XRAY config
-CONFIG_FILE="/etc/xray/config.json"
+CONFIG_FILE="/usr/local/etc/xray/config.json"
 
 # Check if user already exists in config
 if grep -q "\"id\": \"$uuid\"" $CONFIG_FILE; then

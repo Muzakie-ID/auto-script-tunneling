@@ -39,7 +39,7 @@ cat > /etc/tunneling/trojan/${username}.json << EOF
 EOF
 
 # Add to XRAY config
-CONFIG_FILE="/etc/xray/config.json"
+CONFIG_FILE="/usr/local/etc/xray/config.json"
 jq --arg password "$uuid" --arg email "TRIAL-$username@$domain" \
    '.inbounds[] | select(.protocol=="trojan") | .settings.clients += [{"password": $password, "email": $email}]' \
    $CONFIG_FILE > /tmp/xray-config.tmp && mv /tmp/xray-config.tmp $CONFIG_FILE
