@@ -258,15 +258,15 @@ def confirm_approve_order(call):
     protocol = order['type']
     days = order['days']
     
-    # Call create script
+    # Call create script with correct paths
     if protocol == 'ssh':
-        os.system(f"/usr/local/sbin/tunneling/ssh-create.sh {username} {password} {days} >/dev/null 2>&1")
+        os.system(f"bash /usr/local/sbin/tunneling/ssh/ssh-create.sh {username} {password} {days} >/dev/null 2>&1")
     elif protocol == 'vmess':
-        os.system(f"/usr/local/sbin/tunneling/vmess-create.sh {username} {days} >/dev/null 2>&1")
+        os.system(f"echo '{username}\n{days}' | bash /usr/local/sbin/tunneling/xray/vmess-create.sh")
     elif protocol == 'vless':
-        os.system(f"/usr/local/sbin/tunneling/vless-create.sh {username} {days} >/dev/null 2>&1")
+        os.system(f"echo '{username}\n{days}' | bash /usr/local/sbin/tunneling/xray/vless-create.sh")
     elif protocol == 'trojan':
-        os.system(f"/usr/local/sbin/tunneling/trojan-create.sh {username} {password} {days} >/dev/null 2>&1")
+        os.system(f"echo '{username}\n{days}' | bash /usr/local/sbin/tunneling/xray/trojan-create.sh")
     
     # Read account details from JSON
     account_data = {}
