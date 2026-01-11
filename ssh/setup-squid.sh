@@ -20,8 +20,22 @@ http_port 8080
 acl all src 0.0.0.0/0
 http_access allow all
 
+# Allow CONNECT to common ports
+acl SSL_ports port 443
+acl Safe_ports port 80          # http
+acl Safe_ports port 21          # ftp
+acl Safe_ports port 443         # https
+acl Safe_ports port 70          # gopher
+acl Safe_ports port 210         # wais
+acl Safe_ports port 1025-65535  # unregistered ports
+acl Safe_ports port 280         # http-mgmt
+acl Safe_ports port 488         # gss-http
+acl Safe_ports port 591         # filemaker
+acl Safe_ports port 777         # multiling http
+acl CONNECT method CONNECT
+
 # DNS servers
-dns_nameservers 8.8.8.8 8.8.4.4
+dns_nameservers 8.8.8.8 8.8.4.4 1.1.1.1
 
 # Cache settings
 cache deny all
@@ -39,6 +53,10 @@ reply_header_access Link deny all
 # Performance
 max_filedesc 65536
 workers 4
+
+# Connection settings
+request_header_max_size 128 KB
+reply_header_max_size 128 KB
 
 # Logging
 access_log /var/log/squid/access.log

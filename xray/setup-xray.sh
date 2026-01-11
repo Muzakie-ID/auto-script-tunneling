@@ -76,6 +76,11 @@ cat > /usr/local/etc/xray/config.json << EOF
         "type": "field",
         "ip": ["geoip:private"],
         "outboundTag": "blocked"
+      },
+      {
+        "type": "field",
+        "protocol": ["bittorrent"],
+        "outboundTag": "blocked"
       }
     ]
   }

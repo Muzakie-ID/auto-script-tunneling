@@ -229,21 +229,29 @@ if ! command -v ufw &> /dev/null; then
     apt-get install -y ufw
 fi
 ufw --force enable
-ufw allow 22/tcp
-ufw allow 80/tcp
-ufw allow 443/tcp
-ufw allow 8080/tcp
-ufw allow 8443/tcp
-ufw allow 2082/tcp
-ufw allow 2086/tcp
-ufw allow 2087/tcp
-ufw allow 2095/tcp
-ufw allow 2096/tcp
-ufw allow 3128/tcp
-ufw allow 7300/tcp
-ufw allow 109/tcp
-ufw allow 143/tcp
-ufw allow 442/tcp
+
+# TCP Ports
+ufw allow 22/tcp    # SSH
+ufw allow 80/tcp    # HTTP
+ufw allow 443/tcp   # HTTPS
+ufw allow 8080/tcp  # HTTP Alternate
+ufw allow 8443/tcp  # HTTPS Alternate
+ufw allow 2082/tcp  # Custom
+ufw allow 2086/tcp  # Custom
+ufw allow 2087/tcp  # Custom
+ufw allow 2095/tcp  # Custom
+ufw allow 2096/tcp  # Custom
+ufw allow 3128/tcp  # Squid Proxy
+ufw allow 7300/tcp  # Custom
+ufw allow 109/tcp   # POP2
+ufw allow 143/tcp   # IMAP
+ufw allow 442/tcp   # Custom
+
+# UDP Ports
+ufw allow 53/udp    # DNS
+ufw allow 443/udp   # QUIC/HTTP3
+ufw allow 1194/udp  # OpenVPN
+ufw allow 7300/udp  # Custom UDP
 
 # Final setup
 echo -e "${CYAN}[INFO]${NC} Finalizing installation..."
