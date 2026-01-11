@@ -51,13 +51,21 @@ echo "$new_domain" > /etc/xray/domain
 echo -e "${CYAN}[INFO]${NC} Requesting SSL certificate..."
 systemctl stop nginx >/dev/null 2>&1
 
-# Request new certificate
-~/.acme.sh/acme.sh --set-default-ca --server letsencrypt
-~/.acme.sh/acme.sh --issue -d "$new_domain" --standalone -k ec-256
+# Get email
+if [ -f /root/email.txt ]; then
+    email=$(cat /root/email.txt)
+else
+    email="admin@${new_domain}"
+    echo "$email" > /root/email.txt
+fi
+
+# Request new certificate using certbot
+certbot certonly --standalone --non-interactive --agree-tos --email "$email" -d "$new_domain"
 
 if [ $? -eq 0 ]; then
-    # Install certificate
-    ~/.acme.sh/acme.sh --installcert -d "$new_domain" --fullchainpath /etc/xray/xray.crt --keypath /etc/xray/xray.key --ecc
+    # Install certificate (symlink to Let's Encrypt location)
+    ln -sf /etc/letsencrypt/live/"$new_domain"/fullchain.pem /etc/xray/xray.crt
+    ln -sf /etc/letsencrypt/live/"$new_domain"/privkey.pem /etc/xray/xray.key
     
     # Restart services
     systemctl start nginx

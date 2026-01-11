@@ -42,6 +42,14 @@ if [[ -z $domain ]]; then
 fi
 echo "$domain" > /root/domain.txt
 
+# Get email for SSL certificate
+read -p "Enter your email for SSL certificate: " email
+if [[ -z $email ]]; then
+    email="admin@${domain}"
+    echo -e "${YELLOW}No email provided, using default: $email${NC}"
+fi
+echo "$email" > /root/email.txt
+
 # Update and install dependencies
 echo -e "${CYAN}[INFO]${NC} Updating system and installing dependencies..."
 apt-get update

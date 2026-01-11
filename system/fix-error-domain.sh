@@ -38,16 +38,24 @@ echo -e "${CYAN}[1/5]${NC} Stopping services..."
 systemctl stop nginx xray
 
 echo -e "${CYAN}[2/5]${NC} Cleaning old certificates..."
-rm -rf ~/.acme.sh/"$domain"_ecc
-rm -f /etc/xray/xray.crt /etc/xray/xray.key
+rm -rf /etc/letsencrypt/live/"$domain"
+rm -rf /etc/letsencrypt/archive/"$domain"
+rm -rf /etc/letsencrypt/renewal/"$domain".conf
 
 echo -e "${CYAN}[3/5]${NC} Requesting new certificate..."
-~/.acme.sh/acme.sh --set-default-ca --server letsencrypt
-~/.acme.sh/acme.sh --issue -d "$domain" --standalone -k ec-256 --force
+# Get email
+if [ -f /root/email.txt ]; then
+    email=$(cat /root/email.txt)
+else
+    email="admin@${domain}"
+fi
+
+certbot certonly --standalone --non-interactive --agree-tos --email "$email" -d "$domain"
 
 if [ $? -eq 0 ]; then
     echo -e "${CYAN}[4/5]${NC} Installing certificate..."
-    ~/.acme.sh/acme.sh --installcert -d "$domain" --fullchainpath /etc/xray/xray.crt --keypath /etc/xray/xray.key --ecc
+    ln -sf /etc/letsencrypt/live/"$domain"/fullchain.pem /etc/xray/xray.crt
+    ln -sf /etc/letsencrypt/live/"$domain"/privkey.pem /etc/xray/xray.key
     
     echo -e "${CYAN}[5/5]${NC} Restarting services..."
     systemctl start nginx xray
