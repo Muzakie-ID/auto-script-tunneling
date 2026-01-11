@@ -141,7 +141,8 @@ FILES_SYSTEM=(
     "system/fix-error-proxy.sh" "system/renew-ssl.sh" "system/backup-ssl.sh" 
     "system/restore-ssl.sh" "system/auto-record-wildcard.sh" "system/limit-speed-settings.sh" 
     "system/reset-settings.sh" "system/enable-ssh-root.sh" "system/setup-rclone.sh" 
-    "system/backup-online.sh" "system/restore-online.sh" "system/auto-backup-online.sh"
+    "system/setup-rclone-manual.sh" "system/backup-online.sh" "system/restore-online.sh" 
+    "system/auto-backup-online.sh"
 )
 for file in "${FILES_SYSTEM[@]}"; do download_file "$file" "$INSTALL_DIR/$file"; done
 

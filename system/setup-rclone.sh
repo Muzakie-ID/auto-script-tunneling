@@ -62,11 +62,14 @@ echo -e "${GREEN}[6]${NC} pCloud"
 echo -e "${GREEN}[7]${NC} FTP/SFTP Server"
 echo -e "${GREEN}[8]${NC} Custom (Manual Configuration)"
 echo ""
+echo -e "${YELLOW}For Headless Server (No Browser):${NC}"
+echo -e "${GREEN}[9]${NC} Import Config (Paste from Local Machine)"
+echo ""
 echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
 echo -e "${RED}[0]${NC} Cancel"
 echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
 echo ""
-read -p "Select provider [0-8]: " provider
+read -p "Select provider [0-9]: " provider
 
 case $provider in
     1)
@@ -75,14 +78,38 @@ case $provider in
         echo -e "${GREEN}         Google Drive Configuration                  ${NC}"
         echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
         echo ""
-        echo -e "${YELLOW}Instructions:${NC}"
-        echo "1. You will be prompted to authorize rclone with Google"
-        echo "2. Follow the URL and enter the verification code"
-        echo "3. Name your remote: ${GREEN}gdrive${NC} (recommended)"
+        echo -e "${YELLOW}Headless Server Detected!${NC}"
+        echo ""
+        echo -e "${GREEN}Option 1: Remote Authorization (Recommended)${NC}"
+        echo "1. Open this link in your LOCAL computer browser:"
+        echo -e "${CYAN}   https://rclone.org/drive/${NC}"
+        echo "2. Scroll to 'Getting your own client_id'"
+        echo "3. Or use existing Google account"
+        echo ""
+        echo -e "${GREEN}Option 2: Manual Token${NC}"
+        echo "1. Visit: https://accounts.google.com/o/oauth2/auth?client_id=..."
+        echo "2. Get authorization code"
+        echo "3. Paste here"
+        echo ""
+        echo -e "${YELLOW}Starting headless configuration...${NC}"
         echo ""
         read -p "Press [Enter] to continue..."
         
-        rclone config create gdrive drive scope drive
+        # Headless configuration
+        rclone config create gdrive drive config_is_local false
+        
+        if [ $? -ne 0 ]; then
+            echo ""
+            echo -e "${RED}Configuration failed!${NC}"
+            echo ""
+            echo -e "${YELLOW}Alternative: Configure on local machine${NC}"
+            echo "1. Install rclone on your computer with browser"
+            echo "2. Run: rclone config"
+            echo "3. Copy ~/.config/rclone/rclone.conf to this server"
+            echo "4. Location: /root/.config/rclone/rclone.conf"
+            echo ""
+            read -p "Press [Enter] to continue..."
+        fi
         ;;
     2)
         clear
@@ -163,6 +190,10 @@ case $provider in
         echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
         echo ""
         rclone config
+        ;;
+    9)
+        bash /usr/local/sbin/tunneling/system/setup-rclone-manual.sh
+        exit 0
         ;;
     0)
         /usr/local/sbin/tunneling/menu/backup-menu.sh
