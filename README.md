@@ -23,7 +23,7 @@ Script otomatis untuk setup VPN Server dengan berbagai protocol yang siap dijual
 ### Option 1: Online Installer (Recommended)
 Cara termudah, cukup jalankan perintah ini di terminal VPS Anda:
 ```bash
-sysctl -w net.ipv6.conf.all.disable_ipv6=1 && sysctl -w net.ipv6.conf.default.disable_ipv6=1 && apt update && apt install -y bzip2 gzip coreutils screen curl wge && wget -q https://raw.githubusercontent.com/Muzakie-ID/auto-script-tunneling/main/install.sh && chmod +x install.sh && ./install.sh
+sysctl -w net.ipv6.conf.all.disable_ipv6=1 && sysctl -w net.ipv6.conf.default.disable_ipv6=1 && apt update && apt install -y bzip2 gzip coreutils screen curl wget && wget -q https://raw.githubusercontent.com/Muzakie-ID/auto-script-tunneling/main/install.sh && chmod +x install.sh && ./install.sh
 ```
 
 ### Option 2: Manual Installation (Git Clone)
