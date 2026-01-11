@@ -45,8 +45,12 @@ jq --arg password "$uuid" --arg email "TRIAL-$username@$domain" \
    $CONFIG_FILE > /tmp/xray-config.tmp && mv /tmp/xray-config.tmp $CONFIG_FILE
 systemctl restart xray
 
-# Generate trojan:// link
-trojan_link="trojan://$uuid@$domain:443?security=tls&type=ws&host=$domain&path=/trojan&sni=$domain#TRIAL-$username-$domain"
+# Generate trojan:// links
+# Port 443 with TLS
+trojan_link_tls="trojan://$uuid@$domain:443?security=tls&type=ws&host=$domain&path=/trojan&sni=$domain#TRIAL-$username-$domain"
+
+# Port 80 without TLS
+trojan_link_80="trojan://$uuid@$domain:80?security=none&type=ws&host=$domain&path=/trojan#TRIAL-$username-$domain-80"
 
 echo ""
 echo -e "${GREEN}✓ TROJAN Trial created successfully!${NC}"
@@ -58,9 +62,14 @@ echo -e "${YELLOW}Expired:${NC} $exp_date (1 Hour)"
 echo -e "${YELLOW}Path:${NC} /trojan"
 echo -e "${YELLOW}Limit:${NC} 1 IP, 1 GB"
 echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
-echo -e "${GREEN}TROJAN Link (Copy below):${NC}"
+echo -e "${GREEN}TROJAN Link Port 443 (TLS):${NC}"
 echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
-echo -e "${YELLOW}$trojan_link${NC}"
+echo -e "${YELLOW}$trojan_link_tls${NC}"
+echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+echo ""
+echo -e "${GREEN}TROJAN Link Port 80 (Non-TLS):${NC}"
+echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+echo -e "${YELLOW}$trojan_link_80${NC}"
 echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
 echo ""
 echo -e "${YELLOW}Note: Import link above to V2RayNG/V2RayN/Clash${NC}"

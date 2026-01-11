@@ -55,8 +55,12 @@ jq --arg password "$uuid" --arg email "$username@$domain" \
 # Restart XRAY
 systemctl restart xray
 
-# Generate trojan:// link
-trojan_link="trojan://$uuid@$domain:443?security=tls&type=ws&host=$domain&path=/trojan&sni=$domain#$username-$domain"
+# Generate trojan:// links
+# Port 443 with TLS
+trojan_link_tls="trojan://$uuid@$domain:443?security=tls&type=ws&host=$domain&path=/trojan&sni=$domain#$username-$domain"
+
+# Port 80 without TLS
+trojan_link_80="trojan://$uuid@$domain:80?security=none&type=ws&host=$domain&path=/trojan#$username-$domain-80"
 
 echo ""
 echo -e "${GREEN}✓ TROJAN Account created successfully!${NC}"
@@ -65,14 +69,17 @@ echo -e "${YELLOW}Username:${NC} $username"
 echo -e "${YELLOW}UUID/Password:${NC} $uuid"
 echo -e "${YELLOW}Domain:${NC} $domain"
 echo -e "${YELLOW}Expired:${NC} $exp_date"
-echo -e "${YELLOW}Port TLS:${NC} 443"
 echo -e "${YELLOW}Network:${NC} WebSocket (ws)"
 echo -e "${YELLOW}Path:${NC} /trojan"
-echo -e "${YELLOW}Security:${NC} TLS"
 echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
-echo -e "${GREEN}TROJAN Link (Copy below):${NC}"
+echo -e "${GREEN}TROJAN Link Port 443 (TLS):${NC}"
 echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
-echo -e "${YELLOW}$trojan_link${NC}"
+echo -e "${YELLOW}$trojan_link_tls${NC}"
+echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+echo ""
+echo -e "${GREEN}TROJAN Link Port 80 (Non-TLS):${NC}"
+echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+echo -e "${YELLOW}$trojan_link_80${NC}"
 echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
 echo ""
 echo -e "${YELLOW}Note: Import link above to V2RayNG/V2RayN/Clash${NC}"
