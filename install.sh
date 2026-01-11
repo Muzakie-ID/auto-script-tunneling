@@ -127,10 +127,11 @@ FILES_SYSTEM=(
     "system/restore-backup.sh" "system/auto-backup.sh" "system/delete-expired.sh" 
     "system/setup-nginx.sh" "system/restart-all.sh" "system/restart-service.sh" 
     "system/speedtest.sh" "system/delete-all-expired.sh" "system/limit-speed.sh" 
-    "system/monitor-service.sh" "system/check-logs.sh" "system/auto-reboot-settings.sh" 
-    "system/change-domain.sh" "system/change-banner.sh" "system/change-port.sh" 
-    "system/change-timezone.sh" "system/fix-error-domain.sh" "system/fix-error-proxy.sh" 
-    "system/renew-ssl.sh" "system/auto-record-wildcard.sh" "system/limit-speed-settings.sh" 
+    "system/monitor-service.sh" "system/check-logs.sh" "system/view-logs.sh" 
+    "system/auto-reboot-settings.sh" "system/change-domain.sh" "system/change-banner.sh" 
+    "system/change-port.sh" "system/change-timezone.sh" "system/fix-error-domain.sh" 
+    "system/fix-error-proxy.sh" "system/renew-ssl.sh" "system/backup-ssl.sh" 
+    "system/restore-ssl.sh" "system/auto-record-wildcard.sh" "system/limit-speed-settings.sh" 
     "system/reset-settings.sh" "system/enable-ssh-root.sh"
 )
 for file in "${FILES_SYSTEM[@]}"; do download_file "$file" "$INSTALL_DIR/$file"; done
