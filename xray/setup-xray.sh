@@ -85,8 +85,9 @@ EOF
 # Create Nginx config for XRAY
 cat > /etc/nginx/conf.d/xray.conf << 'NGINXEOF'
 server {
-    listen 443 ssl http2;
-    listen [::]:443 ssl http2;
+    listen 443 ssl;
+    listen [::]:443 ssl;
+    http2 on;
     server_name DOMAIN;
 
     ssl_certificate /etc/letsencrypt/live/DOMAIN/fullchain.pem;
@@ -95,6 +96,7 @@ server {
     ssl_ciphers HIGH:!aNULL:!MD5;
 
     location /vmess {
+        proxy_redirect off;
         proxy_pass http://127.0.0.1:10001;
         proxy_http_version 1.1;
         proxy_set_header Upgrade $http_upgrade;
