@@ -20,13 +20,25 @@ Script otomatis untuk setup VPN Server dengan berbagai protocol yang siap dijual
 
 ## 📥 Installation
 
-### Option 1: Online Installer (Recommended)
+### Option 1: Screen Installer (Most Recommended)
+Instalasi berjalan di background dengan screen session. Aman dari koneksi terputus!
+```bash
+sysctl -w net.ipv6.conf.all.disable_ipv6=1 && sysctl -w net.ipv6.conf.default.disable_ipv6=1 && apt update && apt install -y bzip2 gzip coreutils screen curl wget && wget -q https://raw.githubusercontent.com/Muzakie-ID/auto-script-tunneling/main/install-screen.sh && chmod +x install-screen.sh && ./install-screen.sh
+```
+
+**Keuntungan menggunakan Screen Installer:**
+- ✅ Instalasi tetap berjalan meskipun koneksi SSH terputus
+- ✅ Bisa disconnect dan reconnect kapan saja
+- ✅ Log lengkap tersimpan di `/var/log/autoscript-install.log`
+- ✅ Attach kembali dengan: `screen -r autoscript-install`
+
+### Option 2: Online Installer (Direct)
 Cara termudah, cukup jalankan perintah ini di terminal VPS Anda:
 ```bash
 sysctl -w net.ipv6.conf.all.disable_ipv6=1 && sysctl -w net.ipv6.conf.default.disable_ipv6=1 && apt update && apt install -y bzip2 gzip coreutils screen curl wget && wget -q https://raw.githubusercontent.com/Muzakie-ID/auto-script-tunneling/main/install.sh && chmod +x install.sh && ./install.sh
 ```
 
-### Option 2: Manual Installation (Git Clone)
+### Option 3: Manual Installation (Git Clone)
 Jika Anda ingin melihat source code sebelum install:
 ```bash
 apt update && apt install git -y
