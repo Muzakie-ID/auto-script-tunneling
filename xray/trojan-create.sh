@@ -49,7 +49,7 @@ fi
 
 # Add client to TROJAN inbound
 jq --arg password "$uuid" --arg email "$username@$domain" \
-   '.inbounds[] | select(.protocol=="trojan") | .settings.clients += [{"password": $password, "email": $email}]' \
+   '.inbounds |= map(if .protocol == "trojan" then .settings.clients += [{"password": $password, "email": $email}] else . end)' \
    $CONFIG_FILE > /tmp/xray-config.tmp && mv /tmp/xray-config.tmp $CONFIG_FILE
 
 # Restart XRAY

@@ -49,7 +49,7 @@ fi
 
 # Add client to VMESS inbound
 jq --arg uuid "$uuid" --arg email "$username@$domain" \
-   '(.inbounds[] | select(.protocol=="vmess") | .settings.clients) += [{"id": $uuid, "alterId": 0, "email": $email}]' \
+   '.inbounds |= map(if .protocol == "vmess" then .settings.clients += [{"id": $uuid, "alterId": 0, "email": $email}] else . end)' \
    $CONFIG_FILE > /tmp/xray-config.tmp && mv /tmp/xray-config.tmp $CONFIG_FILE
 
 # Restart XRAY

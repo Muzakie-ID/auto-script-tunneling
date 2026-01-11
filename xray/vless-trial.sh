@@ -41,7 +41,7 @@ EOF
 # Add to XRAY config
 CONFIG_FILE="/usr/local/etc/xray/config.json"
 jq --arg uuid "$uuid" --arg email "TRIAL-$username@$domain" \
-   '.inbounds[] | select(.protocol=="vless") | .settings.clients += [{"id": $uuid, "email": $email}]' \
+   '.inbounds |= map(if .protocol == "vless" then .settings.clients += [{"id": $uuid, "email": $email}] else . end)' \
    $CONFIG_FILE > /tmp/xray-config.tmp && mv /tmp/xray-config.tmp $CONFIG_FILE
 systemctl restart xray
 

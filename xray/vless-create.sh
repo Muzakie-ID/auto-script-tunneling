@@ -49,7 +49,7 @@ fi
 
 # Add client to VLESS inbound
 jq --arg uuid "$uuid" --arg email "$username@$domain" \
-   '.inbounds[] | select(.protocol=="vless") | .settings.clients += [{"id": $uuid, "email": $email}]' \
+   '.inbounds |= map(if .protocol == "vless" then .settings.clients += [{"id": $uuid, "email": $email}] else . end)' \
    $CONFIG_FILE > /tmp/xray-config.tmp && mv /tmp/xray-config.tmp $CONFIG_FILE
 
 # Restart XRAY
