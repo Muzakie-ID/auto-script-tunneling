@@ -56,27 +56,28 @@ jq --arg uuid "$uuid" --arg email "$username@$domain" \
 systemctl restart xray
 
 # Generate vless:// link
-vless_link="vless://$uuid@$domain:443?path=/vless&security=tls&encryption=none&type=ws&host=$domain&sni=$domain#$username-$domain"
+# Link TLS (Port 443) - Recommended
+vless_link_tls="vless://$uuid@$domain:443?path=%2Fvless&security=tls&encryption=none&type=ws&host=$domain&sni=$domain#$username-TLS"
+
+# Link Non-TLS (Port 80)
+vless_link_none="vless://$uuid@$domain:80?path=%2Fvless&security=none&encryption=none&type=ws&host=$domain#$username-HTTP"
 
 echo ""
 echo -e "${GREEN}✓ VLESS Account created successfully!${NC}"
 echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
-echo -e "${YELLOW}Username:${NC} $username"
-echo -e "${YELLOW}UUID:${NC} $uuid"
-echo -e "${YELLOW}Domain:${NC} $domain"
-echo -e "${YELLOW}Expired:${NC} $exp_date"
-echo -e "${YELLOW}Port TLS:${NC} 443"
-echo -e "${YELLOW}Network:${NC} WebSocket (ws)"
-echo -e "${YELLOW}Path:${NC} /vless"
-echo -e "${YELLOW}Security:${NC} TLS"
-echo -e "${YELLOW}Encryption:${NC} none"
+echo -e "${YELLOW}Username    :${NC} $username"
+echo -e "${YELLOW}UUID        :${NC} $uuid"
+echo -e "${YELLOW}Domain      :${NC} $domain"
+echo -e "${YELLOW}Expired     :${NC} $exp_date"
 echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
-echo -e "${GREEN}VLESS Link (Copy below):${NC}"
-echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
-echo -e "${YELLOW}$vless_link${NC}"
+echo -e "${GREEN}[LINK TLS] (Port 443) - Recommended:${NC}"
+echo -e "${YELLOW}$vless_link_tls${NC}"
+echo ""
+echo -e "${GREEN}[LINK HTTP] (Port 80):${NC}"
+echo -e "${YELLOW}$vless_link_none${NC}"
 echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
 echo ""
-echo -e "${YELLOW}Note: Import link above to V2RayNG/V2RayN/Clash${NC}"
+echo -e "${YELLOW}Note: If one link doesn't work, try the other one.${NC}"
 echo ""
 read -n 1 -s -r -p "Press any key to continue..."
 
