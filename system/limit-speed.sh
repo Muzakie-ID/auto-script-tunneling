@@ -96,7 +96,7 @@ case $option in
         echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
         ;;
     0)
-        /usr/local/sbin/tunneling/system-menu.sh
+        /usr/local/sbin/tunneling/menu/system-menu.sh
         exit 0
         ;;
     *)
@@ -109,4 +109,4 @@ esac
 
 echo ""
 read -p "Press [Enter] to continue..."
-/usr/local/sbin/tunneling/system-menu.sh
+/usr/local/sbin/tunneling/menu/system-menu.sh

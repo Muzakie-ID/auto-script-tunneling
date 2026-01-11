@@ -34,4 +34,4 @@ echo -e "${GREEN}Speedtest completed!${NC}"
 echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
 echo ""
 read -p "Press [Enter] to continue..."
-/usr/local/sbin/tunneling/system-menu.sh
+/usr/local/sbin/tunneling/menu/system-menu.sh

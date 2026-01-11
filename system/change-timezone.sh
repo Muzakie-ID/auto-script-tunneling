@@ -50,7 +50,7 @@ case $choice in
     *)
         echo -e "${RED}Invalid option!${NC}"
         sleep 2
-        /usr/local/sbin/tunneling/settings-menu.sh
+        /usr/local/sbin/tunneling/menu/settings-menu.sh
         exit 1
         ;;
 esac
@@ -70,4 +70,4 @@ echo ""
 echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
 echo ""
 read -p "Press [Enter] to continue..."
-/usr/local/sbin/tunneling/settings-menu.sh
+/usr/local/sbin/tunneling/menu/settings-menu.sh

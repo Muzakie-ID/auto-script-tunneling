@@ -74,7 +74,28 @@ vmess_json=$(cat <<EOF
 EOF
 )
 
-vmess_link="vmess://$(echo -n $vmess_json | base64 -w 0)"
+vmess_link_tls="vmess://$(echo -n $vmess_json | base64 -w 0)"
+
+# Generate vmess:// link for port 80 (non-TLS)
+vmess_json_80=$(cat <<EOF
+{
+  "v": "2",
+  "ps": "$username-$domain-80",
+  "add": "$domain",
+  "port": "80",
+  "id": "$uuid",
+  "aid": "0",
+  "net": "ws",
+  "type": "none",
+  "host": "$domain",
+  "path": "/vmess",
+  "tls": "",
+  "sni": ""
+}
+EOF
+)
+
+vmess_link_80="vmess://$(echo -n $vmess_json_80 | base64 -w 0)"
 
 echo ""
 echo -e "${GREEN}✓ VMESS Account created successfully!${NC}"
@@ -87,12 +108,15 @@ echo -e "${YELLOW}Port TLS:${NC} 443"
 echo -e "${YELLOW}Port HTTP:${NC} 80"
 echo -e "${YELLOW}Network:${NC} WebSocket (ws)"
 echo -e "${YELLOW}Path:${NC} /vmess"
-echo -e "${YELLOW}Security:${NC} TLS"
 echo -e "${YELLOW}AlterID:${NC} 0"
 echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
-echo -e "${GREEN}VMESS Link (Copy below):${NC}"
+echo -e "${GREEN}VMESS Link TLS (Port 443):${NC}"
 echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
-echo -e "${YELLOW}$vmess_link${NC}"
+echo -e "${YELLOW}$vmess_link_tls${NC}"
+echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+echo -e "${GREEN}VMESS Link HTTP (Port 80):${NC}"
+echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+echo -e "${YELLOW}$vmess_link_80${NC}"
 echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
 echo ""
 echo -e "${YELLOW}Note: XRAY config auto-reload required${NC}"

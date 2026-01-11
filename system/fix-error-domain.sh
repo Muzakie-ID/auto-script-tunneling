@@ -21,7 +21,7 @@ echo ""
 read -p "Continue? [y/n]: " confirm
 
 if [[ ! $confirm =~ ^[Yy]$ ]]; then
-    /usr/local/sbin/tunneling/settings-menu.sh
+    /usr/local/sbin/tunneling/menu/settings-menu.sh
     exit 0
 fi
 
@@ -68,4 +68,4 @@ echo ""
 echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
 echo ""
 read -p "Press [Enter] to continue..."
-/usr/local/sbin/tunneling/settings-menu.sh
+/usr/local/sbin/tunneling/menu/settings-menu.sh

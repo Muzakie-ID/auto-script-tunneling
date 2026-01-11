@@ -96,7 +96,7 @@ EOF
         ;;
         
     0)
-        /usr/local/sbin/tunneling/settings-menu.sh
+        /usr/local/sbin/tunneling/menu/settings-menu.sh
         exit 0
         ;;
         

@@ -22,7 +22,7 @@ read -p "Enter your main domain (e.g., example.com): " main_domain
 if [[ -z $main_domain ]]; then
     echo -e "${RED}Domain cannot be empty!${NC}"
     sleep 2
-    /usr/local/sbin/tunneling/settings-menu.sh
+    /usr/local/sbin/tunneling/menu/settings-menu.sh
     exit 1
 fi
 
@@ -33,7 +33,7 @@ read -p "Enter Cloudflare API Token: " cf_token
 if [[ -z $cf_email ]] || [[ -z $cf_token ]]; then
     echo -e "${RED}Credentials cannot be empty!${NC}"
     sleep 2
-    /usr/local/sbin/tunneling/settings-menu.sh
+    /usr/local/sbin/tunneling/menu/settings-menu.sh
     exit 1
 fi
 
@@ -89,4 +89,4 @@ echo ""
 echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
 echo ""
 read -p "Press [Enter] to continue..."
-/usr/local/sbin/tunneling/settings-menu.sh
+/usr/local/sbin/tunneling/menu/settings-menu.sh

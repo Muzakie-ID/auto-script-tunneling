@@ -60,4 +60,4 @@ echo -e "${YELLOW}Last service check: $(date '+%Y-%m-%d %H:%M:%S')${NC}"
 echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
 echo ""
 read -p "Press [Enter] to continue..."
-/usr/local/sbin/tunneling/system-menu.sh
+/usr/local/sbin/tunneling/menu/system-menu.sh

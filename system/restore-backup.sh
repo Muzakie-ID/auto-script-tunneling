@@ -23,7 +23,7 @@ if [ ! -d "$BACKUP_DIR" ] || [ -z "$(ls -A $BACKUP_DIR)" ]; then
     echo -e "${RED}No backup files found!${NC}"
     echo ""
     read -n 1 -s -r -p "Press any key to back to menu"
-    /usr/local/sbin/tunneling/backup-menu.sh
+    /usr/local/sbin/tunneling/menu/backup-menu.sh
     exit 1
 fi
 
@@ -91,4 +91,4 @@ fi
 
 echo ""
 read -n 1 -s -r -p "Press any key to back to menu"
-/usr/local/sbin/tunneling/backup-menu.sh
+/usr/local/sbin/tunneling/menu/backup-menu.sh

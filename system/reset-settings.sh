@@ -29,7 +29,7 @@ read -p "Are you sure? Type 'YES' to confirm: " confirm
 if [[ "$confirm" != "YES" ]]; then
     echo -e "${YELLOW}Reset cancelled${NC}"
     sleep 2
-    /usr/local/sbin/tunneling/settings-menu.sh
+    /usr/local/sbin/tunneling/menu/settings-menu.sh
     exit 0
 fi
 
@@ -102,4 +102,4 @@ echo ""
 echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
 echo ""
 read -p "Press [Enter] to continue..."
-/usr/local/sbin/tunneling/settings-menu.sh
+/usr/local/sbin/tunneling/menu/settings-menu.sh

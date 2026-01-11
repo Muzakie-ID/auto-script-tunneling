@@ -65,7 +65,7 @@ case $choice in
         echo -e "${YELLOW}XRAY port is fixed at 443 for TLS${NC}"
         ;;
     0)
-        /usr/local/sbin/tunneling/settings-menu.sh
+        /usr/local/sbin/tunneling/menu/settings-menu.sh
         exit 0
         ;;
     *)

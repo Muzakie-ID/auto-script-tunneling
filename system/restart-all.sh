@@ -70,4 +70,4 @@ echo -e "${GREEN}All services restarted successfully!${NC}"
 echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
 echo ""
 read -p "Press [Enter] to continue..."
-/usr/local/sbin/tunneling/system-menu.sh
+/usr/local/sbin/tunneling/menu/system-menu.sh

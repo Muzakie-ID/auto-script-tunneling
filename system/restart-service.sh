@@ -117,7 +117,7 @@ case $service in
         fi
         ;;
     0)
-        /usr/local/sbin/tunneling/system-menu.sh
+        /usr/local/sbin/tunneling/menu/system-menu.sh
         exit 0
         ;;
     *)
@@ -130,4 +130,4 @@ esac
 
 echo ""
 read -p "Press [Enter] to continue..."
-/usr/local/sbin/tunneling/system-menu.sh
+/usr/local/sbin/tunneling/menu/system-menu.sh

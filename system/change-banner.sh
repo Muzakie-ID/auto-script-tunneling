@@ -37,7 +37,7 @@ done
 if [[ -z $banner_text ]]; then
     echo -e "${RED}Banner cannot be empty!${NC}"
     sleep 2
-    /usr/local/sbin/tunneling/settings-menu.sh
+    /usr/local/sbin/tunneling/menu/settings-menu.sh
     exit 1
 fi
 
@@ -57,4 +57,4 @@ echo ""
 echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
 echo ""
 read -p "Press [Enter] to continue..."
-/usr/local/sbin/tunneling/settings-menu.sh
+/usr/local/sbin/tunneling/menu/settings-menu.sh

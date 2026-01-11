@@ -20,7 +20,7 @@ read -p "Are you sure? (yes/no): " confirm
 if [[ "$confirm" != "yes" ]]; then
     echo -e "${GREEN}Operation cancelled${NC}"
     sleep 1
-    /usr/local/sbin/tunneling/system-menu.sh
+    /usr/local/sbin/tunneling/menu/system-menu.sh
     exit 0
 fi
 
@@ -75,4 +75,4 @@ echo -e "${GREEN}All expired accounts have been deleted!${NC}"
 echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
 echo ""
 read -p "Press [Enter] to continue..."
-/usr/local/sbin/tunneling/system-menu.sh
+/usr/local/sbin/tunneling/menu/system-menu.sh
