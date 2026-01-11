@@ -116,4 +116,4 @@ echo -e "Open your bot in Telegram and send ${CYAN}/start${NC}"
 echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
 echo ""
 read -n 1 -s -r -p "Press any key to back to menu"
-/usr/local/sbin/tunneling/bot-menu.sh
+/usr/local/sbin/tunneling/menu/bot-menu.sh

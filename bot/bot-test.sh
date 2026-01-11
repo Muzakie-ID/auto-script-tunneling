@@ -19,7 +19,7 @@ if [ ! -f "$CONFIG_FILE" ]; then
     echo -e "${RED}Bot not configured yet!${NC}"
     echo ""
     read -p "Press [Enter] to continue..."
-    /usr/local/sbin/tunneling/bot-menu.sh
+    /usr/local/sbin/tunneling/menu/bot-menu.sh
     exit 1
 fi
 
@@ -29,7 +29,7 @@ if ! systemctl is-active --quiet telegram-bot; then
     echo -e "${YELLOW}Please start the bot first (option 2)${NC}"
     echo ""
     read -p "Press [Enter] to continue..."
-    /usr/local/sbin/tunneling/bot-menu.sh
+    /usr/local/sbin/tunneling/menu/bot-menu.sh
     exit 1
 fi
 
@@ -92,4 +92,4 @@ echo "3. Reconfigure: Select option 1 (Setup Bot)"
 echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
 echo ""
 read -p "Press [Enter] to continue..."
-/usr/local/sbin/tunneling/bot-menu.sh
+/usr/local/sbin/tunneling/menu/bot-menu.sh

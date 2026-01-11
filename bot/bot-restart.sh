@@ -30,4 +30,4 @@ echo ""
 echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
 echo ""
 read -p "Press [Enter] to continue..."
-/usr/local/sbin/tunneling/bot-menu.sh
+/usr/local/sbin/tunneling/menu/bot-menu.sh

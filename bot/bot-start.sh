@@ -19,7 +19,7 @@ if [ ! -f "/etc/tunneling/bot/config.json" ]; then
     echo -e "${YELLOW}Please run Setup Bot Telegram first (option 1)${NC}"
     echo ""
     read -p "Press [Enter] to continue..."
-    /usr/local/sbin/tunneling/bot-menu.sh
+    /usr/local/sbin/tunneling/menu/bot-menu.sh
     exit 1
 fi
 
@@ -38,7 +38,7 @@ else
         echo -e "${YELLOW}Please run Setup Bot Telegram first (option 1)${NC}"
         echo ""
         read -p "Press [Enter] to continue..."
-        /usr/local/sbin/tunneling/bot-menu.sh
+        /usr/local/sbin/tunneling/menu/bot-menu.sh
         exit 1
     fi
     
@@ -61,4 +61,4 @@ echo ""
 echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
 echo ""
 read -p "Press [Enter] to continue..."
-/usr/local/sbin/tunneling/bot-menu.sh
+/usr/local/sbin/tunneling/menu/bot-menu.sh

@@ -65,13 +65,13 @@ case $package in
     7) PACKAGE_KEY="trojan_7" ;;
     8) PACKAGE_KEY="trojan_30" ;;
     0)
-        /usr/local/sbin/tunneling/bot-menu.sh
+        /usr/local/sbin/tunneling/menu/bot-menu.sh
         exit 0
         ;;
     *)
         echo -e "${RED}Invalid option!${NC}"
         sleep 1
-        /usr/local/sbin/tunneling/bot-menu.sh
+        /usr/local/sbin/tunneling/menu/bot-menu.sh
         exit 0
         ;;
 esac
@@ -86,7 +86,7 @@ read -p "Enter new price (Rp): " new_price
 if [[ ! "$new_price" =~ ^[0-9]+$ ]]; then
     echo -e "${RED}Invalid price! Must be a number${NC}"
     sleep 2
-    /usr/local/sbin/tunneling/bot-menu.sh
+    /usr/local/sbin/tunneling/menu/bot-menu.sh
     exit 1
 fi
 
@@ -101,4 +101,4 @@ sleep 2
 
 echo ""
 read -p "Press [Enter] to continue..."
-/usr/local/sbin/tunneling/bot-menu.sh
+/usr/local/sbin/tunneling/menu/bot-menu.sh
