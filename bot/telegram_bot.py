@@ -329,10 +329,11 @@ Terima kasih! 🎉
     elif protocol == 'vmess':
         uuid = account_data.get('uuid', 'N/A')
         
-        # Generate vmess:// link
-        vmess_config = {
+        # Generate vmess:// links
+        # Port 443 with TLS
+        vmess_config_tls = {
             "v": "2",
-            "ps": f"{username}",
+            "ps": f"{username}-TLS",
             "add": domain,
             "port": "443",
             "id": uuid,
@@ -343,8 +344,23 @@ Terima kasih! 🎉
             "host": domain,
             "tls": "tls"
         }
-        vmess_json = json.dumps(vmess_config)
-        vmess_link = "vmess://" + base64.b64encode(vmess_json.encode()).decode()
+        vmess_link_tls = "vmess://" + base64.b64encode(json.dumps(vmess_config_tls).encode()).decode()
+        
+        # Port 80 without TLS
+        vmess_config_80 = {
+            "v": "2",
+            "ps": f"{username}-HTTP",
+            "add": domain,
+            "port": "80",
+            "id": uuid,
+            "aid": "0",
+            "net": "ws",
+            "path": "/vmess",
+            "type": "none",
+            "host": domain,
+            "tls": ""
+        }
+        vmess_link_80 = "vmess://" + base64.b64encode(json.dumps(vmess_config_80).encode()).decode()
         
         user_text = f"""
 ✅ *PESANAN DISETUJUI*
@@ -366,14 +382,18 @@ Pesanan Anda telah disetujui!
 • Security: auto
 • Network: WebSocket
 • Path: `/vmess`
-• TLS: ON
 
-*Import Config:*
+*🔐 Port 443 (TLS - Recommended):*
 ```
-{vmess_link}
+{vmess_link_tls}
 ```
 
-Copy link di atas ke aplikasi V2Ray/V2RayNG!
+*🌐 Port 80 (HTTP - Bypass):*
+```
+{vmess_link_80}
+```
+
+📝 Copy salah satu link di atas ke aplikasi V2RayNG/V2RayN/Clash!
 
 Terima kasih! 🎉
         """
@@ -381,8 +401,12 @@ Terima kasih! 🎉
     elif protocol == 'vless':
         uuid = account_data.get('uuid', 'N/A')
         
-        # Generate vless:// link
-        vless_link = f"vless://{uuid}@{domain}:443?type=ws&security=tls&path=/vless&host={domain}#{username}"
+        # Generate vless:// links
+        # Port 443 with TLS
+        vless_link_tls = f"vless://{uuid}@{domain}:443?path=%2Fvless&security=tls&encryption=none&type=ws&host={domain}&sni={domain}#{username}-TLS"
+        
+        # Port 80 without TLS
+        vless_link_80 = f"vless://{uuid}@{domain}:80?path=%2Fvless&security=none&encryption=none&type=ws&host={domain}#{username}-HTTP"
         
         user_text = f"""
 ✅ *PESANAN DISETUJUI*
@@ -403,14 +427,18 @@ Pesanan Anda telah disetujui!
 • Encryption: none
 • Network: WebSocket
 • Path: `/vless`
-• TLS: ON
 
-*Import Config:*
+*🔐 Port 443 (TLS - Recommended):*
 ```
-{vless_link}
+{vless_link_tls}
 ```
 
-Copy link di atas ke aplikasi V2Ray/V2RayNG!
+*🌐 Port 80 (HTTP - Bypass):*
+```
+{vless_link_80}
+```
+
+📝 Copy salah satu link di atas ke aplikasi V2RayNG/V2RayN/Clash!
 
 Terima kasih! 🎉
         """
@@ -418,8 +446,12 @@ Terima kasih! 🎉
     elif protocol == 'trojan':
         trojan_password = account_data.get('password', password)
         
-        # Generate trojan:// link
-        trojan_link = f"trojan://{trojan_password}@{domain}:443?type=ws&security=tls&path=/trojan&host={domain}#{username}"
+        # Generate trojan:// links
+        # Port 443 with TLS
+        trojan_link_tls = f"trojan://{trojan_password}@{domain}:443?security=tls&type=ws&host={domain}&path=/trojan&sni={domain}#{username}-TLS"
+        
+        # Port 80 without TLS
+        trojan_link_80 = f"trojan://{trojan_password}@{domain}:80?security=none&type=ws&host={domain}&path=/trojan#{username}-HTTP"
         
         user_text = f"""
 ✅ *PESANAN DISETUJUI*
@@ -435,18 +467,22 @@ Pesanan Anda telah disetujui!
 
 *Detail Koneksi:*
 • Address: `{domain}`
-• Port: 443 (TLS)
+• Port: 443 (TLS) / 80 (HTTP)
 • Password: `{trojan_password}`
 • Network: WebSocket
 • Path: `/trojan`
-• TLS: ON
 
-*Import Config:*
+*🔐 Port 443 (TLS - Recommended):*
 ```
-{trojan_link}
+{trojan_link_tls}
 ```
 
-Copy link di atas ke aplikasi V2Ray/V2RayNG!
+*🌐 Port 80 (HTTP - Bypass):*
+```
+{trojan_link_80}
+```
+
+📝 Copy salah satu link di atas ke aplikasi V2RayNG/V2RayN/Clash!
 
 Terima kasih! 🎉
         """
