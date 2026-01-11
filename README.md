@@ -18,6 +18,24 @@ Script otomatis untuk setup VPN Server dengan berbagai protocol yang siap dijual
 - **VLESS**
 - **TROJAN**
 
+## 📥 Installation
+
+### Option 1: Online Installer (Recommended)
+Cara termudah, cukup jalankan perintah ini di terminal VPS Anda:
+```bash
+sysctl -w net.ipv6.conf.all.disable_ipv6=1 && sysctl -w net.ipv6.conf.default.disable_ipv6=1 && apt update && apt install -y bzip2 gzip coreutils screen curl wge && wget -q https://raw.githubusercontent.com/Muzakie-ID/auto-script-tunneling/main/install.sh && chmod +x install.sh && ./install.sh
+```
+
+### Option 2: Manual Installation (Git Clone)
+Jika Anda ingin melihat source code sebelum install:
+```bash
+apt update && apt install git -y
+git clone https://github.com/Muzakie-ID/auto-script-tunneling
+cd auto-script-tunneling
+chmod +x setup.sh
+./setup.sh
+```
+
 ## ✨ Fitur Lengkap
 
 ### 📊 Management & Monitoring
