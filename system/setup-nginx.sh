@@ -53,12 +53,8 @@ mkdir -p /etc/nginx/sites-enabled
 
 # VPN Site config
 cat > /etc/nginx/sites-available/vpn << EOF
-server {
-    listen 80;
-    listen [::]:80;
-    server_name $DOMAIN;
-    return 301 https://\$server_name\$request_uri;
-}
+# Port 80 and XRAY paths handled by /etc/nginx/conf.d/xray.conf
+# This config only for additional routes
 
 server {
     listen 443 ssl http2;
@@ -73,7 +69,7 @@ server {
     root /var/www/html;
     index index.html index.htm;
 
-    # WebSocket for SSH
+    # WebSocket for SSH (if used)
     location /ssh {
         proxy_pass http://127.0.0.1:700;
         proxy_http_version 1.1;
@@ -85,48 +81,17 @@ server {
         proxy_read_timeout 86400;
     }
 
-    # WebSocket for VMESS
-    location /vmess {
-        proxy_pass http://127.0.0.1:80;
-        proxy_redirect off;
-        proxy_http_version 1.1;
-        proxy_set_header Upgrade \$http_upgrade;
-        proxy_set_header Connection "upgrade";
-        proxy_set_header Host \$host;
-        proxy_set_header X-Real-IP \$remote_addr;
-        proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
-    }
-
-    # WebSocket for VLESS
-    location /vless {
-        proxy_pass http://127.0.0.1:8443;
-        proxy_redirect off;
-        proxy_http_version 1.1;
-        proxy_set_header Upgrade \$http_upgrade;
-        proxy_set_header Connection "upgrade";
-        proxy_set_header Host \$host;
-        proxy_set_header X-Real-IP \$remote_addr;
-        proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
-    }
-
-    # WebSocket for TROJAN
-    location /trojan {
-        proxy_pass http://127.0.0.1:8080;
-        proxy_redirect off;
-        proxy_http_version 1.1;
-        proxy_set_header Upgrade \$http_upgrade;
-        proxy_set_header Connection "upgrade";
-        proxy_set_header Host \$host;
-        proxy_set_header X-Real-IP \$remote_addr;
-        proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
-    }
-
     # Backup download
     location /backup {
         alias /etc/tunneling/backup;
         autoindex on;
         auth_basic "Restricted Access";
         auth_basic_user_file /etc/nginx/.htpasswd;
+    }
+    
+    # Default location for web content
+    location / {
+        try_files \$uri \$uri/ =404;
     }
 }
 EOF
