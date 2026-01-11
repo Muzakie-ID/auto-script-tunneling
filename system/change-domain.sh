@@ -27,15 +27,15 @@ read -p "Enter New Domain: " new_domain
 if [[ -z $new_domain ]]; then
     echo -e "${RED}Domain cannot be empty!${NC}"
     sleep 2
-    /usr/local/sbin/tunneling/settings-menu.sh
+    /usr/local/sbin/tunneling/menu/settings-menu.sh
     exit 1
 fi
 
-# Validate domain format
-if [[ ! $new_domain =~ ^[a-zA-Z0-9][a-zA-Z0-9-]{1,61}[a-zA-Z0-9]\.[a-zA-Z]{2,}$ ]]; then
+# Validate domain format (allow subdomain)
+if [[ ! $new_domain =~ ^[a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(\.[a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*\.[a-zA-Z]{2,}$ ]]; then
     echo -e "${RED}Invalid domain format!${NC}"
     sleep 2
-    /usr/local/sbin/tunneling/settings-menu.sh
+    /usr/local/sbin/tunneling/menu/settings-menu.sh
     exit 1
 fi
 
@@ -81,4 +81,4 @@ echo ""
 echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
 echo ""
 read -p "Press [Enter] to continue..."
-/usr/local/sbin/tunneling/settings-menu.sh
+/usr/local/sbin/tunneling/menu/settings-menu.sh
