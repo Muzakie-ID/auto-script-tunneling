@@ -78,9 +78,6 @@ else
     exit 1
 fi
 
-# Copy bot script
-cp /usr/local/sbin/tunneling/telegram_bot.py /etc/tunneling/bot/
-
 # Create systemd service
 cat > /etc/systemd/system/telegram-bot.service << EOF
 [Unit]
@@ -90,8 +87,8 @@ After=network.target
 [Service]
 Type=simple
 User=root
-WorkingDirectory=/etc/tunneling/bot
-ExecStart=/opt/telegram-bot-venv/bin/python /etc/tunneling/bot/telegram_bot.py
+WorkingDirectory=/usr/local/sbin/tunneling/bot
+ExecStart=/opt/telegram-bot-venv/bin/python /usr/local/sbin/tunneling/bot/telegram_bot.py
 Restart=always
 RestartSec=10
 
