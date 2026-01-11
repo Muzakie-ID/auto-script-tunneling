@@ -19,14 +19,15 @@ echo -e "${GREEN}  [5]${NC} Speedtest"
 echo -e "${GREEN}  [6]${NC} Delete All Expired Accounts"
 echo -e "${GREEN}  [7]${NC} Limit Speed VPS"
 echo -e "${GREEN}  [8]${NC} Monitor Service Status"
-echo -e "${GREEN}  [9]${NC} Check Logs"
-echo -e "${GREEN} [10]${NC} Auto Reboot Settings"
-echo -e "${GREEN} [11]${NC} Update/Repair Scripts"
+echo -e "${GREEN}  [9]${NC} View Logs (Detailed)"
+echo -e "${GREEN} [10]${NC} Check Logs"
+echo -e "${GREEN} [11]${NC} Auto Reboot Settings"
+echo -e "${GREEN} [12]${NC} Update/Repair Scripts"
 echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
 echo -e "${RED}  [0]${NC} Back to Main Menu"
 echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
 echo ""
-read -p "Select Menu [0-11]: " menu
+read -p "Select Menu [0-12]: " menu
 
 case $menu in
     1)
@@ -54,12 +55,15 @@ case $menu in
         /usr/local/sbin/tunneling/system/monitor-service.sh
         ;;
     9)
-        /usr/local/sbin/tunneling/system/check-logs.sh
+        /usr/local/sbin/tunneling/system/view-logs.sh
         ;;
     10)
-        /usr/local/sbin/tunneling/system/auto-reboot-settings.sh
+        /usr/local/sbin/tunneling/system/check-logs.sh
         ;;
     11)
+        /usr/local/sbin/tunneling/system/auto-reboot-settings.sh
+        ;;
+    12)
         /usr/local/sbin/tunneling/fix-install.sh
         ;;
     0)
