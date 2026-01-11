@@ -205,7 +205,7 @@ bash -c "$(curl -L https://github.com/XTLS/Xray-install/raw/main/install-release
 # Setup SSL Certificate
 echo -e "${CYAN}[INFO]${NC} Setting up SSL certificate..."
 systemctl stop nginx
-certbot certonly --standalone --preferred-challenges http --agree-tos --email admin@$domain -d $domain --non-interactive
+certbot certonly --standalone --preferred-challenges http --agree-tos --email "$email" -d "$domain" --non-interactive
 systemctl start nginx
 
 # Link certificates
