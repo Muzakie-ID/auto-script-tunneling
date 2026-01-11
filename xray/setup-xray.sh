@@ -82,8 +82,19 @@ cat > /usr/local/etc/xray/config.json << EOF
 }
 EOF
 
+# Check if SSL certificate exists
+if [ -f "/etc/letsencrypt/live/$DOMAIN/fullchain.pem" ]; then
+    echo "SSL certificate found, creating HTTPS configuration..."
+    HAS_SSL=true
+else
+    echo "SSL certificate not found, creating HTTP-only configuration..."
+    echo "Please run 'certbot certonly --nginx -d $DOMAIN' after this setup to get SSL certificate."
+    HAS_SSL=false
+fi
+
 # Create Nginx config for XRAY
-cat > /etc/nginx/conf.d/xray.conf << 'NGINXEOF'
+if [ "$HAS_SSL" = true ]; then
+    cat > /etc/nginx/conf.d/xray.conf << 'NGINXEOF'
 server {
     listen 443 ssl http2;
     listen [::]:443 ssl http2;
@@ -165,12 +176,103 @@ server {
         proxy_set_header X-Real-IP $remote_addr;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
     }
+}
 
+server {
+    listen 80;
+    listen [::]:80;
+    server_name DOMAIN;
+
+    location /vmess {
+        proxy_redirect off;
+        proxy_pass http://127.0.0.1:10001;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    }
+
+    location /vless {
+        proxy_redirect off;
+        proxy_pass http://127.0.0.1:10002;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    }
+
+    location /trojan {
+        proxy_redirect off;
+        proxy_pass http://127.0.0.1:10003;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    }
 }
 NGINXEOF
+else
+    # Create HTTP-only config when no SSL certificate exists
+    cat > /etc/nginx/conf.d/xray.conf << 'NGINXEOF'
+server {
+    listen 80;
+    listen [::]:80;
+    server_name DOMAIN;
+
+    root /var/www/html;
+
+    location /.well-known/acme-challenge/ {
+        root /var/www/html;
+        allow all;
+    }
+
+    location /vmess {
+        proxy_redirect off;
+        proxy_pass http://127.0.0.1:10001;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    }
+
+    location /vless {
+        proxy_redirect off;
+        proxy_pass http://127.0.0.1:10002;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    }
+
+    location /trojan {
+        proxy_redirect off;
+        proxy_pass http://127.0.0.1:10003;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    }
+}
+NGINXEOF
+fi
 
 # Replace DOMAIN placeholder with actual domain
 sed -i "s|DOMAIN|$DOMAIN|g" /etc/nginx/conf.d/xray.conf
+
+# Create webroot directory for certbot
+mkdir -p /var/www/html
 
 # Create log directory
 mkdir -p /var/log/xray
@@ -189,10 +291,27 @@ echo "XRAY configuration created successfully!"
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 echo "Domain: $DOMAIN"
 echo ""
+
+if [ "$HAS_SSL" = false ]; then
+    echo "⚠️  SSL Certificate not found!"
+    echo ""
+    echo "To get SSL certificate, run:"
+    echo "  certbot certonly --nginx -d $DOMAIN"
+    echo ""
+    echo "After getting certificate, run setup again to enable HTTPS."
+    echo ""
+fi
+
 echo "Services:"
-echo "  • VMESS   → https://$DOMAIN:443/vmess"
-echo "  • VLESS   → https://$DOMAIN:443/vless"
-echo "  • TROJAN  → https://$DOMAIN:443/trojan"
+if [ "$HAS_SSL" = true ]; then
+    echo "  • VMESS   → https://$DOMAIN:443/vmess"
+    echo "  • VLESS   → https://$DOMAIN:443/vless"
+    echo "  • TROJAN  → https://$DOMAIN:443/trojan"
+else
+    echo "  • VMESS   → http://$DOMAIN:80/vmess"
+    echo "  • VLESS   → http://$DOMAIN:80/vless"
+    echo "  • TROJAN  → http://$DOMAIN:80/trojan"
+fi
 echo ""
 echo "Internal Ports:"
 echo "  • VMESS   → 127.0.0.1:10001"
