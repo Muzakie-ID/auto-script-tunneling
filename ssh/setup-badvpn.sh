@@ -32,7 +32,7 @@ if [ -f "udpgw/badvpn-udpgw" ]; then
 else
     echo "Compilation failed! Falling back to pre-compiled binary..."
     # Fallback content if needed, but compilation usually works
-    wget -O /usr/bin/badvpn-udpgw "https://raw.githubusercontent.com/fisabiliyusri/Mantap/main/ssh/badvpn-udpgw64"
+    wget -O /usr/bin/badvpn-udpgw "https://raw.githubusercontent.com/Muzakie-ID/auto-script-tunneling-v2/main/bin/badvpn-udpgw"
     chmod +x /usr/bin/badvpn-udpgw
 fi
 
