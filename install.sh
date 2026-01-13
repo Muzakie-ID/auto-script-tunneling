@@ -243,7 +243,11 @@ else
     certbot certonly --standalone --preferred-challenges http --agree-tos --email "$email" -d "$domain" --non-interactive
 fi
 
-systemctl start nginx
+# Configure NGINX
+echo -e "${CYAN}[INFO]${NC} Configuring NGINX..."
+bash "$INSTALL_DIR/system/setup-nginx.sh"
+
+systemctl restart nginx
 
 # Link certificates
 mkdir -p /etc/xray/certs
