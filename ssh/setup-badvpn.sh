@@ -1,11 +1,44 @@
 #!/bin/bash
 
-# Setup UDP Custom / BadVPN
+# Setup UDP Custom / BadVPN (Compile from Source for Stability)
 
-# Download binary badvpn
-echo "Downloading BadVPN..."
-wget -O /usr/bin/badvpn-udpgw "https://raw.githubusercontent.com/Muzakie-ID/auto-script-tunneling-v2/main/bin/badvpn-udpgw"
-chmod +x /usr/bin/badvpn-udpgw
+echo "Preparing to build BadVPN-UDPGW..."
+
+# Install build dependencies if missing
+apt-get install -y cmake build-essential git
+
+# Create temporary build directory
+mkdir -p /tmp/badvpn-build
+cd /tmp/badvpn-build
+
+# Download source code
+echo "Downloading source code..."
+rm -rf badvpn
+git clone https://github.com/ambrop72/badvpn.git
+
+# Build
+echo "Compiling BadVPN (This may take a minute)..."
+cd badvpn
+mkdir build
+cd build
+cmake .. -DBUILD_NOTHING_BY_DEFAULT=1 -DBUILD_UDPGW=1
+make
+
+# Install binary
+if [ -f "udpgw/badvpn-udpgw" ]; then
+    echo "Compilation successful!"
+    cp udpgw/badvpn-udpgw /usr/bin/badvpn-udpgw
+    chmod +x /usr/bin/badvpn-udpgw
+else
+    echo "Compilation failed! Falling back to pre-compiled binary..."
+    # Fallback content if needed, but compilation usually works
+    wget -O /usr/bin/badvpn-udpgw "https://raw.githubusercontent.com/daybreakersx/prem_script/master/badvpn-udpgw64"
+    chmod +x /usr/bin/badvpn-udpgw
+fi
+
+# Clean up
+cd /root
+rm -rf /tmp/badvpn-build
 
 # Create BadVPN Service
 cat > /etc/systemd/system/badvpn.service << EOF
