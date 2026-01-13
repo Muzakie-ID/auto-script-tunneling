@@ -225,7 +225,8 @@ if [[ "$wildcard_ssl" == "y" ]]; then
     
     if [[ -n "$cf_email" && -n "$cf_token" ]]; then
         echo -e "${CYAN}[INFO]${NC} Installing Cloudflare plugin..."
-        pip3 install certbot-dns-cloudflare
+        # Restore installation compatibility: apt -> pip break -> pip standard
+        apt-get install -y python3-certbot-dns-cloudflare || pip3 install certbot-dns-cloudflare --break-system-packages || pip3 install certbot-dns-cloudflare
         
         mkdir -p /root/.secrets
         echo "dns_cloudflare_email = $cf_email" > /root/.secrets/cloudflare.ini
