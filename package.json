@@ -1,0 +1,95 @@
+{
+  "version": "1.0.0",
+  "name": "AUTOSCRIPT TUNNELING VPN",
+  "description": "Complete VPN Server Auto Installer for Ubuntu 22+ / Debian 11+",
+  "protocols": [
+    "SSH",
+    "SSH UDP",
+    "VMESS",
+    "VLESS",
+    "TROJAN"
+  ],
+  "features": {
+    "account_management": [
+      "Create Account",
+      "Delete Account",
+      "Renew Account",
+      "Trial Account",
+      "Lock/Unlock Account",
+      "List Accounts",
+      "Account Details",
+      "Limit IP",
+      "Limit Quota",
+      "Auto Delete Expired"
+    ],
+    "system_management": [
+      "Check Services",
+      "Restart Services",
+      "Monitor VPS",
+      "Speedtest",
+      "Auto Reboot",
+      "Limit Speed VPS",
+      "Check Logs"
+    ],
+    "backup": [
+      "Manual Backup",
+      "Auto Backup",
+      "Restore Backup",
+      "Download Backup"
+    ],
+    "bot_telegram": [
+      "Auto Order",
+      "Payment QRIS",
+      "Notification",
+      "Trial Request",
+      "Check Account",
+      "Renew Account"
+    ],
+    "settings": [
+      "Change Domain",
+      "Change Banner",
+      "Change Port",
+      "Fix Error Domain",
+      "Fix Error Proxy",
+      "Renew SSL",
+      "Auto Record Domain"
+    ]
+  },
+  "requirements": {
+    "os": [
+      "Ubuntu 22.04+",
+      "Debian 11+"
+    ],
+    "ram": "1GB",
+    "cpu": "1 Core",
+    "storage": "10GB",
+    "ports": [
+      22,
+      80,
+      443,
+      109,
+      143,
+      442,
+      3128,
+      8080,
+      2082,
+      2086,
+      2087,
+      2095,
+      2096,
+      7300,
+      8443
+    ]
+  },
+  "installation": {
+    "quick_install": "wget https://raw.githubusercontent.com/Muzakie-ID/auto-script-tunneling/main/setup.sh && chmod +x setup.sh && ./setup.sh",
+    "manual_install": "git clone https://github.com/Muzakie-ID/auto-script-tunneling.git && cd autoscript-tunneling && chmod +x setup.sh && ./setup.sh"
+  },
+  "author": "AUTOSCRIPT TUNNELING TEAM",
+  "license": "Unlocked - Free to Edit",
+  "support": {
+    "telegram": "@yourtelegram",
+    "whatsapp": "+62xxx",
+    "email": "support@yourdomain.com"
+  }
+}

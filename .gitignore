@@ -1,0 +1,95 @@
+# .gitignore for AUTOSCRIPT TUNNELING
+
+# Backup files
+*.tar.gz
+*.zip
+*.bak
+backup/
+backups/
+
+# Log files
+*.log
+logs/
+/var/log/
+
+# Config files with sensitive data
+config.json
+bot/config.json
+.env
+
+# SSH keys
+*.pem
+*.key
+*.pub
+id_rsa*
+
+# SSL certificates
+*.crt
+*.csr
+fullchain.pem
+privkey.pem
+
+# Database files
+*.db
+*.sqlite
+
+# Temporary files
+*.tmp
+*.temp
+tmp/
+temp/
+
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+pip-log.txt
+pip-delete-this-directory.txt
+.pytest_cache/
+
+# Node modules (if using Node.js)
+node_modules/
+npm-debug.log
+yarn-error.log
+
+# User data
+/etc/tunneling/ssh/*.json
+/etc/tunneling/vmess/*.json
+/etc/tunneling/vless/*.json
+/etc/tunneling/trojan/*.json
+/etc/tunneling/bot/orders/*.json
+
+# QRIS images (contain sensitive info)
+qris.jpg
+qris.png
+
+# Installation files
+setup.sh.bak
+install.log
+
+# Test files
+test/
+tests/
+*.test
+
+# Personal notes
+notes.txt
+TODO.txt
+ideas.txt
