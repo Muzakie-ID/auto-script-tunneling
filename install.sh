@@ -50,6 +50,12 @@ if [[ -z $email ]]; then
 fi
 echo "$email" > /root/email.txt
 
+# Start Logging
+LOG_FILE="/root/install-log.txt"
+exec > >(tee -a "$LOG_FILE") 2>&1
+echo -e "${CYAN}[INFO]${NC} Installation logs will be saved to ${YELLOW}$LOG_FILE${NC}"
+echo "Installation started at $(date)"
+
 # Update and install dependencies
 echo -e "${CYAN}[INFO]${NC} Updating system and installing dependencies..."
 apt-get update
@@ -234,14 +240,29 @@ if [[ "$wildcard_ssl" == "y" ]]; then
         chmod 600 /root/.secrets/cloudflare.ini
         
         echo -e "${CYAN}[INFO]${NC} Requesting Wildcard Certificate..."
-        certbot certonly --dns-cloudflare --dns-cloudflare-credentials /root/.secrets/cloudflare.ini \
-            -d "$domain" -d "*.$domain" --agree-tos --email "$email" --non-interactive
+        if ! certbot certonly --dns-cloudflare --dns-cloudflare-credentials /root/.secrets/cloudflare.ini \
+            -d "$domain" -d "*.$domain" --agree-tos --email "$email" --non-interactive; then
+            echo -e "${RED}[ERROR]${NC} Wildcard certificate request failed! Falling back to standard HTTP challenge..."
+            rm -f /root/.secrets/cloudflare.ini
+            certbot certonly --standalone --preferred-challenges http --agree-tos --email "$email" -d "$domain" --non-interactive
+        fi
     else
         echo -e "${RED}[ERROR]${NC} Missing Cloudflare credentials. Fallback to standard HTTP challenge."
         certbot certonly --standalone --preferred-challenges http --agree-tos --email "$email" -d "$domain" --non-interactive
     fi
 else
     certbot certonly --standalone --preferred-challenges http --agree-tos --email "$email" -d "$domain" --non-interactive
+fi
+
+# Check if certificate exists before configuring NGINX
+if [[ ! -f "/etc/letsencrypt/live/$domain/fullchain.pem" ]]; then
+    echo -e "${RED}[CRITICAL]${NC} SSL Certificate not found! NGINX will fail to start."
+    echo -e "${YELLOW}[INFO]${NC} Attempting to generate self-signed certificate as fallback (NOT RECOMMENDED FOR PRODUCTION)..."
+    mkdir -p /etc/letsencrypt/live/$domain
+    openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
+        -keyout /etc/letsencrypt/live/$domain/privkey.pem \
+        -out /etc/letsencrypt/live/$domain/fullchain.pem \
+        -subj "/C=ID/ST=Java/L=Jakarta/O=Tunneling/CN=$domain"
 fi
 
 # Configure NGINX
