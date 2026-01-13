@@ -126,7 +126,7 @@ FILES_SSH=(
     "ssh/ssh-check.sh" "ssh/ssh-list.sh" "ssh/ssh-delete-expired.sh" "ssh/ssh-lock.sh" 
     "ssh/ssh-unlock.sh" "ssh/ssh-details.sh" "ssh/ssh-limit-ip.sh" "ssh/ssh-limit-quota.sh" 
     "ssh/setup-dropbear.sh" "ssh/setup-stunnel.sh" "ssh/setup-squid.sh" "ssh/setup-tuntap.sh"
-    "ssh/setup-ws.sh"
+    "ssh/setup-ws.sh" "ssh/setup-badvpn.sh"
 )
 for file in "${FILES_SSH[@]}"; do download_file "$file" "$INSTALL_DIR/$file"; done
 
@@ -203,6 +203,9 @@ bash "$INSTALL_DIR/ssh/setup-tuntap.sh"
 echo -e "${CYAN}[INFO]${NC} Setting up WebSocket-SSH..."
 bash "$INSTALL_DIR/ssh/setup-ws.sh"
 
+echo -e "${CYAN}[INFO]${NC} Setting up BadVPN UDP Gateway..."
+bash "$INSTALL_DIR/ssh/setup-badvpn.sh"
+
 # Install XRAY
 echo -e "${CYAN}[INFO]${NC} Installing XRAY..."
 bash -c "$(curl -L https://github.com/XTLS/Xray-install/raw/main/install-release.sh)" @ install
@@ -210,7 +213,36 @@ bash -c "$(curl -L https://github.com/XTLS/Xray-install/raw/main/install-release
 # Setup SSL Certificate
 echo -e "${CYAN}[INFO]${NC} Setting up SSL certificate..."
 systemctl stop nginx
-certbot certonly --standalone --preferred-challenges http --agree-tos --email "$email" -d "$domain" --non-interactive
+
+# Ask for Cloudflare API for Wildcard (Optional)
+echo -e "${YELLOW}Do you want to enable Wildcard SSL for your domain?${NC}"
+echo -e "${YELLOW}This requires Cloudflare API Token.${NC}"
+read -p "Enable Wildcard SSL? (y/n): " wildcard_ssl
+
+if [[ "$wildcard_ssl" == "y" ]]; then
+    read -p "Enter Cloudflare Email: " cf_email
+    read -p "Enter Cloudflare API Token: " cf_token
+    
+    if [[ -n "$cf_email" && -n "$cf_token" ]]; then
+        echo -e "${CYAN}[INFO]${NC} Installing Cloudflare plugin..."
+        pip3 install certbot-dns-cloudflare
+        
+        mkdir -p /root/.secrets
+        echo "dns_cloudflare_email = $cf_email" > /root/.secrets/cloudflare.ini
+        echo "dns_cloudflare_api_token = $cf_token" >> /root/.secrets/cloudflare.ini
+        chmod 600 /root/.secrets/cloudflare.ini
+        
+        echo -e "${CYAN}[INFO]${NC} Requesting Wildcard Certificate..."
+        certbot certonly --dns-cloudflare --dns-cloudflare-credentials /root/.secrets/cloudflare.ini \
+            -d "$domain" -d "*.$domain" --agree-tos --email "$email" --non-interactive
+    else
+        echo -e "${RED}[ERROR]${NC} Missing Cloudflare credentials. Fallback to standard HTTP challenge."
+        certbot certonly --standalone --preferred-challenges http --agree-tos --email "$email" -d "$domain" --non-interactive
+    fi
+else
+    certbot certonly --standalone --preferred-challenges http --agree-tos --email "$email" -d "$domain" --non-interactive
+fi
+
 systemctl start nginx
 
 # Link certificates
