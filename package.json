@@ -82,8 +82,8 @@
     ]
   },
   "installation": {
-    "quick_install": "wget https://raw.githubusercontent.com/Muzakie-ID/auto-script-tunneling/main/setup.sh && chmod +x setup.sh && ./setup.sh",
-    "manual_install": "git clone https://github.com/Muzakie-ID/auto-script-tunneling.git && cd autoscript-tunneling && chmod +x setup.sh && ./setup.sh"
+    "quick_install": "wget https://raw.githubusercontent.com/Muzakie-ID/auto-script-tunneling-v2/main/setup.sh && chmod +x setup.sh && ./setup.sh",
+    "manual_install": "git clone https://github.com/Muzakie-ID/auto-script-tunneling-v2.git && cd autoscript-tunneling && chmod +x setup.sh && ./setup.sh"
   },
   "author": "AUTOSCRIPT TUNNELING TEAM",
   "license": "Unlocked - Free to Edit",

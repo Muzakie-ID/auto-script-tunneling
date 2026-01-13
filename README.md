@@ -23,7 +23,7 @@ Script otomatis untuk setup VPN Server dengan berbagai protocol yang siap dijual
 ### Option 1: Screen Installer (Most Recommended)
 Instalasi berjalan di background dengan screen session. Aman dari koneksi terputus!
 ```bash
-sysctl -w net.ipv6.conf.all.disable_ipv6=1 && sysctl -w net.ipv6.conf.default.disable_ipv6=1 && apt update && apt install -y bzip2 gzip coreutils screen curl wget && wget -q https://raw.githubusercontent.com/Muzakie-ID/auto-script-tunneling/main/install-screen.sh && chmod +x install-screen.sh && ./install-screen.sh
+sysctl -w net.ipv6.conf.all.disable_ipv6=1 && sysctl -w net.ipv6.conf.default.disable_ipv6=1 && apt update && apt install -y bzip2 gzip coreutils screen curl wget && wget -q https://raw.githubusercontent.com/Muzakie-ID/auto-script-tunneling-v2/main/install-screen.sh && chmod +x install-screen.sh && ./install-screen.sh
 ```
 
 **Keuntungan menggunakan Screen Installer:**
@@ -35,14 +35,14 @@ sysctl -w net.ipv6.conf.all.disable_ipv6=1 && sysctl -w net.ipv6.conf.default.di
 ### Option 2: Online Installer (Direct)
 Cara termudah, cukup jalankan perintah ini di terminal VPS Anda:
 ```bash
-sysctl -w net.ipv6.conf.all.disable_ipv6=1 && sysctl -w net.ipv6.conf.default.disable_ipv6=1 && apt update && apt install -y bzip2 gzip coreutils screen curl wget && wget -q https://raw.githubusercontent.com/Muzakie-ID/auto-script-tunneling/main/install.sh && chmod +x install.sh && ./install.sh
+sysctl -w net.ipv6.conf.all.disable_ipv6=1 && sysctl -w net.ipv6.conf.default.disable_ipv6=1 && apt update && apt install -y bzip2 gzip coreutils screen curl wget && wget -q https://raw.githubusercontent.com/Muzakie-ID/auto-script-tunneling-v2/main/install.sh && chmod +x install.sh && ./install.sh
 ```
 
 ### Option 3: Manual Installation (Git Clone)
 Jika Anda ingin melihat source code sebelum install:
 ```bash
 apt update && apt install git -y
-git clone https://github.com/Muzakie-ID/auto-script-tunneling
+git clone https://github.com/Muzakie-ID/auto-script-tunneling-v2
 cd auto-script-tunneling
 chmod +x setup.sh
 ./setup.sh
@@ -107,7 +107,7 @@ chmod +x setup.sh
 Jika VPS Anda belum enable SSH root login dengan password, jalankan script ini terlebih dahulu:
 
 ```bash
-wget https://raw.githubusercontent.com/Muzakie-ID/auto-script-tunneling/main/system/enable-ssh-root.sh && chmod +x enable-ssh-root.sh && ./enable-ssh-root.sh
+wget https://raw.githubusercontent.com/Muzakie-ID/auto-script-tunneling-v2/main/system/enable-ssh-root.sh && chmod +x enable-ssh-root.sh && ./enable-ssh-root.sh
 ```
 
 Script ini akan:
@@ -123,20 +123,20 @@ Script ini akan:
 ### Quick Install (One-Liner)
 
 ```bash
-sysctl -w net.ipv6.conf.all.disable_ipv6=1 && sysctl -w net.ipv6.conf.default.disable_ipv6=1 && apt update && apt install -y bzip2 gzip coreutils screen curl unzip wget && wget https://raw.githubusercontent.com/Muzakie-ID/auto-script-tunneling/main/setup.sh && chmod +x setup.sh && sed -i -e 's/\r$//' setup.sh && screen -S setup ./setup.sh
+sysctl -w net.ipv6.conf.all.disable_ipv6=1 && sysctl -w net.ipv6.conf.default.disable_ipv6=1 && apt update && apt install -y bzip2 gzip coreutils screen curl unzip wget && wget https://raw.githubusercontent.com/Muzakie-ID/auto-script-tunneling-v2/main/setup.sh && chmod +x setup.sh && sed -i -e 's/\r$//' setup.sh && screen -S setup ./setup.sh
 ```
 
 ### Quick Install (Step by Step)
 
 ```bash
 apt update && apt upgrade -y
-wget -O setup.sh https://raw.githubusercontent.com/Muzakie-ID/auto-script-tunneling/main/setup.sh && chmod +x setup.sh && ./setup.sh
+wget -O setup.sh https://raw.githubusercontent.com/Muzakie-ID/auto-script-tunneling-v2/main/setup.sh && chmod +x setup.sh && ./setup.sh
 ```
 
 ### Manual Installation
 
 ```bash
-git clone https://github.com/Muzakie-ID/auto-script-tunneling.git
+git clone https://github.com/Muzakie-ID/auto-script-tunneling-v2.git
 cd auto-script-tunneling
 chmod +x setup.sh
 ./setup.sh
@@ -198,10 +198,10 @@ dig vpn.yourdomain.com +short
 
 ```bash
 # Cara 1: Menggunakan update.sh
-curl -sL https://raw.githubusercontent.com/Muzakie-ID/auto-script-tunneling/main/update.sh | bash
+curl -sL https://raw.githubusercontent.com/Muzakie-ID/auto-script-tunneling-v2/main/update.sh | bash
 
 # Cara 2: Menggunakan git clone (Recommended)
-cd /tmp && rm -rf auto-script-tunneling && git clone https://github.com/Muzakie-ID/auto-script-tunneling.git && cd auto-script-tunneling && cp -f menu/*.sh ssh/*.sh system/*.sh xray/*.sh bot/*.sh /usr/local/sbin/tunneling/ && cp -f bot/telegram_bot.py /usr/local/sbin/tunneling/ && chmod +x /usr/local/sbin/tunneling/*.sh /usr/local/sbin/tunneling/telegram_bot.py && systemctl restart telegram-bot 2>/dev/null && cd ~ && rm -rf /tmp/auto-script-tunneling && echo "✓ Update completed!"
+cd /tmp && rm -rf auto-script-tunneling && git clone https://github.com/Muzakie-ID/auto-script-tunneling-v2.git && cd auto-script-tunneling && cp -f menu/*.sh ssh/*.sh system/*.sh xray/*.sh bot/*.sh /usr/local/sbin/tunneling/ && cp -f bot/telegram_bot.py /usr/local/sbin/tunneling/ && chmod +x /usr/local/sbin/tunneling/*.sh /usr/local/sbin/tunneling/telegram_bot.py && systemctl restart telegram-bot 2>/dev/null && cd ~ && rm -rf /tmp/auto-script-tunneling && echo "✓ Update completed!"
 
 # Cara 3: Via Menu
 menu → System Menu → Update/Repair Scripts
@@ -497,7 +497,7 @@ ufw --force enable
 
 ```bash
 cd /root
-wget -O update.sh https://raw.githubusercontent.com/Muzakie-ID/auto-script-tunneling/main/update.sh
+wget -O update.sh https://raw.githubusercontent.com/Muzakie-ID/auto-script-tunneling-v2/main/update.sh
 chmod +x update.sh
 ./update.sh
 ```
