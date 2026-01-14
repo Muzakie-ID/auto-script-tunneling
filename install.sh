@@ -277,7 +277,14 @@ if [[ "$wildcard_ssl" =~ ^[Yy]$ ]]; then
         
         if [[ -n "$cf_token" ]]; then
             echo -e "${CYAN}[INFO]${NC} Installing Cloudflare DNS plugin..."
-            apt-get install -y python3-certbot-dns-cloudflare || pip3 install certbot-dns-cloudflare --break-system-packages || pip3 install certbot-dns-cloudflare
+            # Install with pinned versions to avoid deprecation warnings
+            if apt-get install -y python3-certbot-dns-cloudflare 2>/dev/null; then
+                echo -e "${GREEN}Installed via apt${NC}"
+            else
+                echo -e "${YELLOW}Installing via pip with stable versions...${NC}"
+                pip3 install certbot-dns-cloudflare cloudflare==2.19.4 --break-system-packages 2>/dev/null || \
+                pip3 install certbot-dns-cloudflare cloudflare==2.19.4
+            fi
             
             mkdir -p /root/.secrets
             echo "# Cloudflare API Token" > /root/.secrets/cloudflare.ini
@@ -314,7 +321,14 @@ if [[ "$wildcard_ssl" =~ ^[Yy]$ ]]; then
         
         if [[ -n "$cf_email" && -n "$cf_api_key" ]]; then
             echo -e "${CYAN}[INFO]${NC} Installing Cloudflare DNS plugin..."
-            apt-get install -y python3-certbot-dns-cloudflare || pip3 install certbot-dns-cloudflare --break-system-packages || pip3 install certbot-dns-cloudflare
+            # Install with pinned versions to avoid deprecation warnings
+            if apt-get install -y python3-certbot-dns-cloudflare 2>/dev/null; then
+                echo -e "${GREEN}Installed via apt${NC}"
+            else
+                echo -e "${YELLOW}Installing via pip with stable versions...${NC}"
+                pip3 install certbot-dns-cloudflare cloudflare==2.19.4 --break-system-packages 2>/dev/null || \
+                pip3 install certbot-dns-cloudflare cloudflare==2.19.4
+            fi
             
             mkdir -p /root/.secrets
             echo "# Cloudflare Global API Key" > /root/.secrets/cloudflare.ini
