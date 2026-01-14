@@ -87,6 +87,28 @@ apt-get install -y \
     dnsutils \
     bc
 
+# Validate NGINX installation
+echo -e "${CYAN}[INFO]${NC} Validating NGINX installation..."
+if ! command -v nginx &> /dev/null; then
+    echo -e "${YELLOW}[WARNING]${NC} NGINX not found, retrying installation..."
+    apt-get install --reinstall -y nginx
+    
+    if ! command -v nginx &> /dev/null; then
+        echo -e "${RED}[ERROR]${NC} Failed to install NGINX. Trying alternative method..."
+        apt-get purge -y nginx nginx-common nginx-core
+        apt-get update
+        apt-get install -y nginx
+    fi
+fi
+
+# Final check
+if command -v nginx &> /dev/null; then
+    echo -e "${GREEN}[SUCCESS]${NC} NGINX installed successfully: $(nginx -v 2>&1)"
+else
+    echo -e "${RED}[CRITICAL]${NC} NGINX installation failed! Some features may not work."
+    echo -e "${YELLOW}[INFO]${NC} You may need to install NGINX manually after installation."
+fi
+
 # Install BBR
 echo -e "${CYAN}[INFO]${NC} Installing BBR..."
 if ! grep -q "net.core.default_qdisc=fq" /etc/sysctl.conf; then
@@ -218,7 +240,9 @@ bash -c "$(curl -L https://github.com/XTLS/Xray-install/raw/main/install-release
 
 # Setup SSL Certificate
 echo -e "${CYAN}[INFO]${NC} Setting up SSL certificate..."
-systemctl stop nginx
+if systemctl is-active --quiet nginx; then
+    systemctl stop nginx
+fi
 
 # Ask for Cloudflare API for Wildcard (Optional)
 echo -e "${YELLOW}Do you want to enable Wildcard SSL for your domain?${NC}"
@@ -266,10 +290,13 @@ if [[ ! -f "/etc/letsencrypt/live/$domain/fullchain.pem" ]]; then
 fi
 
 # Configure NGINX
-echo -e "${CYAN}[INFO]${NC} Configuring NGINX..."
-bash "$INSTALL_DIR/system/setup-nginx.sh"
-
-systemctl restart nginx
+if command -v nginx &> /dev/null; then
+    echo -e "${CYAN}[INFO]${NC} Configuring NGINX..."
+    bash "$INSTALL_DIR/system/setup-nginx.sh"
+    systemctl restart nginx
+else
+    echo -e "${YELLOW}[WARNING]${NC} NGINX not installed, skipping configuration..."
+fi
 
 # Link certificates
 mkdir -p /etc/xray/certs
@@ -327,10 +354,14 @@ ufw allow 7300/udp  # Custom UDP
 
 # Final setup
 echo -e "${CYAN}[INFO]${NC} Finalizing installation..."
-systemctl enable nginx
+if command -v nginx &> /dev/null; then
+    systemctl enable nginx
+    systemctl restart nginx
+else
+    echo -e "${YELLOW}[WARNING]${NC} NGINX not found, skipping service configuration."
+fi
 systemctl enable xray
 systemctl enable fail2ban
-systemctl restart nginx
 systemctl restart xray
 
 # Clean up
