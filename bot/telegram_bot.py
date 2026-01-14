@@ -1089,6 +1089,212 @@ def create_account_menu(message):
         reply_markup=markup
     )
 
+# Callback handlers for creating accounts
+@bot.callback_query_handler(func=lambda call: call.data.startswith('create_'))
+def handle_create_account(call):
+    if call.from_user.id != ADMIN_ID:
+        bot.answer_callback_query(call.id, "⛔️ Access denied!")
+        return
+    
+    protocol = call.data.replace('create_', '')
+    bot.answer_callback_query(call.id)
+    
+    # Ask for username
+    msg = bot.send_message(
+        call.message.chat.id,
+        f"📝 *CREATE {protocol.upper()} ACCOUNT*\n\nEnter username:",
+        parse_mode='Markdown'
+    )
+    bot.register_next_step_handler(msg, ask_days, protocol)
+
+def ask_days(message, protocol):
+    if message.from_user.id != ADMIN_ID:
+        return
+    
+    username = message.text.strip()
+    
+    # Validate username
+    if len(username) < 3:
+        bot.send_message(message.chat.id, "❌ Username must be at least 3 characters!")
+        return
+    
+    # Check if username exists
+    if protocol == 'ssh':
+        result = os.popen(f"id {username}").read()
+        if 'uid=' in result:
+            bot.send_message(message.chat.id, f"❌ Username `{username}` already exists!", parse_mode='Markdown')
+            return
+    else:
+        account_file = f'/etc/tunneling/{protocol}/{username}.json'
+        if os.path.exists(account_file):
+            bot.send_message(message.chat.id, f"❌ Username `{username}` already exists!", parse_mode='Markdown')
+            return
+    
+    # Ask for duration
+    msg = bot.send_message(
+        message.chat.id,
+        f"📅 *Duration*\n\nEnter number of days (1-365):",
+        parse_mode='Markdown'
+    )
+    bot.register_next_step_handler(msg, ask_limit_ip, protocol, username)
+
+def ask_limit_ip(message, protocol, username):
+    if message.from_user.id != ADMIN_ID:
+        return
+    
+    try:
+        days = int(message.text.strip())
+        if days < 1 or days > 365:
+            bot.send_message(message.chat.id, "❌ Days must be between 1 and 365!")
+            return
+    except ValueError:
+        bot.send_message(message.chat.id, "❌ Invalid number!")
+        return
+    
+    # Ask for IP limit
+    msg = bot.send_message(
+        message.chat.id,
+        f"🔢 *IP Limit*\n\nEnter max IP connections (0 = unlimited):",
+        parse_mode='Markdown'
+    )
+    bot.register_next_step_handler(msg, ask_limit_quota, protocol, username, days)
+
+def ask_limit_quota(message, protocol, username, days):
+    if message.from_user.id != ADMIN_ID:
+        return
+    
+    try:
+        limit_ip = int(message.text.strip())
+        if limit_ip < 0:
+            bot.send_message(message.chat.id, "❌ IP limit cannot be negative!")
+            return
+    except ValueError:
+        bot.send_message(message.chat.id, "❌ Invalid number!")
+        return
+    
+    # Ask for quota limit
+    msg = bot.send_message(
+        message.chat.id,
+        f"💾 *Quota Limit*\n\nEnter max quota in GB (0 = unlimited):",
+        parse_mode='Markdown'
+    )
+    bot.register_next_step_handler(msg, process_create_account, protocol, username, days, limit_ip)
+
+def process_create_account(message, protocol, username, days, limit_ip):
+    if message.from_user.id != ADMIN_ID:
+        return
+    
+    try:
+        limit_quota = int(message.text.strip())
+        if limit_quota < 0:
+            bot.send_message(message.chat.id, "❌ Quota limit cannot be negative!")
+            return
+    except ValueError:
+        bot.send_message(message.chat.id, "❌ Invalid number!")
+        return
+    
+    # Create processing message
+    processing_msg = bot.send_message(message.chat.id, "⏳ Creating account...")
+    
+    try:
+        import random
+        import string
+        
+        # Generate password for SSH
+        password = ''.join(random.choices(string.ascii_letters + string.digits, k=12))
+        
+        # Create account based on protocol
+        if protocol == 'ssh':
+            # Create SSH account
+            cmd = f"bash /usr/local/sbin/tunneling/ssh/ssh-create.sh {username} {password} {days} {limit_ip} {limit_quota}"
+            os.system(cmd + " >/dev/null 2>&1")
+        else:
+            # Create XRAY account (vmess/vless/trojan)
+            cmd = f"echo -e '{username}\\n{days}\\n{limit_ip}\\n{limit_quota}' | bash /usr/local/sbin/tunneling/xray/{protocol}-create.sh"
+            os.system(cmd + " >/dev/null 2>&1")
+        
+        # Wait for account creation
+        import time
+        time.sleep(3)
+        
+        # Read account details
+        if protocol == 'ssh':
+            # For SSH, construct details manually
+            expired_date = (datetime.now() + timedelta(days=days)).strftime('%Y-%m-%d')
+            
+            with open('/root/domain.txt', 'r') as f:
+                domain = f.read().strip()
+            
+            account_text = f"""
+✅ *SSH ACCOUNT CREATED*
+
+👤 Username: `{username}`
+🔑 Password: `{password}`
+🌐 Domain: `{domain}`
+📅 Expired: {expired_date} ({days} days)
+🔢 IP Limit: {limit_ip if limit_ip > 0 else 'Unlimited'}
+💾 Quota Limit: {limit_quota if limit_quota > 0 else 'Unlimited'} GB
+
+*Connection Info:*
+• OpenSSH: 22
+• Dropbear: 109, 143
+• SSL/TLS: 442, 777
+• Squid: 3128, 8080
+• WebSocket: 80, 8080 (WS), 443 (WSS)
+            """
+        else:
+            # Read XRAY account JSON
+            account_file = f'/etc/tunneling/{protocol}/{username}.json'
+            if not os.path.exists(account_file):
+                bot.edit_message_text(
+                    "❌ Failed to create account! Please check logs.",
+                    message.chat.id,
+                    processing_msg.message_id
+                )
+                return
+            
+            with open(account_file, 'r') as f:
+                account_data = json.load(f)
+            
+            with open('/root/domain.txt', 'r') as f:
+                domain = f.read().strip()
+            
+            account_text = f"""
+✅ *{protocol.upper()} ACCOUNT CREATED*
+
+👤 Username: `{username}`
+🆔 UUID: `{account_data.get('uuid', 'N/A')}`
+🌐 Domain: `{domain}`
+📅 Expired: {account_data.get('expired', 'N/A')} ({days} days)
+🔢 IP Limit: {limit_ip if limit_ip > 0 else 'Unlimited'}
+💾 Quota Limit: {limit_quota if limit_quota > 0 else 'Unlimited'} GB
+
+*Connection Info:*
+• Port TLS: 443
+• Port Non-TLS: 80
+• Path: /{protocol}
+• Network: ws (WebSocket)
+• Security: auto (TLS), none (Non-TLS)
+
+*Alternative Ports:*
+• TLS: 2082, 2086, 2087, 2095, 2096, 8443
+• Non-TLS: 8080
+            """
+        
+        # Delete processing message and send result
+        bot.delete_message(message.chat.id, processing_msg.message_id)
+        bot.send_message(message.chat.id, account_text, parse_mode='Markdown')
+        
+        # Log creation
+        print(f"[ADMIN] Created {protocol.upper()} account: {username} ({days} days)")
+        
+    except Exception as e:
+        bot.edit_message_text(
+            f"❌ Error creating account: {str(e)}",
+            message.chat.id,
+            processing_msg.message_id
+        )
+
 # Admin Statistics
 @bot.message_handler(func=lambda message: message.text == '📈 Statistics')
 def admin_statistics(message):
