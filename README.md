@@ -514,8 +514,8 @@ chmod +x update.sh
 
 ## 📞 Support
 
-- **Telegram:** @yourtelegram
-- **WhatsApp:** +62xxx
+- **Telegram:** @MuzakieID
+- **WhatsApp:** +62
 - **Email:** support@yourdomain.com
 
 ## 📄 License
