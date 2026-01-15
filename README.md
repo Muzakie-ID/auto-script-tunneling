@@ -21,25 +21,25 @@ Script otomatis untuk setup VPN Server dengan berbagai protocol yang siap dijual
 ## 📥 Installation
 Jika VPS Anda belum enable SSH root login dengan password, jalankan script ini terlebih dahulu:
 
-### Option 1: Screen Installer (Most Recommended)
-Instalasi berjalan di background dengan screen session. Aman dari koneksi terputus!
 ```bash
-sysctl -w net.ipv6.conf.all.disable_ipv6=1 && sysctl -w net.ipv6.conf.default.disable_ipv6=1 && apt update && apt install -y bzip2 gzip coreutils screen curl wget && wget -q https://raw.githubusercontent.com/Muzakie-ID/auto-script-tunneling-v2/main/install-screen.sh && chmod +x install-screen.sh && ./install-screen.sh
+wget https://raw.githubusercontent.com/Muzakie-ID/auto-script-tunneling-v2/main/system/enable-ssh-root.sh && chmod +x enable-ssh-root.sh && ./enable-ssh-root.sh
 ```
 
-**Keuntungan menggunakan Screen Installer:**
-- ✅ Instalasi tetap berjalan meskipun koneksi SSH terputus
-- ✅ Bisa disconnect dan reconnect kapan saja
-- ✅ Log lengkap tersimpan di `/var/log/autoscript-install.log`
-- ✅ Attach kembali dengan: `screen -r autoscript-install`
+Script ini akan:
+- ✅ Enable SSH root login
+- ✅ Set password untuk root user
+- ✅ Display IP, username, password untuk login
+- ✅ Auto restart SSH service
 
-### Option 2: Online Installer (Direct)
+**⚠️ Note:** Lewati step ini jika Anda sudah bisa login sebagai root dengan password.
+
+---
 Cara termudah, cukup jalankan perintah ini di terminal VPS Anda:
 ```bash
 sysctl -w net.ipv6.conf.all.disable_ipv6=1 && sysctl -w net.ipv6.conf.default.disable_ipv6=1 && apt update && apt install -y bzip2 gzip coreutils screen curl wget && wget -q https://raw.githubusercontent.com/Muzakie-ID/auto-script-tunneling-v2/main/install.sh && chmod +x install.sh && ./install.sh
 ```
 
-### Option 3: Manual Installation (Git Clone)
+Manual Installation (Git Clone)
 Jika Anda ingin melihat source code sebelum install:
 ```bash
 apt update && apt install git -y
@@ -105,26 +105,12 @@ chmod +x setup.sh
 
 ### ⚙️ Pre-Installation (Optional - Enable SSH Root Login)
 
-Jika VPS Anda belum enable SSH root login dengan password, jalankan script ini terlebih dahulu:
 
-```bash
-wget https://raw.githubusercontent.com/Muzakie-ID/auto-script-tunneling-v2/main/system/enable-ssh-root.sh && chmod +x enable-ssh-root.sh && ./enable-ssh-root.sh
-```
-
-Script ini akan:
-- ✅ Enable SSH root login
-- ✅ Set password untuk root user
-- ✅ Display IP, username, password untuk login
-- ✅ Auto restart SSH service
-
-**⚠️ Note:** Lewati step ini jika Anda sudah bisa login sebagai root dengan password.
-
----
 
 ### Quick Install (One-Liner)
 
 ```bash
-sysctl -w net.ipv6.conf.all.disable_ipv6=1 && sysctl -w net.ipv6.conf.default.disable_ipv6=1 && apt update && apt install -y bzip2 gzip coreutils screen curl unzip wget && wget https://raw.githubusercontent.com/Muzakie-ID/auto-script-tunneling-v2/main/setup.sh && chmod +x setup.sh && sed -i -e 's/\r$//' setup.sh && screen -S setup ./setup.sh
+sysctl -w net.ipv6.conf.all.disable_ipv6=1 && sysctl -w net.ipv6.conf.default.disable_ipv6=1 && apt update && apt install -y bzip2 gzip coreutils screen curl unzip wget && wget https://raw.githubusercontent.com/Muzakie-ID/auto-script-tunneling-v2/main/install.sh && chmod +x install.sh && sed -i -e 's/\r$//' install.sh && screen -S setup ./install.sh
 ```
 
 ### Quick Install (Step by Step)
