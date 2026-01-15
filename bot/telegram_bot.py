@@ -259,14 +259,43 @@ def confirm_approve_order(call):
     days = order['days']
     
     # Call create script with correct paths
-    if protocol == 'ssh':
-        os.system(f"bash /usr/local/sbin/tunneling/ssh/ssh-create.sh {username} {password} {days} >/dev/null 2>&1")
-    elif protocol == 'vmess':
-        os.system(f"echo '{username}\n{days}' | bash /usr/local/sbin/tunneling/xray/vmess-create.sh")
-    elif protocol == 'vless':
-        os.system(f"echo '{username}\n{days}' | bash /usr/local/sbin/tunneling/xray/vless-create.sh")
-    elif protocol == 'trojan':
-        os.system(f"echo '{username}\n{days}' | bash /usr/local/sbin/tunneling/xray/trojan-create.sh")
+    SCRIPT_PATHS = {
+    'vmess': {
+        'create': '/usr/local/sbin/tunneling/xray/vmess-create.sh',
+        'delete': '/usr/local/sbin/tunneling/xray/vmess-delete.sh',
+        'renew': '/usr/local/sbin/tunneling/xray/vmess-renew.sh',
+        'check': '/usr/local/sbin/tunneling/xray/vmess-check.sh',
+    },
+    'vless': {
+        'create': '/usr/local/sbin/tunneling/xray/vless-create.sh',
+        'delete': '/usr/local/sbin/tunneling/xray/vless-delete.sh',
+        'renew': '/usr/local/sbin/tunneling/xray/vless-renew.sh',
+        'check': '/usr/local/sbin/tunneling/xray/vless-check.sh',
+    },
+    'trojan': {
+        'create': '/usr/local/sbin/tunneling/xray/trojan-create.sh',
+        'delete': '/usr/local/sbin/tunneling/xray/trojan-delete.sh',
+        'renew': '/usr/local/sbin/tunneling/xray/trojan-renew.sh',
+        'check': '/usr/local/sbin/tunneling/xray/trojan-check.sh',
+    },
+    'ssh': {
+        'create': '/usr/local/sbin/tunneling/ssh/ssh-create.sh',
+        'delete': '/usr/local/sbin/tunneling/ssh/ssh-delete.sh',
+        'renew': '/usr/local/sbin/tunneling/ssh/ssh-renew.sh',
+        'check': '/usr/local/sbin/tunneling/ssh/ssh-check.sh',
+    }
+}
+    
+    create_script = SCRIPT_PATHS.get(protocol, {}).get('create')
+    
+    if create_script:
+        if protocol == 'ssh':
+            os.system(f"bash {create_script} {username} {password} {days} >/dev/null 2>&1")
+        elif protocol in ['vmess', 'vless', 'trojan']:
+            os.system(f"echo '{username}\n{days}' | bash {create_script}")
+    else:
+        bot.answer_callback_query(call.id, f"❌ Unknown protocol: {protocol}")
+        return
     
     # Read account details from JSON
     account_data = {}
