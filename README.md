@@ -19,6 +19,7 @@ Script otomatis untuk setup VPN Server dengan berbagai protocol yang siap dijual
 - **TROJAN**
 
 ## 📥 Installation
+Jika VPS Anda belum enable SSH root login dengan password, jalankan script ini terlebih dahulu:
 
 ### Option 1: Screen Installer (Most Recommended)
 Instalasi berjalan di background dengan screen session. Aman dari koneksi terputus!
