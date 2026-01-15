@@ -1856,5 +1856,95 @@ Thank you for your order! 🎉
 
 # Run bot
 if __name__ == '__main__':
-    print("Bot started...")
-    bot.infinity_polling()
+# Admin command untuk add bug host
+@bot.message_handler(commands=['addbug'])
+def handle_add_bug(message):
+    """Handle /addbug command untuk expand SSL certificate"""
+    user_id = message.from_user.id
+    
+    # Check if admin
+    if user_id != ADMIN_ID:
+        bot.reply_to(message, "⛔️ Access denied! Admin only.")
+        return
+    
+    # Parse bug host
+    try:
+        bug_host = message.text.split(maxsplit=1)[1]
+    except IndexError:
+        bot.reply_to(message, """
+❌ *Usage Error*
+
+Format: `/addbug <bug-host>`
+
+*Examples:*
+• `/addbug support.zoom.us`
+• `/addbug ava.game.naver.com`
+• `/addbug quiz.vidio.com`
+
+The bug host will be added to SSL certificate automatically.
+        """, parse_mode='Markdown')
+        return
+    
+    # Send processing message
+    processing_msg = bot.reply_to(message, f"⏳ Processing `{bug_host}`...", parse_mode='Markdown')
+    
+    # Execute script
+    import subprocess
+    result = subprocess.run(
+        ['/usr/local/sbin/tunneling/auto-add-bug.sh', bug_host],
+        capture_output=True,
+        text=True
+    )
+    
+    if result.returncode == 0:
+        # Success - get domain
+        domain = 'your-domain.com'
+        if os.path.exists('/root/domain.txt'):
+            with open('/root/domain.txt', 'r') as f:
+                domain = f.read().strip()
+        
+        full_domain = f"{bug_host}.{domain}"
+        
+        # Success message dengan config template
+        response = f"""
+✅ *Bug Host Added Successfully!*
+
+🌐 **Domain:** `{full_domain}`
+🔐 **SSL:** Certificate updated
+🔄 **Nginx:** Reloaded
+
+📝 **Config Template (TROJAN):**
+```yaml
+- name: {bug_host.replace('.', '-')}-vpn
+  server: {full_domain}
+  port: 443
+  type: trojan
+  password: [user-password]
+  skip-cert-verify: false
+  sni: {full_domain}
+  network: ws
+  ws-opts:
+    path: /trojan
+    headers:
+      Host: {full_domain}
+  udp: true
+```
+
+⚡ Ready to use! Customer dapat langsung connect dengan config di atas.
+
+💡 **Tip:** Replace `[user-password]` dengan password TROJAN user yang sudah dibuat.
+        """
+        bot.edit_message_text(response, message.chat.id, processing_msg.message_id, parse_mode='Markdown')
+    else:
+        # Error
+        error_msg = result.stderr if result.stderr else result.stdout
+        bot.edit_message_text(
+            f"❌ *Failed to add bug host*\n\n```\n{error_msg}\n```\n\nPlease check:\n• Cloudflare credentials\n• DNS record exists\n• Server has internet access",
+            message.chat.id,
+            processing_msg.message_id,
+            parse_mode='Markdown'
+        )
+
+# Keep the bot running
+print(f"Bot started! Admin ID: {ADMIN_ID}")
+bot.infinity_polling()
