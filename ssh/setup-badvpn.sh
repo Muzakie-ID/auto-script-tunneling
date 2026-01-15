@@ -20,7 +20,18 @@ echo ""
 echo -e "${BLUE}1.${NC} Compile from source (Latest, requires build tools)"
 echo -e "${BLUE}2.${NC} Use pre-compiled binary from bin folder (Faster)"
 echo ""
-read -p "Enter your choice [1-2]: " choice
+echo -e "${YELLOW}Auto-selecting option 2 in 10 seconds if no input...${NC}"
+
+# Read with timeout - if timeout or empty, default to 2
+choice=""
+read -t 10 -p "Enter your choice [1-2] (default: 2): " choice 2>/dev/null || choice="2"
+
+# If still empty, default to 2  
+if [ -z "$choice" ]; then
+    choice=2
+    echo ""
+    echo -e "${CYAN}[INFO]${NC} No input received, using default option 2 (pre-compiled binary)"
+fi
 
 case $choice in
     1)
