@@ -152,7 +152,7 @@ cat > /var/www/html/index.html << EOF
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>VPN Dashboard - $DOMAIN</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
     <style>
         :root {
@@ -266,6 +266,7 @@ cat > /var/www/html/index.html << EOF
             display: flex;
             flex-direction: column;
             gap: 1.5rem;
+            min-width: 0; /* Important for grid responsiveness */
         }
 
         .card-header {
@@ -334,7 +335,7 @@ cat > /var/www/html/index.html << EOF
             body { padding: 0.75rem; }
             .header { padding: 0.75rem 1rem; margin-bottom: 1rem; }
             .brand { font-size: 1.1rem; }
-            .stats-grid { grid-template-columns: repeat(2, 1fr); gap: 0.75rem; }
+            .stats-grid { grid-template-columns: 1fr; gap: 0.75rem; }
             .stat-card { padding: 1rem; }
             .stat-value { font-size: 1.25rem; }
             .card-box { padding: 1.25rem; }
@@ -371,7 +372,7 @@ cat > /var/www/html/index.html << EOF
                 </div>
             </div>
             <div class="stat-card">
-                <i class="ri-ram-2-line stat-icon"></i>
+                <i class="ri-stack-line stat-icon"></i>
                 <div>
                     <div class="stat-label">RAM</div>
                     <div><span class="stat-value" id="ram">--</span><span class="stat-unit">MB</span></div>
@@ -446,8 +447,9 @@ cat > /var/www/html/index.html << EOF
     <script>
         // Palette for JS
         const theme = {
-            primary: '#89986D',
-            secondary: '#9CAB84',
+            primary: '#89986D',     // Dark Sage
+            secondary: '#9CAB84',   // Sage
+            accent: '#C5D89D',      // Light Green (distinct)
             bg: '#F6F0D7',
             white: '#ffffff',
             grid: '#e1e6d8'
@@ -456,7 +458,7 @@ cat > /var/www/html/index.html << EOF
         const ctx = document.getElementById('metricsChart');
         const maxDataPoints = 20;
 
-        Chart.defaults.font.family = 'Outfit';
+        Chart.defaults.font.family = 'Inter';
         Chart.defaults.color = theme.secondary;
 
         const chart = new Chart(ctx, {
@@ -468,7 +470,7 @@ cat > /var/www/html/index.html << EOF
                         label: 'CPU (%)',
                         data: [],
                         borderColor: theme.primary,
-                        backgroundColor: 'rgba(137, 152, 109, 0.1)',
+                        backgroundColor: 'rgba(137, 152, 109, 0.2)',
                         borderWidth: 2,
                         tension: 0.4,
                         fill: true,
@@ -478,8 +480,8 @@ cat > /var/www/html/index.html << EOF
                     {
                         label: 'RAM (%)',
                         data: [],
-                        borderColor: theme.secondary,
-                        backgroundColor: 'rgba(156, 171, 132, 0.1)',
+                        borderColor: theme.accent,  // Changed to accent for contrast
+                        backgroundColor: 'rgba(197, 216, 157, 0.4)', // Lighter fill
                         borderWidth: 2,
                         tension: 0.4,
                         fill: true,
