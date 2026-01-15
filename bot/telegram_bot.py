@@ -5,6 +5,7 @@ import json
 import telebot
 import requests
 from datetime import datetime, timedelta
+from telebot import types
 import logging
 # Configure logging
 logging.basicConfig(
