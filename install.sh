@@ -177,7 +177,7 @@ FILES_SYSTEM=(
     "system/setup-rclone-manual.sh" "system/backup-online.sh" "system/restore-online.sh" 
     "system/auto-backup-online.sh" "system/auto-add-bug.sh" 
     "system/view-auto-ssl-analytics.sh" "system/fix-metrics-php.sh"
-    "system/auto-setup-cloudflare-dns.sh"
+    "system/auto-setup-cloudflare-dns.sh" "system/fix-xray-config.sh"
 )
 for file in "${FILES_SYSTEM[@]}"; do download_file "$file" "$INSTALL_DIR/$file"; done
 
