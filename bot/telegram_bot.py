@@ -1263,7 +1263,9 @@ def process_create_account(message, protocol, username, days, limit_ip):
              cmd = f"bash {create_script} {username} {password} {days} {limit_ip} {limit_quota}"
              exit_code = os.system(cmd + " >/dev/null 2>&1")
         else:
-             cmd = f"echo -e '{username}\\n{days}\\n{limit_ip}\\n{limit_quota}' | bash {create_script}"
+             # Use standard echo with newlines, same as approve_order
+             cmd = f"echo '{username}\n{days}\n{limit_ip}\n{limit_quota}' | bash {create_script}"
+             # Also add || true to prevent pipe failure
              exit_code = os.system(cmd + " >/dev/null 2>&1")
         
         logger.info(f"Script execution finished with exit code: {exit_code}")
