@@ -23,11 +23,15 @@ echo -e "${GREEN}  [9]${NC} View Logs (Detailed)"
 echo -e "${GREEN} [10]${NC} Check Logs"
 echo -e "${GREEN} [11]${NC} Auto Reboot Settings"
 echo -e "${GREEN} [12]${NC} Update/Repair Scripts"
+echo -e "${GREEN} [13]${NC} Renew SSL Certificate"
+echo -e "${GREEN} [14]${NC} Change Auto Reboot Settings"
+echo -e "${GREEN} [15]${NC} Limit Speed Settings"
+echo -e "${GREEN} [16]${NC} View Auto SSL Analytics"
 echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
 echo -e "${RED}  [0]${NC} Back to Main Menu"
 echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
 echo ""
-read -p "Select Menu [0-12]: " menu
+read -p "Select Menu [0-16]: " menu
 
 case $menu in
     1)
@@ -65,6 +69,18 @@ case $menu in
         ;;
     12)
         /usr/local/sbin/tunneling/fix-install.sh
+        ;;
+    13)
+        /usr/local/sbin/tunneling/system/renew-ssl.sh
+        ;;
+    14)
+        /usr/local/sbin/tunneling/system/change-auto-reboot-settings.sh
+        ;;
+    15)
+        /usr/local/sbin/tunneling/system/limit-speed-settings.sh
+        ;;
+    16)
+        /usr/local/sbin/tunneling/system/view-auto-ssl-analytics.sh
         ;;
     0)
         /usr/local/sbin/tunneling/menu/main-menu.sh
