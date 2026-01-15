@@ -1394,13 +1394,12 @@ http://{domain}:89/{username}.ovpn
 📝 *Config Links:*
 
 🔐 *TLS (443):*
-`{config_link_tls}`
+```{config_link_tls}```
 
 🌐 *Non-TLS (80):*
-`{config_link_ntls}`
+```{config_link_ntls}```
 
-🔗 *Web Config Download:*
-https://{domain}/{protocol}/{username}
+
             """
         
         # Delete processing message and send result
