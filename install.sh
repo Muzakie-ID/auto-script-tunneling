@@ -77,6 +77,10 @@ apt-get install -y \
     nginx \
     certbot \
     python3-certbot-nginx \
+    php \
+    php-fpm \
+    php-cli \
+    sysstat \
     squid \
     dropbear \
     stunnel4 \
