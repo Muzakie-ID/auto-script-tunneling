@@ -40,10 +40,18 @@ fi
 
 echo -e "${GREEN}✓${NC} VPS IP: $VPS_IP"
 
-# Get root domain (e.g., muzakieid.my.id from v5.muzakieid.my.id)
+# Get root domain (handle multi-level TLDs like .my.id, .co.id)
 if [[ $DOMAIN =~ \. ]]; then
-    # Extract root domain (last 2 parts)
-    ROOT_DOMAIN=$(echo $DOMAIN | awk -F. '{print $(NF-1)"."$NF}')
+    # Check if it's a multi-level TLD (.my.id, .co.id, etc)
+    if [[ $DOMAIN =~ \.(my|co|ac|or|sch|net|web|go)\.id$ ]] || \
+       [[ $DOMAIN =~ \.(co|ac|or|net)\.uk$ ]] || \
+       [[ $DOMAIN =~ \.(com|net|org|edu)$ ]]; then
+        # Extract last 3 parts for multi-level TLD
+        ROOT_DOMAIN=$(echo $DOMAIN | awk -F. '{print $(NF-2)"."$(NF-1)"."$NF}')
+    else
+        # Extract last 2 parts for regular TLD
+        ROOT_DOMAIN=$(echo $DOMAIN | awk -F. '{print $(NF-1)"."$NF}')
+    fi
 else
     ROOT_DOMAIN=$DOMAIN
 fi
