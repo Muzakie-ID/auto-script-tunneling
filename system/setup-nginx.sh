@@ -149,310 +149,356 @@ cat > /var/www/html/index.html << EOF
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VPN Server - $DOMAIN</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>VPN Dashboard - $DOMAIN</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
     <style>
         :root {
-            --bg-dark: #1B211A;
-            --green-primary: #628141;
-            --green-light: #8BAE66;
-            --beige: #EBD5AB;
-            --glass: rgba(255, 255, 255, 0.03);
-            --border: rgba(139, 174, 102, 0.2);
-        }
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body {
-            font-family: 'Outfit', sans-serif;
-            background-color: var(--bg-dark);
-            color: var(--beige);
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-            background-image: 
-                radial-gradient(circle at 10% 20%, rgba(98, 129, 65, 0.1) 0%, transparent 20%),
-                radial-gradient(circle at 90% 80%, rgba(139, 174, 102, 0.1) 0%, transparent 20%);
-        }
-        .container {
-            width: 100%;
-            max-width: 1000px;
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 2rem;
-        }
-        .header {
-            text-align: center;
-            margin-bottom: 1rem;
-        }
-        h1 {
-            font-size: 3rem;
-            font-weight: 700;
-            background: linear-gradient(to right, var(--beige), var(--green-light));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            margin-bottom: 0.5rem;
-            letter-spacing: -1px;
-        }
-        .status-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            background: rgba(98, 129, 65, 0.2);
-            color: var(--green-light);
-            border: 1px solid var(--green-primary);
-            padding: 6px 16px;
-            border-radius: 100px;
-            font-size: 0.9rem;
-            font-weight: 600;
-        }
-        .status-dot {
-            width: 8px;
-            height: 8px;
-            background-color: #4ade80;
-            border-radius: 50%;
-            box-shadow: 0 0 10px #4ade80;
+            /* Palette */
+            --bg-body: #F6F0D7;     /* Cream BG */
+            --primary: #89986D;     /* Dark Sage - Primary Action/Text */
+            --secondary: #9CAB84;   /* Sage - Secondary Elements */
+            --accent: #C5D89D;      /* Light Sage - Accents/Soft BG */
+            --card-bg: #ffffff;
+            --text-main: #2c3e2e;   /* Darker text */
+            --text-muted: #89986D;
+            --border: #e1e6d8;
         }
 
-        .grid-dashboard {
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        
+        body {
+            font-family: 'Outfit', sans-serif;
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            min-height: 100vh;
+            padding: 1rem;
+            /* Subtle texture */
+            background-image: radial-gradient(#9CAB84 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+
+        .app-container {
+            max-width: 1100px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        /* Header */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            background: var(--card-bg);
+            padding: 1rem 1.5rem;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(137, 152, 109, 0.05);
+            border: 1px solid var(--border);
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+        .brand i { font-size: 1.5rem; }
+
+        .status-pill {
+            background: #e6f4ea;
+            color: #1e7e34;
+            padding: 6px 12px;
+            border-radius: 100px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .status-dot { width: 8px; height: 8px; background: #28a745; border-radius: 50%; }
+
+        /* Dashboard Grid */
+        .stats-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .stat-card {
+            background: var(--card-bg);
+            padding: 1.25rem;
+            border-radius: 16px;
+            border: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            box-shadow: 0 2px 10px rgba(137, 152, 109, 0.03);
+        }
+
+        .stat-icon {
+            color: var(--secondary);
+            font-size: 1.5rem;
+            margin-bottom: 4px;
+        }
+        .stat-label { font-size: 0.75rem; color: var(--text-muted); font-weight: 600; letter-spacing: 0.5px; text-transform: uppercase; }
+        .stat-value { font-size: 1.5rem; font-weight: 700; color: var(--text-main); line-height: 1; }
+        .stat-unit { font-size: 0.8rem; color: var(--text-muted); font-weight: 500; }
+
+        /* Main Content Layout */
+        .content-wrapper {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
             gap: 1.5rem;
         }
 
-        /* Cards */
-        .card {
-            background: var(--glass);
-            border: 1px solid var(--border);
+        .card-box {
+            background: var(--card-bg);
             border-radius: 20px;
-            padding: 25px;
-            backdrop-filter: blur(10px);
-            transition: transform 0.3s ease, border-color 0.3s ease;
-        }
-        .card:hover {
-            transform: translateY(-5px);
-            border-color: var(--green-primary);
+            padding: 1.5rem;
+            border: 1px solid var(--border);
+            box-shadow: 0 2px 15px rgba(137, 152, 109, 0.03);
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
         }
 
-        .metric-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 15px;
+        .card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
         }
-        .metric-item {
-            background: rgba(0,0,0,0.2);
-            padding: 15px;
-            border-radius: 15px;
+        .card-title { font-size: 1.1rem; font-weight: 600; color: var(--text-main); display: flex; align-items: center; gap: 8px; }
+
+        /* List Styling */
+        .info-list { display: flex; flex-direction: column; gap: 0; }
+        .info-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid var(--border);
+            font-size: 0.95rem;
+        }
+        .info-item:last-child { border-bottom: none; padding-bottom: 0; }
+        .info-item:first-child { padding-top: 0; }
+        
+        .info-label { color: var(--text-muted); display: flex; align-items: center; gap: 8px; }
+        .info-value { font-weight: 600; color: var(--text-main); }
+
+        /* Action Button */
+        .btn-order {
+            background: var(--primary);
+            color: white;
+            text-decoration: none;
+            padding: 1rem;
+            border-radius: 14px;
             text-align: center;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: transform 0.2s, background 0.2s;
+            margin-top: auto; /* Push to bottom */
         }
-        .metric-label {
-            font-size: 0.8rem;
-            color: var(--green-light);
-            margin-bottom: 5px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-        .metric-value {
-            font-size: 1.5rem;
-            font-weight: 700;
-            color: var(--beige);
-        }
-        .metric-unit {
-            font-size: 0.8rem;
-            color: rgba(235, 213, 171, 0.5);
-        }
+        .btn-order:active { transform: scale(0.98); background: var(--secondary); }
 
         /* Chart */
         .chart-container {
+            position: relative;
             height: 300px;
             width: 100%;
         }
 
-        /* Server Info */
-        .info-list {
-            list-style: none;
-        }
-        .info-list li {
-            display: flex;
-            justify-content: space-between;
-            padding: 12px 0;
-            border-bottom: 1px solid var(--border);
-            color: rgba(235, 213, 171, 0.8);
-        }
-        .info-list li:last-child {
-            border-bottom: none;
-        }
-        .info-list span.value {
-            color: var(--green-light);
-            font-weight: 600;
-        }
-
-        /* CTA Button */
-        .cta-container {
-            text-align: center;
-            margin-top: 1rem;
-        }
-        .telegram-btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 10px;
-            background: var(--green-primary);
-            color: var(--bg-dark);
-            padding: 16px 40px;
-            border-radius: 12px;
-            font-weight: 700;
-            text-decoration: none;
-            font-size: 1.1rem;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 20px rgba(98, 129, 65, 0.3);
-        }
-        .telegram-btn:hover {
-            background: var(--green-light);
-            transform: scale(1.02);
-            box-shadow: 0 6px 25px rgba(139, 174, 102, 0.4);
-        }
-
+        /* Footer */
         .footer {
             text-align: center;
-            margin-top: 3rem;
-            color: rgba(139, 174, 102, 0.5);
+            margin-top: 2rem;
+            color: var(--text-muted);
             font-size: 0.8rem;
+            padding-bottom: 1rem;
+        }
+
+        /* Mobile Adjustments */
+        @media (max-width: 900px) {
+            .content-wrapper { grid-template-columns: 1fr; }
+        }
+
+        @media (max-width: 600px) {
+            body { padding: 0.75rem; }
+            .header { padding: 0.75rem 1rem; margin-bottom: 1rem; }
+            .brand { font-size: 1.1rem; }
+            .stats-grid { grid-template-columns: repeat(2, 1fr); gap: 0.75rem; }
+            .stat-card { padding: 1rem; }
+            .stat-value { font-size: 1.25rem; }
+            .card-box { padding: 1.25rem; }
+            .chart-container { height: 250px; }
+            
+            /* Remove highlighting on mobile tap */
+            a, button, div { -webkit-tap-highlight-color: rgba(0,0,0,0); }
         }
     </style>
 </head>
 <body>
-    <div class="container">
+
+    <div class="app-container">
         
         <!-- Header -->
-        <div class="header">
-            <div class="status-badge"><div class="status-dot"></div> SYSTEM OPERATIONAL</div>
-            <h1 style="margin-top: 15px;">VPN SERVER</h1>
-            <p style="color: var(--green-light);">$DOMAIN</p>
+        <header class="header">
+            <div class="brand">
+                <i class="ri-shield-flash-fill"></i>
+                <span>VPN Panel</span>
+            </div>
+            <div class="status-pill">
+                <div class="status-dot"></div>
+                <span>Online</span>
+            </div>
+        </header>
+
+        <!-- Stats Grid -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <i class="ri-cpu-line stat-icon"></i>
+                <div>
+                    <div class="stat-label">CPU Load</div>
+                    <div><span class="stat-value" id="cpu">--</span><span class="stat-unit">%</span></div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <i class="ri-ram-2-line stat-icon"></i>
+                <div>
+                    <div class="stat-label">RAM</div>
+                    <div><span class="stat-value" id="ram">--</span><span class="stat-unit">MB</span></div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <i class="ri-speed-line stat-icon"></i>
+                <div>
+                    <div class="stat-label">Network</div>
+                    <div><span class="stat-value" id="network">--</span><span class="stat-unit">Mbps</span></div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <i class="ri-database-2-line stat-icon"></i>
+                <div>
+                    <div class="stat-label">Disk</div>
+                    <div><span class="stat-value" id="disk">--</span><span class="stat-unit">MB/s</span></div>
+                </div>
+            </div>
         </div>
 
-        <div class="grid-dashboard">
+        <!-- Content -->
+        <div class="content-wrapper">
             
-            <!-- Metrics Column -->
-            <div class="card">
-                <h3 style="margin-bottom: 20px; color: var(--green-light);">SYSTEM METRICS</h3>
-                <div class="metric-grid">
-                    <div class="metric-item">
-                        <div class="metric-label">CPU LOAD</div>
-                        <div class="metric-value"><span id="cpu">0</span><span class="metric-unit">%</span></div>
-                    </div>
-                    <div class="metric-item">
-                        <div class="metric-label">RAM USAGE</div>
-                        <div class="metric-value"><span id="ram">0</span><span class="metric-unit">MB</span></div>
-                    </div>
-                    <div class="metric-item">
-                        <div class="metric-label">DISK I/O</div>
-                        <div class="metric-value"><span id="disk">0</span><span class="metric-unit">MB/s</span></div>
-                    </div>
-                    <div class="metric-item">
-                        <div class="metric-label">NETWORK</div>
-                        <div class="metric-value"><span id="network">0</span><span class="metric-unit">Mbps</span></div>
-                    </div>
+            <!-- Chart Section -->
+            <div class="card-box">
+                <div class="card-header">
+                    <div class="card-title"><i class="ri-bar-chart-box-line"></i> Traffic Monitor</div>
+                </div>
+                <div class="chart-container">
+                    <canvas id="metricsChart"></canvas>
                 </div>
             </div>
 
-            <!-- Server Info Column -->
-            <div class="card">
-                <h3 style="margin-bottom: 20px; color: var(--green-light);">SERVER DETAILS</h3>
-                <ul class="info-list">
-                    <li><span>Domain</span> <span class="value">$DOMAIN</span></li>
-                    <li><span>Location</span> <span class="value">Singapore (SG)</span></li>
-                    <li><span>ISP</span> <span class="value">DigitalOcean</span></li>
-                    <li><span>Protocols</span> <span class="value">VMESS, VLESS, TROJAN, SSH</span></li>
-                </ul>
-                <div class="cta-container" style="margin-top: 25px;">
-                    <a href="https://t.me/yourvpnbot" class="telegram-btn">
-                        <span>⚡ ORDER VIA BOT</span>
-                    </a>
+            <!-- Server Details -->
+            <div class="card-box">
+                <div class="card-header">
+                    <div class="card-title"><i class="ri-server-line"></i> Server Info</div>
                 </div>
+                <div class="info-list">
+                    <div class="info-item">
+                        <span class="info-label"><i class="ri-global-line"></i> Host</span>
+                        <span class="info-value">$DOMAIN</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label"><i class="ri-map-pin-line"></i> Location</span>
+                        <span class="info-value">SG / IDN</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label"><i class="ri-base-station-line"></i> Protocol</span>
+                        <span class="info-value">Multi-Port</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label"><i class="ri-time-line"></i> Uptime</span>
+                        <span class="info-value">99.9%</span>
+                    </div>
+                </div>
+                
+                <a href="https://t.me/yourvpnbot" class="btn-order">
+                    <i class="ri-telegram-fill"></i> OPEN BOT MENU
+                </a>
             </div>
 
-        </div>
-
-        <!-- Chart Section -->
-        <div class="card">
-            <h3 style="margin-bottom: 20px; color: var(--green-light);">TRAFFIC ANALYTICS</h3>
-            <div class="chart-container">
-                <canvas id="metricsChart"></canvas>
-            </div>
         </div>
 
         <div class="footer">
-            <p>&copy; 2026 MUZAKIE TUNNELING. SECURED BY XRAY.</p>
+            &copy; 2026 Secured by XRAY Core. Optimized for Mobile.
         </div>
+
     </div>
 
     <script>
-        // Colors & Config based on new palette
-        const colors = {
-            primary: '#628141',
-            light: '#8BAE66',
-            beige: '#EBD5AB',
-            grid: 'rgba(139, 174, 102, 0.1)'
+        // Palette for JS
+        const theme = {
+            primary: '#89986D',
+            secondary: '#9CAB84',
+            bg: '#F6F0D7',
+            white: '#ffffff',
+            grid: '#e1e6d8'
         };
 
         const ctx = document.getElementById('metricsChart');
         const maxDataPoints = 20;
-        
-        // Init Chart with Modern Config
-        Chart.defaults.color = colors.light;
-        Chart.defaults.borderColor = colors.grid;
-        
-        const chartData = {
-            labels: [],
-            datasets: [
-                {
-                    label: 'CPU',
-                    data: [],
-                    borderColor: colors.beige,
-                    backgroundColor: 'rgba(235, 213, 171, 0.1)',
-                    borderWidth: 2,
-                    fill: true,
-                    tension: 0.4,
-                    pointRadius: 0
-                },
-                {
-                    label: 'RAM',
-                    data: [],
-                    borderColor: colors.primary,
-                    backgroundColor: 'rgba(98, 129, 65, 0.1)',
-                    borderWidth: 2,
-                    fill: true,
-                    tension: 0.4,
-                    pointRadius: 0
-                }
-            ]
-        };
+
+        Chart.defaults.font.family = 'Outfit';
+        Chart.defaults.color = theme.secondary;
 
         const chart = new Chart(ctx, {
             type: 'line',
-            data: chartData,
+            data: {
+                labels: [],
+                datasets: [
+                    {
+                        label: 'CPU (%)',
+                        data: [],
+                        borderColor: theme.primary,
+                        backgroundColor: 'rgba(137, 152, 109, 0.1)',
+                        borderWidth: 2,
+                        tension: 0.4,
+                        fill: true,
+                        pointRadius: 0,
+                        pointHitRadius: 10
+                    },
+                    {
+                        label: 'RAM (%)',
+                        data: [],
+                        borderColor: theme.secondary,
+                        backgroundColor: 'rgba(156, 171, 132, 0.1)',
+                        borderWidth: 2,
+                        tension: 0.4,
+                        fill: true,
+                        pointRadius: 0,
+                        pointHitRadius: 10
+                    }
+                ]
+            },
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
                 plugins: {
                     legend: {
-                        display: true,
+                        position: 'top',
                         labels: {
-                            font: { family: 'Outfit' },
                             usePointStyle: true,
-                            boxWidth: 8
+                            boxWidth: 8,
+                            padding: 20
                         }
-                    },
-                    tooltip: {
-                        mode: 'index',
-                        intersect: false,
-                        backgroundColor: '#1B211A',
-                        titleColor: '#EBD5AB',
-                        bodyColor: '#8BAE66',
-                        borderColor: '#628141',
-                        borderWidth: 1
                     }
                 },
                 scales: {
@@ -463,48 +509,45 @@ cat > /var/www/html/index.html << EOF
                     y: {
                         beginAtZero: true,
                         max: 100,
-                        grid: { color: colors.grid }
+                        grid: { color: theme.grid },
+                        border: { display: false },
+                        ticks: { maxTicksLimit: 5 }
                     }
                 },
                 interaction: {
-                    mode: 'nearest',
-                    axis: 'x',
-                    intersect: false
+                    mode: 'index',
+                    intersect: false,
                 }
             }
         });
 
-        // Update Logic
         async function updateMetrics() {
             try {
                 const response = await fetch('/metrics.php');
                 const data = await response.json();
                 
-                // DOM Update
                 document.getElementById('cpu').textContent = data.cpu.toFixed(1);
                 document.getElementById('ram').textContent = data.ram_used.toFixed(0);
                 document.getElementById('disk').textContent = data.disk_io.toFixed(2);
                 document.getElementById('network').textContent = data.network.toFixed(1);
                 
-                // Chart Update
                 const now = new Date().toLocaleTimeString();
-                chartData.labels.push(now);
-                chartData.datasets[0].data.push(data.cpu);
-                chartData.datasets[1].data.push(data.ram_percent);
-                
-                if (chartData.labels.length > maxDataPoints) {
-                    chartData.labels.shift();
-                    chartData.datasets.forEach(dataset => dataset.data.shift());
+                if (chart.data.labels.length > maxDataPoints) {
+                    chart.data.labels.shift();
+                    chart.data.datasets.forEach(d => d.data.shift());
                 }
+                chart.data.labels.push(now);
+                chart.data.datasets[0].data.push(data.cpu);
+                chart.data.datasets[1].data.push(data.ram_percent);
                 
                 chart.update('none');
-            } catch (error) {
-                console.error('Metrics Error:', error);
+            } catch (err) {
+                console.error(err);
             }
         }
 
-        updateMetrics();
         setInterval(updateMetrics, 2000);
+        updateMetrics();
     </script>
 </body>
 </html>
