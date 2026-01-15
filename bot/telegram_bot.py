@@ -1854,8 +1854,6 @@ Thank you for your order! 🎉
     except Exception as e:
         bot.send_message(message.chat.id, f"❌ Error: {str(e)}")
 
-# Run bot
-if __name__ == '__main__':
 # Admin command untuk add bug host
 @bot.message_handler(commands=['addbug'])
 def handle_add_bug(message):
@@ -1980,6 +1978,8 @@ The bug host will be added to SSL certificate automatically.
             parse_mode='Markdown'
         )
 
-# Keep the bot running
-print(f"Bot started! Admin ID: {ADMIN_ID}")
-bot.infinity_polling()
+# Run bot
+if __name__ == '__main__':
+    # Keep the bot running
+    print(f"Bot started! Admin ID: {ADMIN_ID}")
+    bot.infinity_polling()
