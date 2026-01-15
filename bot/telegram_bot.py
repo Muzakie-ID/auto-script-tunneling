@@ -1905,7 +1905,7 @@ The bug host will be added to SSL certificate automatically.
         
         full_domain = f"{bug_host}.{domain}"
         
-        # Success message dengan config template
+        # Success message dengan config templates untuk 3 protocol
         response = f"""
 ✅ *Bug Host Added Successfully!*
 
@@ -1913,9 +1913,11 @@ The bug host will be added to SSL certificate automatically.
 🔐 **SSL:** Certificate updated
 🔄 **Nginx:** Reloaded
 
-📝 **Config Template (TROJAN):**
+📝 **Config Templates (Choose Protocol):**
+
+*1️⃣ TROJAN*
 ```yaml
-- name: {bug_host.replace('.', '-')}-vpn
+- name: {bug_host.replace('.', '-')}-trojan
   server: {full_domain}
   port: 443
   type: trojan
@@ -1930,9 +1932,42 @@ The bug host will be added to SSL certificate automatically.
   udp: true
 ```
 
-⚡ Ready to use! Customer dapat langsung connect dengan config di atas.
+*2️⃣ VMESS*
+```yaml
+- name: {bug_host.replace('.', '-')}-vmess
+  server: {full_domain}
+  port: 443
+  type: vmess
+  uuid: [user-uuid]
+  alterId: 0
+  cipher: auto
+  tls: true
+  servername: {full_domain}
+  network: ws
+  ws-opts:
+    path: /vmess
+    headers:
+      Host: {full_domain}
+  udp: true
+```
 
-💡 **Tip:** Replace `[user-password]` dengan password TROJAN user yang sudah dibuat.
+*3️⃣ VLESS*
+```yaml
+- name: {bug_host.replace('.', '-')}-vless
+  server: {full_domain}
+  port: 443
+  type: vless
+  uuid: [user-uuid]
+  tls: true
+  servername: {full_domain}
+  network: ws
+  ws-path: /vless
+  ws-headers:
+    Host: {full_domain}
+  udp: true
+```
+
+💡 **Tip:** Replace `[user-password]` atau `[user-uuid]` dengan data user yang sudah dibuat.
         """
         bot.edit_message_text(response, message.chat.id, processing_msg.message_id, parse_mode='Markdown')
     else:

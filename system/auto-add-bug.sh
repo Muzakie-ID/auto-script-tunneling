@@ -107,14 +107,19 @@ if [ $? -eq 0 ]; then
     echo ""
     echo -e "${YELLOW}Bug Host:${NC}  ${FULL_DOMAIN}"
     echo ""
-    echo -e "${CYAN}Config Template:${NC}"
+    echo -e "${CYAN}Config Templates (Choose Protocol):${NC}"
     echo ""
+    
+    # Template 1: TROJAN
+    echo -e "${YELLOW}═══════════════════════════════════════════════${NC}"
+    echo -e "${GREEN}1. TROJAN${NC}"
+    echo -e "${YELLOW}═══════════════════════════════════════════════${NC}"
     cat << EOF
-- name: ${BUG_HOST}-vpn
+- name: ${BUG_HOST}-trojan
   server: ${FULL_DOMAIN}
   port: 443
   type: trojan
-  password: [your-password]
+  password: [user-password]
   skip-cert-verify: false
   sni: ${FULL_DOMAIN}
   network: ws
@@ -124,6 +129,56 @@ if [ $? -eq 0 ]; then
       Host: ${FULL_DOMAIN}
   udp: true
 EOF
+    
+    echo ""
+    
+    # Template 2: VMESS
+    echo -e "${YELLOW}═══════════════════════════════════════════════${NC}"
+    echo -e "${GREEN}2. VMESS${NC}"
+    echo -e "${YELLOW}═══════════════════════════════════════════════${NC}"
+    cat << EOF
+- name: ${BUG_HOST}-vmess
+  server: ${FULL_DOMAIN}
+  port: 443
+  type: vmess
+  uuid: [user-uuid]
+  alterId: 0
+  cipher: auto
+  tls: true
+  skip-cert-verify: false
+  servername: ${FULL_DOMAIN}
+  network: ws
+  ws-opts:
+    path: /vmess
+    headers:
+      Host: ${FULL_DOMAIN}
+  udp: true
+EOF
+    
+    echo ""
+    
+    # Template 3: VLESS
+    echo -e "${YELLOW}═══════════════════════════════════════════════${NC}"
+    echo -e "${GREEN}3. VLESS${NC}"
+    echo -e "${YELLOW}═══════════════════════════════════════════════${NC}"
+    cat << EOF
+- name: ${BUG_HOST}-vless
+  server: ${FULL_DOMAIN}
+  port: 443
+  type: vless
+  uuid: [user-uuid]
+  tls: true
+  skip-cert-verify: false
+  servername: ${FULL_DOMAIN}
+  network: ws
+  ws-path: /vless
+  ws-headers:
+    Host: ${FULL_DOMAIN}
+  udp: true
+EOF
+    
+    echo ""
+    echo -e "${CYAN}💡 Tip:${NC} Replace ${YELLOW}[user-password]${NC} atau ${YELLOW}[user-uuid]${NC} dengan data user yang sudah dibuat"
     echo ""
     echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
     
