@@ -71,6 +71,8 @@ wget -q -O setup-dropbear.sh "${BASE_URL}/ssh/setup-dropbear.sh"
 wget -q -O setup-stunnel.sh "${BASE_URL}/ssh/setup-stunnel.sh"
 wget -q -O setup-squid.sh "${BASE_URL}/ssh/setup-squid.sh"
 wget -q -O setup-tuntap.sh "${BASE_URL}/ssh/setup-tuntap.sh"
+wget -q -O setup-ws.sh "${BASE_URL}/ssh/setup-ws.sh"
+wget -q -O setup-badvpn.sh "${BASE_URL}/ssh/setup-badvpn.sh"
 
 # Download system scripts
 
@@ -104,6 +106,25 @@ wget -q -O renew-ssl.sh "${BASE_URL}/system/renew-ssl.sh"
 wget -q -O auto-record-wildcard.sh "${BASE_URL}/system/auto-record-wildcard.sh"
 wget -q -O limit-speed-settings.sh "${BASE_URL}/system/limit-speed-settings.sh"
 wget -q -O reset-settings.sh "${BASE_URL}/system/reset-settings.sh"
+
+# Additional system scripts
+wget -q -O enable-ssh-root.sh "${BASE_URL}/system/enable-ssh-root.sh"
+wget -q -O setup-rclone.sh "${BASE_URL}/system/setup-rclone.sh"
+wget -q -O setup-rclone-manual.sh "${BASE_URL}/system/setup-rclone-manual.sh"
+wget -q -O backup-online.sh "${BASE_URL}/system/backup-online.sh"
+wget -q -O restore-online.sh "${BASE_URL}/system/restore-online.sh"
+wget -q -O auto-backup-online.sh "${BASE_URL}/system/auto-backup-online.sh"
+wget -q -O auto-add-bug.sh "${BASE_URL}/system/auto-add-bug.sh"
+wget -q -O view-auto-ssl-analytics.sh "${BASE_URL}/system/view-auto-ssl-analytics.sh"
+wget -q -O fix-metrics-php.sh "${BASE_URL}/system/fix-metrics-php.sh"
+wget -q -O auto-setup-cloudflare-dns.sh "${BASE_URL}/system/auto-setup-cloudflare-dns.sh"
+wget -q -O fix-cloudflare-dns.sh "${BASE_URL}/system/fix-cloudflare-dns.sh"
+wget -q -O check-cloudflare-dns.sh "${BASE_URL}/system/check-cloudflare-dns.sh"
+wget -q -O fix-xray-config.sh "${BASE_URL}/system/fix-xray-config.sh"
+wget -q -O backup-ssl.sh "${BASE_URL}/system/backup-ssl.sh"
+wget -q -O restore-ssl.sh "${BASE_URL}/system/restore-ssl.sh"
+wget -q -O view-logs.sh "${BASE_URL}/system/view-logs.sh"
+wget -q -O update-firewall.sh "${BASE_URL}/system/update-firewall.sh"
 
 # Download XRAY scripts
 echo -e "${CYAN}[4/5]${NC} Downloading XRAY scripts..."
@@ -161,13 +182,27 @@ if [ $failed -eq 0 ]; then
     echo ""
     echo -e "${CYAN}[INFO]${NC} Installing updates..."
     
-    # Copy all scripts to installation directory
-    cp -f *.sh /usr/local/sbin/tunneling/ 2>/dev/null
-    cp -f telegram_bot.py /usr/local/sbin/tunneling/ 2>/dev/null
+    # Create directories if not exist
+    mkdir -p /usr/local/sbin/tunneling/{menu,ssh,system,xray,bot}
+    
+    # Copy scripts to respective directories
+    cp -f *-menu.sh /usr/local/sbin/tunneling/menu/ 2>/dev/null
+    cp -f ssh-*.sh /usr/local/sbin/tunneling/ssh/ 2>/dev/null
+    cp -f setup-dropbear.sh setup-stunnel.sh setup-squid.sh setup-tuntap.sh setup-ws.sh setup-badvpn.sh /usr/local/sbin/tunneling/ssh/ 2>/dev/null
+    cp -f check-*.sh monitor-*.sh backup-*.sh restore-*.sh auto-*.sh delete-*.sh setup-*.sh restart-*.sh /usr/local/sbin/tunneling/system/ 2>/dev/null
+    cp -f speedtest.sh limit-speed*.sh check-logs.sh change-*.sh fix-*.sh renew-ssl.sh reset-settings.sh enable-ssh-root.sh /usr/local/sbin/tunneling/system/ 2>/dev/null
+    cp -f view-*.sh update-firewall.sh /usr/local/sbin/tunneling/system/ 2>/dev/null
+    cp -f vmess-*.sh vless-*.sh trojan-*.sh placeholder.sh /usr/local/sbin/tunneling/xray/ 2>/dev/null
+    cp -f bot-*.sh /usr/local/sbin/tunneling/bot/ 2>/dev/null
+    cp -f telegram_bot.py /usr/local/sbin/tunneling/bot/ 2>/dev/null
     
     # Set permissions
-    chmod +x /usr/local/sbin/tunneling/*.sh
-    chmod +x /usr/local/sbin/tunneling/telegram_bot.py
+    chmod +x /usr/local/sbin/tunneling/menu/*.sh
+    chmod +x /usr/local/sbin/tunneling/ssh/*.sh
+    chmod +x /usr/local/sbin/tunneling/system/*.sh
+    chmod +x /usr/local/sbin/tunneling/xray/*.sh
+    chmod +x /usr/local/sbin/tunneling/bot/*.sh
+    chmod +x /usr/local/sbin/tunneling/bot/telegram_bot.py
     
     echo -e "${GREEN}[✓]${NC} Files installed"
     

@@ -174,6 +174,8 @@ create_a_record() {
             echo -e "${GREEN}✓${NC} A record updated"
         else
             echo -e "${RED}✗${NC} Failed to update A record"
+            echo -e "${YELLOW}Response:${NC}"
+            echo "$RESPONSE" | jq '.' 2>/dev/null || echo "$RESPONSE"
             return 1
         fi
     else
@@ -189,6 +191,8 @@ create_a_record() {
             echo -e "${GREEN}✓${NC} A record created"
         else
             echo -e "${RED}✗${NC} Failed to create A record"
+            echo -e "${YELLOW}Response:${NC}"
+            echo "$RESPONSE" | jq '.' 2>/dev/null || echo "$RESPONSE"
             return 1
         fi
     fi
@@ -223,6 +227,8 @@ create_cname_wildcard() {
             echo -e "${GREEN}✓${NC} CNAME wildcard updated"
         else
             echo -e "${RED}✗${NC} Failed to update CNAME"
+            echo -e "${YELLOW}Response:${NC}"
+            echo "$RESPONSE" | jq '.' 2>/dev/null || echo "$RESPONSE"
             return 1
         fi
     else
@@ -238,6 +244,8 @@ create_cname_wildcard() {
             echo -e "${GREEN}✓${NC} CNAME wildcard created"
         else
             echo -e "${RED}✗${NC} Failed to create CNAME"
+            echo -e "${YELLOW}Response:${NC}"
+            echo "$RESPONSE" | jq '.' 2>/dev/null || echo "$RESPONSE"
             return 1
         fi
     fi

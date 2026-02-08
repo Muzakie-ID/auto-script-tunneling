@@ -132,7 +132,8 @@ create_a_record() {
         return 0
     else
         echo -e "${RED}✗${NC} Failed to create A record"
-        echo "$RESPONSE"
+        echo -e "${YELLOW}Response:${NC}"
+        echo "$RESPONSE" | jq '.' 2>/dev/null || echo "$RESPONSE"
         return 1
     fi
 }
@@ -178,7 +179,8 @@ create_cname_record() {
         return 0
     else
         echo -e "${RED}✗${NC} Failed to create CNAME record"
-        echo "$RESPONSE"
+        echo -e "${YELLOW}Response:${NC}"
+        echo "$RESPONSE" | jq '.' 2>/dev/null || echo "$RESPONSE"
         return 1
     fi
 }
