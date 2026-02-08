@@ -36,15 +36,16 @@ echo -e "${GREEN} [15]${NC} Renew SSL Certificate"
 echo -e "${GREEN} [16]${NC} Configure Cloudflare / Wildcard SSL"
 echo -e "${GREEN} [17]${NC} Check Cloudflare DNS Records"
 echo -e "${GREEN} [18]${NC} Fix/Create Cloudflare DNS Records"
-echo -e "${GREEN} [19]${NC} View Auto SSL Analytics"
-echo -e "${GREEN} [20]${NC} Fix Metrics PHP (Landing Page)"
-echo -e "${GREEN} [21]${NC} Fix Corrupted XRAY Config"
+echo -e "${GREEN} [19]${NC} Add Bug Host to SSL Certificate"
+echo -e "${GREEN} [20]${NC} View Auto SSL Analytics"
+echo -e "${GREEN} [21]${NC} Fix Metrics PHP (Landing Page)"
+echo -e "${GREEN} [22]${NC} Fix Corrupted XRAY Config"
 
 echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
 echo -e "${RED}  [0]${NC} Back to Main Menu"
 echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
 echo ""
-read -p "Select Menu [0-21]: " menu
+read -p "Select Menu [0-22]: " menu
 
 case $menu in
     1)
@@ -102,12 +103,23 @@ case $menu in
         /usr/local/sbin/tunneling/system/fix-cloudflare-dns.sh
         ;;
     19)
-        /usr/local/sbin/tunneling/system/view-auto-ssl-analytics.sh
+        echo ""
+        read -p "Enter bug host (e.g., support.zoom.us): " bughost
+        if [ -n "$bughost" ]; then
+            /usr/local/sbin/tunneling/system/auto-add-bug.sh "$bughost"
+        else
+            echo -e "${RED}Bug host cannot be empty!${NC}"
+        fi
+        read -n 1 -s -r -p "Press any key to continue"
+        /usr/local/sbin/tunneling/menu/system-menu.sh
         ;;
     20)
-        /usr/local/sbin/tunneling/system/fix-metrics-php.sh
+        /usr/local/sbin/tunneling/system/view-auto-ssl-analytics.sh
         ;;
     21)
+        /usr/local/sbin/tunneling/system/fix-metrics-php.sh
+        ;;
+    22)
         /usr/local/sbin/tunneling/system/fix-xray-config.sh
         ;;
     0)
