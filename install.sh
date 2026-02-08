@@ -113,6 +113,19 @@ else
     echo -e "${YELLOW}[INFO]${NC} You may need to install NGINX manually after installation."
 fi
 
+# Validate netfilter-persistent installation
+echo -e "${CYAN}[INFO]${NC} Validating netfilter-persistent installation..."
+if ! command -v netfilter-persistent &> /dev/null; then
+    echo -e "${YELLOW}[WARNING]${NC} netfilter-persistent not found, installing..."
+    DEBIAN_FRONTEND=noninteractive apt-get install -y netfilter-persistent iptables-persistent
+fi
+
+if command -v netfilter-persistent &> /dev/null; then
+    echo -e "${GREEN}[SUCCESS]${NC} netfilter-persistent installed successfully"
+else
+    echo -e "${YELLOW}[WARNING]${NC} netfilter-persistent installation failed (non-critical)"
+fi
+
 # Install BBR
 echo -e "${CYAN}[INFO]${NC} Installing BBR..."
 if ! grep -q "net.core.default_qdisc=fq" /etc/sysctl.conf; then
@@ -456,7 +469,9 @@ ufw allow 7300/udp  # BadVPN UDP
 # Save iptables rules for netfilter-persistent
 echo -e "${CYAN}[INFO]${NC} Saving firewall rules..."
 if command -v netfilter-persistent &> /dev/null; then
-    netfilter-persistent save
+    netfilter-persistent save 2>/dev/null || echo -e "${YELLOW}[WARNING]${NC} Could not save iptables rules"
+else
+    echo -e "${YELLOW}[WARNING]${NC} netfilter-persistent command not found, skipping rule save"
 fi
 
 # Final setup
@@ -469,9 +484,16 @@ else
 fi
 systemctl enable xray
 systemctl enable fail2ban
-systemctl enable netfilter-persistent
 systemctl restart xray
-systemctl start netfilter-persistent
+
+# Enable and start netfilter-persistent if available
+if systemctl list-unit-files | grep -q "netfilter-persistent"; then
+    systemctl enable netfilter-persistent 2>/dev/null || true
+    systemctl start netfilter-persistent 2>/dev/null || true
+    echo -e "${GREEN}[SUCCESS]${NC} netfilter-persistent service enabled"
+else
+    echo -e "${YELLOW}[WARNING]${NC} netfilter-persistent service not found (non-critical)"
+fi
 
 # Clean up
 apt-get clean
