@@ -413,6 +413,11 @@ bash "$INSTALL_DIR/xray/setup-xray.sh"
 echo -e "\n${B_CYA}[INFO]${RESET} Setting up Nginx...\n"
 bash "$INSTALL_DIR/system/setup-nginx.sh"
 
+# Di install.sh setelah setup-nginx.sh
+echo -e "${CYAN}[INFO]${NC} Creating Clash YAML Converter..."
+bash "$INSTALL_DIR/system/create-clash-converter.sh"
+
+
 # Configure cron jobs
 echo "0 3 * * * root certbot renew --quiet --post-hook 'systemctl reload nginx'" > /etc/cron.d/ssl-renewal
 echo "0 5 * * * root /sbin/reboot" > /etc/cron.d/auto-reboot
