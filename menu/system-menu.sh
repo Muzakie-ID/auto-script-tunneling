@@ -36,17 +36,23 @@ echo -e "${GREEN} [15]${NC} Renew SSL Certificate"
 echo -e "${GREEN} [16]${NC} Configure Cloudflare / Wildcard SSL"
 echo -e "${GREEN} [17]${NC} Check Cloudflare DNS Records"
 echo -e "${GREEN} [18]${NC} Fix/Create Cloudflare DNS Records"
+echo ""
+echo -e "${YELLOW}Bug Host Management:${NC}"
 echo -e "${GREEN} [19]${NC} Add Bug Host to SSL Certificate"
-echo -e "${GREEN} [20]${NC} View Auto SSL Analytics"
-echo -e "${GREEN} [21]${NC} Fix Metrics PHP (Landing Page)"
-echo -e "${GREEN} [22]${NC} Create Clash YAML Converter Web"
-echo -e "${GREEN} [23]${NC} Fix Corrupted XRAY Config"
+echo -e "${GREEN} [20]${NC} List All Bug Hosts"
+echo -e "${GREEN} [21]${NC} Remove Bug Host"
+echo ""
+echo -e "${YELLOW}Tools & Utilities:${NC}"
+echo -e "${GREEN} [22]${NC} View Auto SSL Analytics"
+echo -e "${GREEN} [23]${NC} Fix Metrics PHP (Landing Page)"
+echo -e "${GREEN} [24]${NC} Create Clash YAML Converter Web"
+echo -e "${GREEN} [25]${NC} Fix Corrupted XRAY Config"
 
 echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
 echo -e "${RED}  [0]${NC} Back to Main Menu"
 echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
 echo ""
-read -p "Select Menu [0-23]: " menu
+read -p "Select Menu [0-25]: " menu
 
 case $menu in
     1)
@@ -115,15 +121,32 @@ case $menu in
         /usr/local/sbin/tunneling/menu/system-menu.sh
         ;;
     20)
-        /usr/local/sbin/tunneling/system/view-auto-ssl-analytics.sh
+        /usr/local/sbin/tunneling/system/list-bug.sh
+        read -n 1 -s -r -p "Press any key to continue"
+        /usr/local/sbin/tunneling/menu/system-menu.sh
         ;;
     21)
-        /usr/local/sbin/tunneling/system/fix-metrics-php.sh
+        /usr/local/sbin/tunneling/system/list-bug.sh
+        echo ""
+        read -p "Enter bug host to remove (e.g., support.zoom.us): " bughost
+        if [ -n "$bughost" ]; then
+            /usr/local/sbin/tunneling/system/remove-bug.sh "$bughost"
+        else
+            echo -e "${RED}Bug host cannot be empty!${NC}"
+        fi
+        read -n 1 -s -r -p "Press any key to continue"
+        /usr/local/sbin/tunneling/menu/system-menu.sh
         ;;
     22)
-        /usr/local/sbin/tunneling/system/create-clash-converter.sh
+        /usr/local/sbin/tunneling/system/view-auto-ssl-analytics.sh
         ;;
     23)
+        /usr/local/sbin/tunneling/system/fix-metrics-php.sh
+        ;;
+    24)
+        /usr/local/sbin/tunneling/system/create-clash-converter.sh
+        ;;
+    25)
         /usr/local/sbin/tunneling/system/fix-xray-config.sh
         ;;
     0)

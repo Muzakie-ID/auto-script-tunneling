@@ -905,6 +905,7 @@ fi
 
 # Configure nginx to handle PHP
 cat > /etc/nginx/sites-available/vpn << EOF
+# ===== PORT 80 - NON-TLS (All domains) =====
 server {
     listen 80;
     listen [::]:80;
@@ -973,6 +974,7 @@ server {
     }
 }
 
+# ===== PORT 89 - Internal (All domains) =====
 server {
     listen 89;
     listen [::]:89;
@@ -986,11 +988,12 @@ server {
     }
 }
 
+# ===== MAIN DOMAIN - HTTPS (Full features) =====
 server {
     listen 443 ssl;
     listen [::]:443 ssl;
     http2 on;
-    server_name $DOMAIN *.$DOMAIN;
+    server_name $DOMAIN;
 
     ssl_certificate /etc/letsencrypt/live/$DOMAIN/fullchain.pem;
     ssl_certificate_key /etc/letsencrypt/live/$DOMAIN/privkey.pem;
@@ -1062,12 +1065,326 @@ server {
         auth_basic_user_file /etc/nginx/.htpasswd;
     }
     
-    # Serve HTML/PHP for browser access (including bug hosts)
+    # Serve HTML/PHP for browser access
     location / {
         try_files \$uri \$uri/ /index.php?\$query_string;
     }
 }
 EOF
+
+# Generate Bug Hosts Server Block (if exists)
+BUG_LIST_FILE="/etc/tunneling/bug-hosts.txt"
+if [ -f "\$BUG_LIST_FILE" ] && [ -s "\$BUG_LIST_FILE" ]; then
+    echo "Generating bug hosts server block..."
+    
+    # Read and format bug domains
+    BUG_DOMAINS=""
+    while IFS= read -r bug || [ -n "\$bug" ]; do
+        # Skip empty lines and comments
+        [[ -z "\$bug" || "\$bug" =~ ^#.* ]] && continue
+        BUG_DOMAINS="\${BUG_DOMAINS} \${bug}.$DOMAIN"
+    done < "\$BUG_LIST_FILE"
+    
+    if [ -n "\$BUG_DOMAINS" ]; then
+        cat >> /etc/nginx/sites-available/vpn << BUGEOF
+
+# ===== BUG HOSTS - HTTPS (WebSocket only, enhanced security) =====
+server {
+    listen 443 ssl http2;
+    listen [::]:443 ssl http2;
+    server_name\$BUG_DOMAINS;
+
+    ssl_certificate /etc/letsencrypt/live/$DOMAIN/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/$DOMAIN/privkey.pem;
+    ssl_protocols TLSv1.2 TLSv1.3;
+    ssl_ciphers HIGH:!aNULL:!MD5;
+
+    # Specific logs for bug hosts
+    access_log /var/log/nginx/bug-hosts-access.log;
+    error_log /var/log/nginx/bug-hosts-error.log warn;
+
+    # Minimal root for landing page
+    root /var/www/bug-hosts;
+    index index.html;
+
+    # Security: Limit request methods
+    if (\\\$request_method !~ ^(GET|POST|HEAD|OPTIONS)\\\$) {
+        return 405;
+    }
+
+    # Security: Small body size limit
+    client_max_body_size 2m;
+
+    # Rate limiting zone
+    limit_req_zone \\\$binary_remote_addr zone=buglimit:10m rate=20r/s;
+    limit_req zone=buglimit burst=40 nodelay;
+
+    # WebSocket for SSH
+    location /ssh {
+        proxy_pass http://127.0.0.1:700;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade \\\$http_upgrade;
+        proxy_set_header Connection "upgrade";
+        proxy_set_header Host \\\$host;
+        proxy_set_header X-Real-IP \\\$remote_addr;
+        proxy_set_header X-Forwarded-For \\\$proxy_add_x_forwarded_for;
+        proxy_read_timeout 86400;
+    }
+
+    # WebSocket for VMESS
+    location /vmess {
+        proxy_pass http://127.0.0.1:10001;
+        proxy_redirect off;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade \\\$http_upgrade;
+        proxy_set_header Connection "upgrade";
+        proxy_set_header Host \\\$host;
+        proxy_set_header X-Real-IP \\\$remote_addr;
+        proxy_set_header X-Forwarded-For \\\$proxy_add_x_forwarded_for;
+    }
+
+    # WebSocket for VLESS
+    location /vless {
+        proxy_pass http://127.0.0.1:10002;
+        proxy_redirect off;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade \\\$http_upgrade;
+        proxy_set_header Connection "upgrade";
+        proxy_set_header Host \\\$host;
+        proxy_set_header X-Real-IP \\\$remote_addr;
+        proxy_set_header X-Forwarded-For \\\$proxy_add_x_forwarded_for;
+    }
+
+    # WebSocket for TROJAN
+    location /trojan {
+        proxy_pass http://127.0.0.1:10003;
+        proxy_redirect off;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade \\\$http_upgrade;
+        proxy_set_header Connection "upgrade";
+        proxy_set_header Host \\\$host;
+        proxy_set_header X-Real-IP \\\$remote_addr;
+        proxy_set_header X-Forwarded-For \\\$proxy_add_x_forwarded_for;
+    }
+
+    # Simple landing page (no PHP, no backup access)
+    location / {
+        try_files \\\$uri \\\$uri/ /index.html;
+    }
+}
+BUGEOF
+    fi
+fi
+
+# Wildcard server block for other subdomains
+cat >> /etc/nginx/sites-available/vpn << EOF
+
+# ===== WILDCARD SUBDOMAINS - HTTPS (Default for other subdomains) =====
+server {
+    listen 443 ssl http2;
+    listen [::]:443 ssl http2;
+    server_name *.$DOMAIN;
+
+    ssl_certificate /etc/letsencrypt/live/$DOMAIN/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/$DOMAIN/privkey.pem;
+    ssl_protocols TLSv1.2 TLSv1.3;
+    ssl_ciphers HIGH:!aNULL:!MD5;
+
+    root /var/www/html;
+    index index.html index.htm index.php;
+
+    # PHP handler
+    location ~ \.php\$ {
+        include snippets/fastcgi-php.conf;
+        fastcgi_pass unix:/var/run/php/php-fpm.sock;
+    }
+
+    # WebSocket paths
+    location /ssh {
+        proxy_pass http://127.0.0.1:700;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade \$http_upgrade;
+        proxy_set_header Connection "upgrade";
+        proxy_set_header Host \$host;
+        proxy_set_header X-Real-IP \$remote_addr;
+        proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
+        proxy_read_timeout 86400;
+    }
+
+    location /vmess {
+        proxy_pass http://127.0.0.1:10001;
+        proxy_redirect off;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade \$http_upgrade;
+        proxy_set_header Connection "upgrade";
+        proxy_set_header Host \$host;
+        proxy_set_header X-Real-IP \$remote_addr;
+        proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
+    }
+
+    location /vless {
+        proxy_pass http://127.0.0.1:10002;
+        proxy_redirect off;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade \$http_upgrade;
+        proxy_set_header Connection "upgrade";
+        proxy_set_header Host \$host;
+        proxy_set_header X-Real-IP \$remote_addr;
+        proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
+    }
+
+    location /trojan {
+        proxy_pass http://127.0.0.1:10003;
+        proxy_redirect off;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade \$http_upgrade;
+        proxy_set_header Connection "upgrade";
+        proxy_set_header Host \$host;
+        proxy_set_header X-Real-IP \$remote_addr;
+        proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
+    }
+
+    # Serve HTML/PHP
+    location / {
+        try_files \$uri \$uri/ /index.html;
+    }
+}
+EOF
+
+# Create bug hosts landing page
+mkdir -p /var/www/bug-hosts
+cat > /var/www/bug-hosts/index.html << 'BUGHTML'
+<!DOCTYPE html>
+<html lang="en">
+<head>
+   <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VPN Endpoint</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .container {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            padding: 40px;
+            max-width: 500px;
+            width: 100%;
+            text-align: center;
+        }
+        .icon {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 20px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(102, 126, 234, 0.7); }
+            50% { transform: scale(1.05); box-shadow: 0 0 0 10px rgba(102, 126, 234, 0); }
+        }
+        .icon svg {
+            width: 40px;
+            height: 40px;
+            fill: white;
+        }
+        h1 {
+            color: #333;
+            font-size: 28px;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+        p {
+            color: #666;
+            margin-bottom: 30px;
+            line-height: 1.6;
+        }
+        .status {
+            display: inline-block;
+            background: #10b981;
+            color: white;
+            padding: 10px 30px;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 14px;
+            margin-bottom: 20px;
+        }
+        .info {
+            background: #f3f4f6;
+            border-radius: 12px;
+            padding: 20px;
+            margin-top: 20px;
+            text-align: left;
+        }
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        .info-row:last-child {
+            border-bottom: none;
+        }
+        .info-label {
+            color: #6b7280;
+            font-weight: 500;
+        }
+        .info-value {
+            color: #1f2937;
+            font-weight: 600;
+        }
+        @media (max-width: 480px) {
+            .container { padding: 30px 20px; }
+            h1 { font-size: 24px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="icon">
+            <svg viewBox="0 0 24 24">
+                <path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 10.99h7c-.53 4.12-3.28 7.79-7 8.94V12H5V6.3l7-3.11v8.8z"/>
+            </svg>
+        </div>
+        
+        <h1>VPN Endpoint Active</h1>
+        <div class="status">🟢 ONLINE</div>
+        <p>This endpoint is configured for secure VPN connections. WebSocket tunneling is enabled for authorized clients.</p>
+        
+        <div class="info">
+            <div class="info-row">
+                <span class="info-label">Protocol</span>
+                <span class="info-value">TLS / XTLS</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">Supported</span>
+                <span class="info-value">VMESS, VLESS, TROJAN, SSH</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">Transport</span>
+                <span class="info-value">WebSocket</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">Security</span>
+                <span class="info-value">Enhanced</span>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
+BUGHTML
 
 # Test nginx config
 nginx -t

@@ -43,9 +43,24 @@ echo -e "${YELLOW}Bug Host:${NC}     ${BUG_HOST}"
 echo -e "${YELLOW}Full Domain:${NC}  ${FULL_DOMAIN}"
 echo ""
 
+# Create bug hosts directory if not exists
+mkdir -p /etc/tunneling
+
 # Check if already in certificate
 if openssl x509 -in /etc/letsencrypt/live/${DOMAIN}/fullchain.pem -text 2>/dev/null | grep -q "DNS:${FULL_DOMAIN}"; then
     echo -e "${GREEN}[✓]${NC} ${FULL_DOMAIN} already in certificate!"
+    
+    # Still add to list if not present
+    BUG_LIST="/etc/tunneling/bug-hosts.txt"
+    if ! grep -qx "${BUG_HOST}" "$BUG_LIST" 2>/dev/null; then
+        echo "${BUG_HOST}" >> "$BUG_LIST"
+        echo -e "${GREEN}[✓]${NC} Added to bug hosts list"
+        
+        # Regenerate nginx config
+        echo -e "${CYAN}[INFO]${NC} Regenerating Nginx configuration..."
+        bash /usr/local/sbin/tunneling/system/setup-nginx.sh
+    fi
+    
     exit 0
 fi
 
@@ -90,6 +105,17 @@ eval ${CMD}
 if [ $? -eq 0 ]; then
     echo ""
     echo -e "${GREEN}[✓]${NC} SSL certificate updated successfully!"
+    
+    # Save bug host to list
+    BUG_LIST="/etc/tunneling/bug-hosts.txt"
+    if ! grep -qx "${BUG_HOST}" "$BUG_LIST" 2>/dev/null; then
+        echo "${BUG_HOST}" >> "$BUG_LIST"
+        echo -e "${GREEN}[✓]${NC} Saved to bug hosts list: $BUG_LIST"
+    fi
+    
+    # Regenerate Nginx configuration with bug hosts server block
+    echo -e "${CYAN}[INFO]${NC} Regenerating Nginx configuration..."
+    bash /usr/local/sbin/tunneling/system/setup-nginx.sh
     
     # Reload Nginx/OpenResty
     if systemctl is-active openresty >/dev/null 2>&1; then
