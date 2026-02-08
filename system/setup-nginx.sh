@@ -109,9 +109,9 @@ server {
         proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
     }
     
-    # Redirect other requests to HTTPS
+    # Serve HTML for browser access (including bug hosts)
     location / {
-        return 301 https://\$server_name\$request_uri;
+        try_files \$uri \$uri/ /index.html;
     }
 }
 
@@ -191,6 +191,11 @@ server {
         autoindex on;
         auth_basic "Restricted Access";
         auth_basic_user_file /etc/nginx/.htpasswd;
+    }
+    
+    # Serve HTML for browser access (including bug hosts)
+    location / {
+        try_files \$uri \$uri/ /index.html;
     }
 }
 EOF
@@ -962,12 +967,9 @@ server {
         proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
     }
     
-    # Redirect other requests to HTTPS  
+    # Serve HTML/PHP for browser access (including bug hosts)
     location / {
-        try_files \$uri \$uri/ =404;
-        if (!-e \$request_filename) {
-            return 301 https://\$server_name\$request_uri;
-        }
+        try_files \$uri \$uri/ /index.html;
     }
 }
 
@@ -1058,6 +1060,11 @@ server {
         autoindex on;
         auth_basic "Restricted Access";
         auth_basic_user_file /etc/nginx/.htpasswd;
+    }
+    
+    # Serve HTML/PHP for browser access (including bug hosts)
+    location / {
+        try_files \$uri \$uri/ /index.php?\$query_string;
     }
 }
 EOF
