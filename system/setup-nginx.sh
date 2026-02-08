@@ -57,7 +57,62 @@ server {
     listen 80;
     listen [::]:80;
     server_name $DOMAIN *.$DOMAIN;
-    return 301 https://\$server_name\$request_uri;
+    
+    root /var/www/html;
+    index index.html index.htm;
+    
+    # WebSocket for SSH (non-TLS)
+    location /ssh {
+        proxy_pass http://127.0.0.1:700;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade \$http_upgrade;
+        proxy_set_header Connection "upgrade";
+        proxy_set_header Host \$host;
+        proxy_set_header X-Real-IP \$remote_addr;
+        proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
+        proxy_read_timeout 86400;
+    }
+    
+    # WebSocket for VMESS (non-TLS)
+    location /vmess {
+        proxy_pass http://127.0.0.1:10001;
+        proxy_redirect off;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade \$http_upgrade;
+        proxy_set_header Connection "upgrade";
+        proxy_set_header Host \$host;
+        proxy_set_header X-Real-IP \$remote_addr;
+        proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
+    }
+    
+    # WebSocket for VLESS (non-TLS)
+    location /vless {
+        proxy_pass http://127.0.0.1:10002;
+        proxy_redirect off;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade \$http_upgrade;
+        proxy_set_header Connection "upgrade";
+        proxy_set_header Host \$host;
+        proxy_set_header X-Real-IP \$remote_addr;
+        proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
+    }
+    
+    # WebSocket for TROJAN (non-TLS)
+    location /trojan {
+        proxy_pass http://127.0.0.1:10003;
+        proxy_redirect off;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade \$http_upgrade;
+        proxy_set_header Connection "upgrade";
+        proxy_set_header Host \$host;
+        proxy_set_header X-Real-IP \$remote_addr;
+        proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
+    }
+    
+    # Redirect other requests to HTTPS
+    location / {
+        return 301 https://\$server_name\$request_uri;
+    }
 }
 
 server {
@@ -849,7 +904,71 @@ server {
     listen 80;
     listen [::]:80;
     server_name $DOMAIN *.$DOMAIN;
-    return 301 https://\$server_name\$request_uri;
+    
+    root /var/www/html;
+    index index.html index.htm index.php;
+    
+    # PHP handler
+    location ~ \.php\$ {
+        include snippets/fastcgi-php.conf;
+        fastcgi_pass unix:/var/run/php/php-fpm.sock;
+    }
+    
+    # WebSocket for SSH (non-TLS)
+    location /ssh {
+        proxy_pass http://127.0.0.1:700;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade \$http_upgrade;
+        proxy_set_header Connection "upgrade";
+        proxy_set_header Host \$host;
+        proxy_set_header X-Real-IP \$remote_addr;
+        proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
+        proxy_read_timeout 86400;
+    }
+    
+    # WebSocket for VMESS (non-TLS)
+    location /vmess {
+        proxy_pass http://127.0.0.1:10001;
+        proxy_redirect off;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade \$http_upgrade;
+        proxy_set_header Connection "upgrade";
+        proxy_set_header Host \$host;
+        proxy_set_header X-Real-IP \$remote_addr;
+        proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
+    }
+    
+    # WebSocket for VLESS (non-TLS)
+    location /vless {
+        proxy_pass http://127.0.0.1:10002;
+        proxy_redirect off;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade \$http_upgrade;
+        proxy_set_header Connection "upgrade";
+        proxy_set_header Host \$host;
+        proxy_set_header X-Real-IP \$remote_addr;
+        proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
+    }
+    
+    # WebSocket for TROJAN (non-TLS)
+    location /trojan {
+        proxy_pass http://127.0.0.1:10003;
+        proxy_redirect off;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade \$http_upgrade;
+        proxy_set_header Connection "upgrade";
+        proxy_set_header Host \$host;
+        proxy_set_header X-Real-IP \$remote_addr;
+        proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
+    }
+    
+    # Redirect other requests to HTTPS  
+    location / {
+        try_files \$uri \$uri/ =404;
+        if (!-e \$request_filename) {
+            return 301 https://\$server_name\$request_uri;
+        }
+    }
 }
 
 server {
