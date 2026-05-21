@@ -40,23 +40,26 @@ EOF
 
 # Add to XRAY config
 CONFIG_FILE="/usr/local/etc/xray/config.json"
-jq --arg uuid "$uuid" --arg email "TRIAL-$username@$domain" \
-   '.inbounds |= map(if .protocol == "vmess" then .settings.clients += [{"id": $uuid, "alterId": 0, "email": $email}] else . end)' \
-   $CONFIG_FILE > /tmp/xray-config.tmp && mv /tmp/xray-config.tmp $CONFIG_FILE
-
-# Validate JSON config
-echo -e "${CYAN}Validating XRAY config...${NC}"
-if ! jq empty $CONFIG_FILE 2>/dev/null; then
-    echo -e "${RED}Invalid JSON config! Restoring backup...${NC}"
-    if [ -f "${CONFIG_FILE}.bak" ]; then
-        mv ${CONFIG_FILE}.bak $CONFIG_FILE
-    fi
+if [ ! -f "$CONFIG_FILE" ]; then
+    echo -e "${RED}XRAY config not found: $CONFIG_FILE${NC}"
     rm -f /etc/tunneling/vmess/${username}.json
     exit 1
 fi
 
-# Backup current config
-cp $CONFIG_FILE ${CONFIG_FILE}.bak
+cp "$CONFIG_FILE" "${CONFIG_FILE}.bak"
+
+jq --arg uuid "$uuid" --arg email "TRIAL-$username@$domain" \
+   '.inbounds |= map(if .protocol == "vmess" then .settings.clients += [{"id": $uuid, "alterId": 0, "email": $email}] else . end)' \
+   "$CONFIG_FILE" > /tmp/xray-config.tmp && mv /tmp/xray-config.tmp "$CONFIG_FILE"
+
+# Validate JSON config
+echo -e "${CYAN}Validating XRAY config...${NC}"
+if ! jq empty "$CONFIG_FILE" 2>/dev/null; then
+    echo -e "${RED}Invalid JSON config! Restoring backup...${NC}"
+    mv "${CONFIG_FILE}.bak" "$CONFIG_FILE"
+    rm -f /etc/tunneling/vmess/${username}.json
+    exit 1
+fi
 
 # Restart XRAY
 echo -e "${CYAN}Restarting XRAY service...${NC}"
@@ -68,12 +71,9 @@ sleep 2
 
 # Check if XRAY is running
 if ! systemctl is-active --quiet xray; then
-    echo -e "${RED}Failed to start XRAY! Check logs with: journalctl -u xray -n 50${NC}"
-    # Restore backup
-    if [ -f "${CONFIG_FILE}.bak" ]; then
-        mv ${CONFIG_FILE}.bak $CONFIG_FILE
-        systemctl restart xray
-    fi
+    echo -e "${RED}Failed to start XRAY! Restoring backup...${NC}"
+    mv "${CONFIG_FILE}.bak" "$CONFIG_FILE"
+    systemctl restart xray
     rm -f /etc/tunneling/vmess/${username}.json
     exit 1
 fi
@@ -99,7 +99,15 @@ vmess_json=$(cat <<EOF
 EOF
 )
 
-vmess_link_tls="vmess://$(echo -n $vmess_json | base64 -w 0)"
+vmess_b64() {
+  if base64 --help 2>/dev/null | grep -q '\\-w'; then
+    echo -n "$1" | base64 -w 0
+  else
+    echo -n "$1" | base64 | tr -d '\n'
+  fi
+}
+
+vmess_link_tls="vmess://$(vmess_b64 "$vmess_json")"
 
 # Generate vmess:// link for port 80 (non-TLS)
 vmess_json_80=$(cat <<EOF
@@ -120,7 +128,7 @@ vmess_json_80=$(cat <<EOF
 EOF
 )
 
-vmess_link_80="vmess://$(echo -n $vmess_json_80 | base64 -w 0)"
+vmess_link_80="vmess://$(vmess_b64 "$vmess_json_80")"
 
 echo ""
 echo -e "${GREEN}✓ VMESS Trial created successfully!${NC}"

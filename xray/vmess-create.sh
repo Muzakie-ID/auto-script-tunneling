@@ -112,7 +112,15 @@ vmess_json=$(cat <<EOF
 EOF
 )
 
-vmess_link_tls="vmess://$(echo -n "$vmess_json" | base64 -w 0)"
+vmess_b64() {
+  if base64 --help 2>/dev/null | grep -q '\\-w'; then
+    echo -n "$1" | base64 -w 0
+  else
+    echo -n "$1" | base64 | tr -d '\n'
+  fi
+}
+
+vmess_link_tls="vmess://$(vmess_b64 "$vmess_json")"
 
 vmess_json_80=$(cat <<EOF
 {
@@ -132,7 +140,7 @@ vmess_json_80=$(cat <<EOF
 EOF
 )
 
-vmess_link_80="vmess://$(echo -n "$vmess_json_80" | base64 -w 0)"
+vmess_link_80="vmess://$(vmess_b64 "$vmess_json_80")"
 
 echo ""
 echo -e "${GREEN}✓ VMESS Account created successfully!${NC}"

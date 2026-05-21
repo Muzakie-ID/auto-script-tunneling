@@ -87,11 +87,27 @@ case $service in
         ;;
     7)
         echo -e "${YELLOW}Restarting Cron...${NC}"
-        systemctl restart cron
-        if systemctl is-active --quiet cron; then
-            echo -e "${GREEN}✓ Cron restarted successfully${NC}"
+        if systemctl list-unit-files | grep -q "^cron\.service"; then
+            systemctl restart cron
+            if systemctl is-active --quiet cron; then
+                echo -e "${GREEN}✓ Cron restarted successfully${NC}"
+            else
+                echo -e "${RED}✗ Failed to restart Cron${NC}"
+            fi
+        elif systemctl list-unit-files | grep -q "^crond\.service"; then
+            systemctl restart crond
+            if systemctl is-active --quiet crond; then
+                echo -e "${GREEN}✓ Crond restarted successfully${NC}"
+            else
+                echo -e "${RED}✗ Failed to restart Crond${NC}"
+            fi
         else
-            echo -e "${RED}✗ Failed to restart Cron${NC}"
+            service cron restart 2>/dev/null || service crond restart 2>/dev/null
+            if [ $? -eq 0 ]; then
+                echo -e "${GREEN}✓ Cron restarted successfully${NC}"
+            else
+                echo -e "${RED}✗ Failed to restart Cron/Crond${NC}"
+            fi
         fi
         ;;
     8)

@@ -9,6 +9,16 @@ NC='\033[0m'
 CRON_FILE="/etc/cron.d/auto-backup"
 SCRIPT_PATH="/usr/local/sbin/tunneling/system/auto-backup.sh"
 
+restart_cron_service() {
+  if systemctl list-unit-files | grep -q "^cron\.service"; then
+    systemctl restart cron
+  elif systemctl list-unit-files | grep -q "^crond\.service"; then
+    systemctl restart crond
+  else
+    service cron restart 2>/dev/null || service crond restart 2>/dev/null || true
+  fi
+}
+
 clear
 echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
 echo -e "${GREEN}             AUTO BACKUP SETTINGS                    ${NC}"
@@ -24,17 +34,17 @@ read -p "Select option [0-4]: " opt
 case "$opt" in
   1)
     echo "0 2 * * * root $SCRIPT_PATH" > "$CRON_FILE"
-    systemctl restart cron
+    restart_cron_service
     echo -e "${GREEN}Daily auto backup enabled.${NC}"
     ;;
   2)
     echo "0 */6 * * * root $SCRIPT_PATH" > "$CRON_FILE"
-    systemctl restart cron
+    restart_cron_service
     echo -e "${GREEN}Auto backup every 6 hours enabled.${NC}"
     ;;
   3)
     rm -f "$CRON_FILE"
-    systemctl restart cron
+    restart_cron_service
     echo -e "${YELLOW}Auto backup disabled.${NC}"
     ;;
   4)

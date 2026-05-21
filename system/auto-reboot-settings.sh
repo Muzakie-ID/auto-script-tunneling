@@ -9,6 +9,16 @@ NC='\033[0m'
 
 CRON_FILE="/etc/cron.d/auto-reboot"
 
+restart_cron_service() {
+    if systemctl list-unit-files | grep -q "^cron\.service"; then
+        systemctl restart cron
+    elif systemctl list-unit-files | grep -q "^crond\.service"; then
+        systemctl restart crond
+    else
+        service cron restart 2>/dev/null || service crond restart 2>/dev/null || true
+    fi
+}
+
 clear
 echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
 echo -e "${GREEN}           AUTO REBOOT SETTINGS                   ${NC}"
@@ -57,7 +67,7 @@ case $option in
         echo "$MINUTE $HOUR * * * root /sbin/reboot" >> $CRON_FILE
 
         # Restart cron
-        systemctl restart cron
+        restart_cron_service
 
         echo -e "${GREEN}✓ Auto reboot enabled at $time${NC}"
         ;;
@@ -67,7 +77,7 @@ case $option in
 
         if [ -f "$CRON_FILE" ]; then
             rm -f $CRON_FILE
-            systemctl restart cron
+            restart_cron_service
             echo -e "${GREEN}✓ Auto reboot disabled${NC}"
         else
             echo -e "${YELLOW}✓ Auto reboot is already disabled${NC}"
@@ -100,7 +110,7 @@ case $option in
             echo "$MINUTE $HOUR * * * root /sbin/reboot" >> $CRON_FILE
 
             # Restart cron
-            systemctl restart cron
+            restart_cron_service
 
             echo -e "${GREEN}✓ Reboot time changed to $time${NC}"
         fi

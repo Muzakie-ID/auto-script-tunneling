@@ -60,8 +60,21 @@ echo ""
 
 # Restart Cron
 echo -e "${CYAN}[5/8] Restarting Cron...${NC}"
-systemctl restart cron
-echo -e "${GREEN}✓ Cron restarted${NC}"
+if systemctl list-unit-files | grep -q "^cron\.service"; then
+    systemctl restart cron
+    CRON_OK=$?
+elif systemctl list-unit-files | grep -q "^crond\.service"; then
+    systemctl restart crond
+    CRON_OK=$?
+else
+    service cron restart 2>/dev/null || service crond restart 2>/dev/null
+    CRON_OK=$?
+fi
+if [ ${CRON_OK:-1} -eq 0 ]; then
+    echo -e "${GREEN}✓ Cron restarted${NC}"
+else
+    echo -e "${YELLOW}⚠ Cron service not found/restart failed${NC}"
+fi
 echo ""
 
 # Restart Netfilter

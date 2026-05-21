@@ -36,14 +36,25 @@ fi
 
 # Check current cron job
 CRON_FILE="/etc/cron.d/auto-backup-online"
+
+restart_cron_service() {
+    if systemctl list-unit-files | grep -q "^cron\.service"; then
+        systemctl restart cron
+    elif systemctl list-unit-files | grep -q "^crond\.service"; then
+        systemctl restart crond
+    else
+        service cron restart 2>/dev/null || service crond restart 2>/dev/null || true
+    fi
+}
+
 if [ -f "$CRON_FILE" ]; then
     echo -e "${GREEN}Auto backup online is currently enabled${NC}"
     echo ""
-    
+
     CURRENT_SCHEDULE=$(grep "backup-online-script.sh" "$CRON_FILE" 2>/dev/null | awk '{print $1, $2, $3, $4, $5}')
     if [[ -n "$CURRENT_SCHEDULE" ]]; then
         echo -e "${CYAN}Current schedule:${NC} $CURRENT_SCHEDULE"
-        
+
         # Parse schedule
         case "$CURRENT_SCHEDULE" in
             "0 2 * * *")
@@ -60,7 +71,7 @@ if [ -f "$CRON_FILE" ]; then
                 ;;
         esac
     fi
-    
+
     echo ""
     echo -e "${GREEN}[1]${NC} Modify Schedule"
     echo -e "${GREEN}[2]${NC} Disable Auto Backup"
@@ -68,14 +79,14 @@ if [ -f "$CRON_FILE" ]; then
     echo -e "${RED}[0]${NC} Back"
     echo ""
     read -p "Select option [0-3]: " mod_choice
-    
+
     case $mod_choice in
         1)
             # Continue to setup
             ;;
         2)
             rm -f "$CRON_FILE"
-            systemctl restart cron
+            restart_cron_service
             echo ""
             echo -e "${GREEN}Auto backup online disabled${NC}"
             echo ""
@@ -233,14 +244,14 @@ rclone copy "$BACKUP_PATH" "$REMOTE_NAME:/VPS-Backups/$BACKUP_NAME" >> "$LOG_FIL
 
 if [ $? -eq 0 ]; then
     log "Backup uploaded successfully"
-    
+
     # Clean old backups (keep last 7)
     BACKUP_COUNT=$(rclone lsf "$REMOTE_NAME:/VPS-Backups/" --dirs-only | wc -l)
     if [ $BACKUP_COUNT -gt 7 ]; then
         log "Cleaning old backups..."
         rclone delete "$REMOTE_NAME:/VPS-Backups/" --min-age 7d >> "$LOG_FILE" 2>&1
     fi
-    
+
     # Remove local backup
     rm -rf "$BACKUP_PATH"
     log "Local backup removed"
@@ -263,7 +274,7 @@ $CRON_SCHEDULE root bash /usr/local/sbin/tunneling/system/backup-online-script.s
 EOF
 
 # Restart cron
-systemctl restart cron
+restart_cron_service
 
 echo ""
 echo -e "${GREEN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
