@@ -18,22 +18,31 @@ read -p "Duration (days): " days
 read -p "Limit IP (0=unlimited): " limit_ip
 read -p "Limit Quota GB (0=unlimited): " limit_quota
 
-# Set defaults if empty
 limit_ip=${limit_ip:-0}
 limit_quota=${limit_quota:-0}
 
-# Generate UUID
-uuid=$(cat /proc/sys/kernel/random/uuid)
+if [[ -z "$username" ]] || [[ ! "$username" =~ ^[a-zA-Z0-9_]{3,32}$ ]]; then
+    echo -e "${RED}Invalid username! Use 3-32 chars: letters, numbers, underscore only.${NC}"
+    exit 1
+fi
 
-# Calculate expiry
+if ! [[ "$days" =~ ^[0-9]+$ ]] || [ "$days" -le 0 ]; then
+    echo -e "${RED}Duration must be a positive number.${NC}"
+    exit 1
+fi
+
+if ! [[ "$limit_ip" =~ ^[0-9]+$ ]] || ! [[ "$limit_quota" =~ ^[0-9]+$ ]]; then
+    echo -e "${RED}Limit IP and Limit Quota must be numeric (0 or greater).${NC}"
+    exit 1
+fi
+
+uuid=$(cat /proc/sys/kernel/random/uuid)
 exp_date=$(date -d "+${days} days" +"%Y-%m-%d")
 exp_timestamp=$(date -d "$exp_date" +%s)
+domain=$(cat /root/domain.txt 2>/dev/null)
 
-# Get domain
-domain=$(cat /root/domain.txt)
-
-# Create JSON record
-cat > /etc/tunneling/vmess/${username}.json << EOF
+mkdir -p /etc/tunneling/vmess
+cat > "/etc/tunneling/vmess/${username}.json" << EOF
 {
     "username": "$username",
     "uuid": "$uuid",
@@ -44,57 +53,47 @@ cat > /etc/tunneling/vmess/${username}.json << EOF
 }
 EOF
 
-# Add to XRAY config
 CONFIG_FILE="/usr/local/etc/xray/config.json"
-
-# Check if user already exists in config
-if grep -q "\"id\": \"$uuid\"" $CONFIG_FILE; then
-    echo -e "${RED}User already exists in XRAY config!${NC}"
+if [ ! -f "$CONFIG_FILE" ]; then
+    echo -e "${RED}XRAY config not found: $CONFIG_FILE${NC}"
+    rm -f "/etc/tunneling/vmess/${username}.json"
     exit 1
 fi
 
-# Add client to VMESS inbound
+if grep -q "\"email\": \"$username@$domain\"" "$CONFIG_FILE"; then
+    echo -e "${RED}Username already exists in XRAY config!${NC}"
+    rm -f "/etc/tunneling/vmess/${username}.json"
+    exit 1
+fi
+
+cp "$CONFIG_FILE" "${CONFIG_FILE}.bak"
+
 jq --arg uuid "$uuid" --arg email "$username@$domain" \
    '.inbounds |= map(if .protocol == "vmess" then .settings.clients += [{"id": $uuid, "alterId": 0, "email": $email}] else . end)' \
-   $CONFIG_FILE > /tmp/xray-config.tmp && mv /tmp/xray-config.tmp $CONFIG_FILE
+   "$CONFIG_FILE" > /tmp/xray-config.tmp && mv /tmp/xray-config.tmp "$CONFIG_FILE"
 
-# Validate JSON config
 echo -e "${CYAN}Validating XRAY config...${NC}"
-if ! jq empty $CONFIG_FILE 2>/dev/null; then
+if ! jq empty "$CONFIG_FILE" 2>/dev/null; then
     echo -e "${RED}Invalid JSON config! Restoring backup...${NC}"
-    if [ -f "${CONFIG_FILE}.bak" ]; then
-        mv ${CONFIG_FILE}.bak $CONFIG_FILE
-    fi
-    rm -f /etc/tunneling/vmess/${username}.json
+    mv "${CONFIG_FILE}.bak" "$CONFIG_FILE"
+    rm -f "/etc/tunneling/vmess/${username}.json"
     exit 1
 fi
 
-# Backup current config
-cp $CONFIG_FILE ${CONFIG_FILE}.bak
-
-# Restart XRAY
 echo -e "${CYAN}Restarting XRAY service...${NC}"
 systemctl restart xray
-
-# Wait for service to be ready
-echo -e "${CYAN}Waiting for XRAY to start...${NC}"
 sleep 2
 
-# Check if XRAY is running
 if ! systemctl is-active --quiet xray; then
-    echo -e "${RED}Failed to start XRAY! Check logs with: journalctl -u xray -n 50${NC}"
-    # Restore backup
-    if [ -f "${CONFIG_FILE}.bak" ]; then
-        mv ${CONFIG_FILE}.bak $CONFIG_FILE
-        systemctl restart xray
-    fi
-    rm -f /etc/tunneling/vmess/${username}.json
+    echo -e "${RED}Failed to start XRAY! Restoring backup...${NC}"
+    mv "${CONFIG_FILE}.bak" "$CONFIG_FILE"
+    systemctl restart xray
+    rm -f "/etc/tunneling/vmess/${username}.json"
     exit 1
 fi
 
 echo -e "${GREEN}XRAY service running successfully!${NC}"
 
-# Generate vmess:// link
 vmess_json=$(cat <<EOF
 {
   "v": "2",
@@ -113,9 +112,8 @@ vmess_json=$(cat <<EOF
 EOF
 )
 
-vmess_link_tls="vmess://$(echo -n $vmess_json | base64 -w 0)"
+vmess_link_tls="vmess://$(echo -n "$vmess_json" | base64 -w 0)"
 
-# Generate vmess:// link for port 80 (non-TLS)
 vmess_json_80=$(cat <<EOF
 {
   "v": "2",
@@ -134,7 +132,7 @@ vmess_json_80=$(cat <<EOF
 EOF
 )
 
-vmess_link_80="vmess://$(echo -n $vmess_json_80 | base64 -w 0)"
+vmess_link_80="vmess://$(echo -n "$vmess_json_80" | base64 -w 0)"
 
 echo ""
 echo -e "${GREEN}✓ VMESS Account created successfully!${NC}"
@@ -157,7 +155,5 @@ echo -e "${GREEN}VMESS Link HTTP (Port 80):${NC}"
 echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
 echo -e "${YELLOW}$vmess_link_80${NC}"
 echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
-echo ""
-echo -e "${YELLOW}Note: XRAY config auto-reload required${NC}"
 echo ""
 read -n 1 -s -r -p "Press any key to continue..."

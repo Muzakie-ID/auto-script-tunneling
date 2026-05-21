@@ -7,7 +7,7 @@ YELLOW='\033[1;33m'
 CYAN='\033[0;36m'
 NC='\033[0m'
 
-DOMAIN=$(cat /root/domain.txt)
+DOMAIN=$(cat /root/domain.txt 2>/dev/null)
 
 clear
 echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
@@ -21,8 +21,26 @@ read -p "Expired (days): " exp
 read -p "Limit IP (0=unlimited): " limit_ip
 read -p "Limit Quota GB (0=unlimited): " limit_quota
 
-if [[ -z $username || -z $password || -z $exp ]]; then
+limit_ip=${limit_ip:-0}
+limit_quota=${limit_quota:-0}
+
+if [[ -z "$username" || -z "$password" || -z "$exp" ]]; then
     echo -e "${RED}All fields are required!${NC}"
+    exit 1
+fi
+
+if [[ ! "$username" =~ ^[a-zA-Z0-9_]{3,32}$ ]]; then
+    echo -e "${RED}Invalid username! Use 3-32 chars: letters, numbers, underscore only.${NC}"
+    exit 1
+fi
+
+if ! [[ "$exp" =~ ^[0-9]+$ ]] || [ "$exp" -le 0 ]; then
+    echo -e "${RED}Expired days must be a positive number.${NC}"
+    exit 1
+fi
+
+if ! [[ "$limit_ip" =~ ^[0-9]+$ ]] || ! [[ "$limit_quota" =~ ^[0-9]+$ ]]; then
+    echo -e "${RED}Limit IP and Limit Quota must be numeric (0 or greater).${NC}"
     exit 1
 fi
 
@@ -33,17 +51,22 @@ if id "$username" &>/dev/null; then
 fi
 
 # Create user
-useradd -e $(date -d "$exp days" +"%Y-%m-%d") -s /bin/false -M $username
-echo -e "$password\n$password\n" | passwd $username &> /dev/null
+useradd -e "$(date -d "+$exp days" +"%Y-%m-%d")" -s /bin/false -M "$username"
+if [ $? -ne 0 ]; then
+    echo -e "${RED}Failed to create system user.${NC}"
+    exit 1
+fi
+
+echo -e "$password\n$password\n" | passwd "$username" &> /dev/null
 
 # Save user data
 mkdir -p /etc/tunneling/ssh
-cat > /etc/tunneling/ssh/$username.json << EOF
+cat > "/etc/tunneling/ssh/$username.json" << EOF
 {
     "username": "$username",
     "password": "$password",
     "created": "$(date +%Y-%m-%d)",
-    "expired": "$(date -d "$exp days" +"%Y-%m-%d")",
+    "expired": "$(date -d "+$exp days" +"%Y-%m-%d")",
     "limit_ip": "$limit_ip",
     "limit_quota": "$limit_quota",
     "status": "active"
@@ -51,7 +74,7 @@ cat > /etc/tunneling/ssh/$username.json << EOF
 EOF
 
 # Get expiration date
-exp_date=$(date -d "$exp days" +"%d %b %Y")
+exp_date=$(date -d "+$exp days" +"%d %b %Y")
 
 clear
 echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
