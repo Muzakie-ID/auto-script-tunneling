@@ -61,12 +61,22 @@ fi
 echo ""
 
 # Delete expired TROJAN accounts
-echo -e "${CYAN}[4/4] Checking TROJAN accounts...${NC}"
+echo -e "${CYAN}[4/5] Checking TROJAN accounts...${NC}"
 if [ -f /usr/local/sbin/tunneling/xray/trojan-delete-expired.sh ]; then
     bash /usr/local/sbin/tunneling/xray/trojan-delete-expired.sh
     echo -e "${GREEN}✓ TROJAN accounts checked${NC}"
 else
     echo -e "${YELLOW}✓ TROJAN delete script not found${NC}"
+fi
+echo ""
+
+# Delete expired ZIVPN accounts
+echo -e "${CYAN}[5/5] Checking ZIVPN accounts...${NC}"
+if [ -f /usr/local/sbin/tunneling/xray/zivpn-delete-expired.sh ]; then
+    bash /usr/local/sbin/tunneling/xray/zivpn-delete-expired.sh
+    echo -e "${GREEN}✓ ZIVPN accounts checked${NC}"
+else
+    echo -e "${YELLOW}✓ ZIVPN delete script not found${NC}"
 fi
 echo ""
 

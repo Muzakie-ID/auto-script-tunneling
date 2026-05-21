@@ -109,6 +109,7 @@ mkdir -p /var/log/xray
 mkdir -p /etc/tunneling/vmess
 mkdir -p /etc/tunneling/vless
 mkdir -p /etc/tunneling/trojan
+mkdir -p /etc/tunneling/zivpn
 
 # Restart services
 systemctl restart xray

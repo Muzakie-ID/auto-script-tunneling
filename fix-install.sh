@@ -47,7 +47,7 @@ mkdir -p "$INSTALL_DIR/xray"
 mkdir -p "$INSTALL_DIR/bot"
 
 echo -e "${CYAN}[1/5]${NC} Downloading menu scripts..."
-MENU_FILES="main-menu ssh-menu vmess-menu vless-menu trojan-menu system-menu backup-menu bot-menu settings-menu info-menu"
+MENU_FILES="main-menu ssh-menu vmess-menu vless-menu trojan-menu zivpn-menu system-menu backup-menu bot-menu settings-menu info-menu"
 for file in $MENU_FILES; do
     wget -q -O "$INSTALL_DIR/menu/${file}.sh" "${BASE_URL}/menu/${file}.sh"
 done
@@ -59,7 +59,7 @@ for file in $SSH_FILES; do
 done
 
 echo -e "${CYAN}[3/5]${NC} Downloading system scripts..."
-SYSTEM_FILES="check-services monitor-vps backup-now restore-backup auto-backup delete-expired setup-nginx restart-all restart-service speedtest delete-all-expired limit-speed monitor-service check-logs view-logs auto-reboot-settings change-domain change-banner change-port change-timezone fix-error-domain fix-error-proxy renew-ssl backup-ssl restore-ssl auto-record-wildcard limit-speed-settings reset-settings enable-ssh-root setup-rclone setup-rclone-manual backup-online restore-online auto-backup-online auto-add-bug list-bug remove-bug view-auto-ssl-analytics fix-metrics-php auto-setup-cloudflare-dns fix-cloudflare-dns check-cloudflare-dns fix-xray-config create-clash-converter update-firewall quick-fix-metrics setup-cloudflare-interactive list-backups delete-backup auto-backup-settings download-backup"
+SYSTEM_FILES="check-services monitor-vps backup-now restore-backup auto-backup delete-expired setup-nginx restart-all restart-service speedtest delete-all-expired limit-speed monitor-service check-logs view-logs auto-reboot-settings change-domain change-banner change-port change-timezone fix-error-domain fix-error-proxy renew-ssl backup-ssl restore-ssl auto-record-wildcard limit-speed-settings reset-settings enable-ssh-root setup-rclone setup-rclone-manual backup-online restore-online auto-backup-online auto-add-bug list-bug remove-bug view-auto-ssl-analytics fix-metrics-php auto-setup-cloudflare-dns fix-cloudflare-dns check-cloudflare-dns fix-xray-config setup-zivpn create-clash-converter update-firewall quick-fix-metrics setup-cloudflare-interactive list-backups delete-backup auto-backup-settings download-backup"
 for file in $SYSTEM_FILES; do
     wget -q -O "$INSTALL_DIR/system/${file}.sh" "${BASE_URL}/system/${file}.sh"
 done
@@ -68,12 +68,13 @@ echo -e "${CYAN}[4/5]${NC} Downloading XRAY scripts..."
 wget -q -O "$INSTALL_DIR/xray/setup-xray.sh" "${BASE_URL}/xray/setup-xray.sh"
 wget -q -O "$INSTALL_DIR/xray/placeholder.sh" "${BASE_URL}/xray/placeholder.sh"
 
-# VMESS, VLESS, TROJAN
-for proto in vmess vless trojan; do
+# VMESS, VLESS, TROJAN, ZIVPN
+for proto in vmess vless trojan zivpn; do
     for action in create trial list renew delete check delete-expired lock unlock details limit-ip limit-quota; do
         wget -q -O "$INSTALL_DIR/xray/${proto}-${action}.sh" "${BASE_URL}/xray/${proto}-${action}.sh"
     done
 done
+wget -q -O "$INSTALL_DIR/xray/zivpn-common.sh" "${BASE_URL}/xray/zivpn-common.sh"
 
 echo -e "${CYAN}[5/5]${NC} Downloading bot scripts..."
 wget -q -O "$INSTALL_DIR/bot/telegram_bot.py" "${BASE_URL}/bot/telegram_bot.py"

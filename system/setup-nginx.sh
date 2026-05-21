@@ -57,10 +57,10 @@ server {
     listen 80;
     listen [::]:80;
     server_name $DOMAIN *.$DOMAIN;
-    
+
     root /var/www/html;
     index index.html index.htm;
-    
+
     # WebSocket for SSH (non-TLS)
     location /ssh {
         proxy_pass http://127.0.0.1:700;
@@ -72,7 +72,7 @@ server {
         proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
         proxy_read_timeout 86400;
     }
-    
+
     # WebSocket for VMESS (non-TLS)
     location /vmess {
         proxy_pass http://127.0.0.1:10001;
@@ -84,7 +84,7 @@ server {
         proxy_set_header X-Real-IP \$remote_addr;
         proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
     }
-    
+
     # WebSocket for VLESS (non-TLS)
     location /vless {
         proxy_pass http://127.0.0.1:10002;
@@ -96,7 +96,7 @@ server {
         proxy_set_header X-Real-IP \$remote_addr;
         proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
     }
-    
+
     # WebSocket for TROJAN (non-TLS)
     location /trojan {
         proxy_pass http://127.0.0.1:10003;
@@ -108,7 +108,8 @@ server {
         proxy_set_header X-Real-IP \$remote_addr;
         proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
     }
-    
+
+
     # Serve HTML for browser access (including bug hosts)
     location / {
         try_files \$uri \$uri/ /index.html;
@@ -192,7 +193,7 @@ server {
         auth_basic "Restricted Access";
         auth_basic_user_file /etc/nginx/.htpasswd;
     }
-    
+
     # Serve HTML for browser access (including bug hosts)
     location / {
         try_files \$uri \$uri/ /index.html;
@@ -223,12 +224,12 @@ cat > /var/www/html/index.html << EOF
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>VPN Dashboard - $DOMAIN</title>
-    
+
     <!-- Libraries -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
-    
+
     <style>
         :root {
             /* Modern Light Theme Palette */
@@ -241,7 +242,7 @@ cat > /var/www/html/index.html << EOF
             --text-main: #0f172a;     /* Slate 900 */
             --text-muted: #64748b;    /* Slate 500 */
             --border: #e2e8f0;
-            
+
             /* Effects */
             --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
             --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
@@ -258,11 +259,11 @@ cat > /var/www/html/index.html << EOF
             color: var(--text-main);
             min-height: 100vh;
             /* Modern abstract background */
-            background-image: 
-                radial-gradient(at 0% 0%, hsla(253,16%,7%,1) 0, transparent 50%), 
-                radial-gradient(at 50% 0%, hsla(225,39%,30%,1) 0, transparent 50%), 
+            background-image:
+                radial-gradient(at 0% 0%, hsla(253,16%,7%,1) 0, transparent 50%),
+                radial-gradient(at 50% 0%, hsla(225,39%,30%,1) 0, transparent 50%),
                 radial-gradient(at 100% 0%, hsla(339,49%,30%,1) 0, transparent 50%);
-            background-image: 
+            background-image:
                 radial-gradient(at 40% 20%, hsla(228,100%,74%,0.1) 0px, transparent 50%),
                 radial-gradient(at 80% 0%, hsla(189,100%,56%,0.1) 0px, transparent 50%),
                 radial-gradient(at 0% 50%, hsla(340,100%,76%,0.05) 0px, transparent 50%);
@@ -286,7 +287,7 @@ cat > /var/www/html/index.html << EOF
             animation: fadeUp 0.6s ease-out forwards;
             opacity: 0; /* Start hidden */
         }
-        
+
         .delay-1 { animation-delay: 0.1s; }
         .delay-2 { animation-delay: 0.2s; }
         .delay-3 { animation-delay: 0.3s; }
@@ -365,7 +366,7 @@ cat > /var/www/html/index.html << EOF
             position: relative;
             overflow: hidden;
         }
-        
+
         .stat-card:hover {
             transform: translateY(-5px);
             box-shadow: var(--shadow-lg);
@@ -385,7 +386,7 @@ cat > /var/www/html/index.html << EOF
         .stat-header { display: flex; align-items: center; justify-content: space-between; color: var(--text-muted); }
         .stat-icon { font-size: 1.25rem; background: var(--bg-body); padding: 8px; border-radius: 10px; }
         .stat-title { font-size: 0.875rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; }
-        
+
         .stat-body { display: flex; align-items: baseline; gap: 4px; }
         .stat-value { font-size: 2rem; font-weight: 700; color: var(--text-main); line-height: 1; }
         .stat-unit { font-size: 0.875rem; font-weight: 500; color: var(--text-muted); }
@@ -475,62 +476,62 @@ cat > /var/www/html/index.html << EOF
 
         @media (max-width: 640px) {
             body { padding: 1rem; padding-bottom: 3rem; }
-            
+
             /* Enhanced Header for Mobile */
-            .header { 
-                flex-direction: column; 
-                gap: 1rem; 
+            .header {
+                flex-direction: column;
+                gap: 1rem;
                 text-align: center;
                 align-items: stretch;
                 padding: 1.25rem;
             }
             .brand { justify-content: center; width: 100%; }
             .status-badge { width: 100%; justify-content: center; }
-            
+
             .stats-grid { grid-template-columns: 1fr; gap: 0.75rem; }
 
             /* Mobile Horizontal Stat Card Layout */
-            .stat-card { 
-                flex-direction: row; 
-                align-items: center; 
+            .stat-card {
+                flex-direction: row;
+                align-items: center;
                 justify-content: space-between;
                 padding: 1rem 1.25rem;
                 min-height: auto;
             }
-            
+
             /* Keep accent border */
             .stat-card::before { width: 4px; }
-            
+
             /* Reorganize Header: Icon left, Title right */
-            .stat-header { 
+            .stat-header {
                 display: flex;
                 align-items: center;
                 gap: 10px;
                 margin-bottom: 0;
                 justify-content: flex-start;
             }
-            
+
             /* Move icon before title using order */
-            .stat-icon { 
-                order: -1; 
+            .stat-icon {
+                order: -1;
                 font-size: 1.2rem;
                 padding: 6px;
-                background: rgba(79, 70, 229, 0.1); 
+                background: rgba(79, 70, 229, 0.1);
                 color: var(--primary);
                 border-radius: 8px;
             }
-            
-            .stat-title { 
-                font-size: 0.95rem; 
+
+            .stat-title {
+                font-size: 0.95rem;
                 font-weight: 600;
                 color: var(--text-main);
                 text-transform: none; /* easier to read */
             }
 
             /* Adjust Values to be right-aligned */
-            .stat-body { 
-                flex-direction: row; 
-                align-items: baseline; 
+            .stat-body {
+                flex-direction: row;
+                align-items: baseline;
             }
             .stat-value { font-size: 1.25rem; }
             .stat-unit { font-size: 0.85rem; }
@@ -544,7 +545,7 @@ cat > /var/www/html/index.html << EOF
 <body>
 
     <div class="container">
-        
+
         <!-- Header -->
         <header class="header animate-enter">
             <div class="brand">
@@ -612,7 +613,7 @@ cat > /var/www/html/index.html << EOF
 
         <!-- Main Dashboard -->
         <div class="dashboard-layout">
-            
+
             <!-- Chart Area -->
             <div class="panel animate-enter delay-3">
                 <div class="panel-header">
@@ -631,7 +632,7 @@ cat > /var/www/html/index.html << EOF
                 <div class="panel-header">
                     <div class="panel-title"><i class="ri-server-line"></i> Server Details</div>
                 </div>
-                
+
                 <div class="info-list">
                     <div class="info-row">
                         <span class="info-label"><i class="ri-global-line"></i> Hostname</span>
@@ -654,7 +655,7 @@ cat > /var/www/html/index.html << EOF
                 <a href="https://t.me/MuzakieID" class="btn-action">
                     <i class="ri-telegram-fill"></i> OPEN BOT MENU
                 </a>
-                
+
                 <a href="/clash-converter.php" class="btn-action" style="margin-top: 10px; background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
                     <i class="ri-file-code-line"></i> CLASH YAML CONVERTER
                 </a>
@@ -671,7 +672,7 @@ cat > /var/www/html/index.html << EOF
     <!-- JS Logic -->
     <script>
         const ctx = document.getElementById('metricsChart').getContext('2d');
-        
+
         // Gradient for chart
         const gradientCpu = ctx.createLinearGradient(0, 0, 0, 400);
         gradientCpu.addColorStop(0, 'rgba(79, 70, 229, 0.4)'); // Primary
@@ -749,7 +750,7 @@ cat > /var/www/html/index.html << EOF
                     y: {
                         beginAtZero: true,
                         max: 100,
-                        grid: { 
+                        grid: {
                             color: '#f1f5f9',
                             borderDash: [5, 5]
                         },
@@ -771,22 +772,22 @@ cat > /var/www/html/index.html << EOF
             try {
                 // Fetch live data from the PHP script
                 const response = await fetch('metrics.php');
-                
+
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: \${response.status}`);
                 }
-                
+
                 const data = await response.json();
-                
+
                 // Update DOM elements with live data
                 document.getElementById('cpu').textContent = data.cpu ? data.cpu.toFixed(1) : '0.0';
                 document.getElementById('ram').textContent = data.ram_used ? data.ram_used.toFixed(0) : '0';
                 document.getElementById('network').textContent = data.network ? data.network.toFixed(1) : '0.0';
                 document.getElementById('disk').textContent = data.disk_io ? data.disk_io.toFixed(2) : '0.00';
-                
+
                 // Update Chart
                 const now = new Date().toLocaleTimeString();
-                
+
                 if (chart.data.labels.length > maxDataPoints) {
                     chart.data.labels.shift();
                     chart.data.datasets.forEach(d => d.data.shift());
@@ -796,8 +797,8 @@ cat > /var/www/html/index.html << EOF
                 // Use fallback of 0 if data isn't available
                 chart.data.datasets[0].data.push(data.cpu || 0);
                 chart.data.datasets[1].data.push(data.ram_percent || 0);
-                
-                chart.update('none'); 
+
+                chart.update('none');
             } catch (err) {
                 console.error('Error fetching metrics:', err);
                 // Optional: You could uncomment the below to fallback to mock data for testing
@@ -848,7 +849,7 @@ $net_int = getDefaultInterface();
 $cpu1 = getCpuStats();
 $net1 = getNetBytes($net_int);
 
-sleep(1); 
+sleep(1);
 
 // 2. End Snapshot
 $cpu2 = getCpuStats();
@@ -910,16 +911,16 @@ server {
     listen 80;
     listen [::]:80;
     server_name $DOMAIN *.$DOMAIN;
-    
+
     root /var/www/html;
     index index.html index.htm index.php;
-    
+
     # PHP handler
     location ~ \.php\$ {
         include snippets/fastcgi-php.conf;
         fastcgi_pass unix:/var/run/php/php-fpm.sock;
     }
-    
+
     # WebSocket for SSH (non-TLS)
     location /ssh {
         proxy_pass http://127.0.0.1:700;
@@ -931,7 +932,7 @@ server {
         proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
         proxy_read_timeout 86400;
     }
-    
+
     # WebSocket for VMESS (non-TLS)
     location /vmess {
         proxy_pass http://127.0.0.1:10001;
@@ -943,7 +944,7 @@ server {
         proxy_set_header X-Real-IP \$remote_addr;
         proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
     }
-    
+
     # WebSocket for VLESS (non-TLS)
     location /vless {
         proxy_pass http://127.0.0.1:10002;
@@ -955,7 +956,7 @@ server {
         proxy_set_header X-Real-IP \$remote_addr;
         proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
     }
-    
+
     # WebSocket for TROJAN (non-TLS)
     location /trojan {
         proxy_pass http://127.0.0.1:10003;
@@ -967,7 +968,7 @@ server {
         proxy_set_header X-Real-IP \$remote_addr;
         proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
     }
-    
+
     # Serve HTML/PHP for browser access (including bug hosts)
     location / {
         try_files \$uri \$uri/ /index.html;
@@ -981,7 +982,7 @@ server {
     server_name $DOMAIN *.$DOMAIN;
     root /var/www/html;
     index index.html index.htm index.php;
-    
+
     location ~ \.php\$ {
         include snippets/fastcgi-php.conf;
         fastcgi_pass unix:/var/run/php/php-fpm.sock;
@@ -1057,6 +1058,7 @@ server {
         proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
     }
 
+
     # Backup download
     location /backup {
         alias /etc/tunneling/backup;
@@ -1064,7 +1066,7 @@ server {
         auth_basic "Restricted Access";
         auth_basic_user_file /etc/nginx/.htpasswd;
     }
-    
+
     # Serve HTML/PHP for browser access
     location / {
         try_files \$uri \$uri/ /index.php?\$query_string;
@@ -1076,7 +1078,7 @@ EOF
 BUG_LIST_FILE="/etc/tunneling/bug-hosts.txt"
 if [ -f "\$BUG_LIST_FILE" ] && [ -s "\$BUG_LIST_FILE" ]; then
     echo "Generating bug hosts server block..."
-    
+
     # Read and format bug domains
     BUG_DOMAINS=""
     while IFS= read -r bug || [ -n "\$bug" ]; do
@@ -1084,7 +1086,7 @@ if [ -f "\$BUG_LIST_FILE" ] && [ -s "\$BUG_LIST_FILE" ]; then
         [[ -z "\$bug" || "\$bug" =~ ^#.* ]] && continue
         BUG_DOMAINS="\${BUG_DOMAINS} \${bug}.$DOMAIN"
     done < "\$BUG_LIST_FILE"
-    
+
     if [ -n "\$BUG_DOMAINS" ]; then
         cat >> /etc/nginx/sites-available/vpn << BUGEOF
 
@@ -1167,6 +1169,7 @@ server {
         proxy_set_header X-Forwarded-For \\\$proxy_add_x_forwarded_for;
     }
 
+
     # Simple landing page (no PHP, no backup access)
     location / {
         try_files \\\$uri \\\$uri/ /index.html;
@@ -1243,6 +1246,7 @@ server {
         proxy_set_header X-Real-IP \$remote_addr;
         proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
     }
+
 
     # Serve HTML/PHP
     location / {
@@ -1358,11 +1362,11 @@ cat > /var/www/bug-hosts/index.html << 'BUGHTML'
                 <path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 10.99h7c-.53 4.12-3.28 7.79-7 8.94V12H5V6.3l7-3.11v8.8z"/>
             </svg>
         </div>
-        
+
         <h1>VPN Endpoint Active</h1>
         <div class="status">🟢 ONLINE</div>
         <p>This endpoint is configured for secure VPN connections. WebSocket tunneling is enabled for authorized clients.</p>
-        
+
         <div class="info">
             <div class="info-row">
                 <span class="info-label">Protocol</span>

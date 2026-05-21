@@ -227,6 +227,9 @@ bash "$INSTALL_DIR/ssh/setup-ws.sh"
 echo -e "${CYAN}[INFO]${NC} Setting up BadVPN UDP Gateway..."
 bash "$INSTALL_DIR/ssh/setup-badvpn.sh"
 
+echo -e "${CYAN}[INFO]${NC} Setting up ZIVPN UDP Service..."
+bash "$INSTALL_DIR/system/setup-zivpn.sh"
+
 # Install XRAY
 echo -e "${CYAN}[INFO]${NC} Installing XRAY..."
 bash -c "$(curl -L https://github.com/XTLS/Xray-install/raw/main/install-release.sh)" @ install
@@ -284,6 +287,8 @@ ufw allow 777/tcp   # Stunnel (OpenSSH SSL)
 ufw allow 3128/tcp  # Squid Proxy
 ufw allow 7300/tcp  # BadVPN TCP
 ufw allow 7300/udp  # BadVPN UDP
+ufw allow 5667/udp  # ZIVPN UDP Server
+ufw allow 6000:19999/udp # ZIVPN UDP Forward Range
 ufw allow 8080/tcp  # Squid Proxy
 ufw allow 8443/tcp  # HTTPS Alternate
 ufw reload

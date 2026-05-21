@@ -56,6 +56,7 @@ wget -q -O ssh-menu.sh "${BASE_URL}/menu/ssh-menu.sh"
 wget -q -O vmess-menu.sh "${BASE_URL}/menu/vmess-menu.sh"
 wget -q -O vless-menu.sh "${BASE_URL}/menu/vless-menu.sh"
 wget -q -O trojan-menu.sh "${BASE_URL}/menu/trojan-menu.sh"
+wget -q -O zivpn-menu.sh "${BASE_URL}/menu/zivpn-menu.sh"
 wget -q -O system-menu.sh "${BASE_URL}/menu/system-menu.sh"
 wget -q -O backup-menu.sh "${BASE_URL}/menu/backup-menu.sh"
 wget -q -O bot-menu.sh "${BASE_URL}/menu/bot-menu.sh"
@@ -127,6 +128,7 @@ wget -q -O auto-setup-cloudflare-dns.sh "${BASE_URL}/system/auto-setup-cloudflar
 wget -q -O fix-cloudflare-dns.sh "${BASE_URL}/system/fix-cloudflare-dns.sh"
 wget -q -O check-cloudflare-dns.sh "${BASE_URL}/system/check-cloudflare-dns.sh"
 wget -q -O fix-xray-config.sh "${BASE_URL}/system/fix-xray-config.sh"
+wget -q -O setup-zivpn.sh "${BASE_URL}/system/setup-zivpn.sh"
 wget -q -O backup-ssl.sh "${BASE_URL}/system/backup-ssl.sh"
 wget -q -O restore-ssl.sh "${BASE_URL}/system/restore-ssl.sh"
 wget -q -O view-logs.sh "${BASE_URL}/system/view-logs.sh"
@@ -152,7 +154,13 @@ for script in create trial list renew delete check delete-expired lock unlock de
     wget -q -O trojan-${script}.sh "${BASE_URL}/xray/trojan-${script}.sh"
 done
 
+# ZIVPN scripts
+for script in create trial list renew delete check delete-expired lock unlock details limit-ip limit-quota; do
+    wget -q -O zivpn-${script}.sh "${BASE_URL}/xray/zivpn-${script}.sh"
+done
+
 wget -q -O placeholder.sh "${BASE_URL}/xray/placeholder.sh"
+wget -q -O zivpn-common.sh "${BASE_URL}/xray/zivpn-common.sh"
 
 # Download bot scripts
 echo -e "${CYAN}[5/5]${NC} Downloading bot scripts..."
@@ -199,7 +207,7 @@ if [ $failed -eq 0 ]; then
     cp -f check-*.sh monitor-*.sh backup-*.sh restore-*.sh auto-*.sh delete-*.sh setup-*.sh restart-*.sh /usr/local/sbin/tunneling/system/ 2>/dev/null
     cp -f speedtest.sh limit-speed*.sh check-logs.sh change-*.sh fix-*.sh renew-ssl.sh reset-settings.sh enable-ssh-root.sh /usr/local/sbin/tunneling/system/ 2>/dev/null
     cp -f view-*.sh update-firewall.sh /usr/local/sbin/tunneling/system/ 2>/dev/null
-    cp -f vmess-*.sh vless-*.sh trojan-*.sh placeholder.sh /usr/local/sbin/tunneling/xray/ 2>/dev/null
+    cp -f vmess-*.sh vless-*.sh trojan-*.sh zivpn-*.sh placeholder.sh zivpn-common.sh /usr/local/sbin/tunneling/xray/ 2>/dev/null
     cp -f bot-*.sh /usr/local/sbin/tunneling/bot/ 2>/dev/null
     cp -f telegram_bot.py /usr/local/sbin/tunneling/bot/ 2>/dev/null
 

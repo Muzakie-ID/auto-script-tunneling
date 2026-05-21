@@ -160,7 +160,7 @@ echo -e "${CYAN}[INFO]${NC} Downloading scripts from GitHub..."
 # --- MENU SCRIPTS ---
 FILES_MENU=(
     "menu/main-menu.sh" "menu/ssh-menu.sh" "menu/vmess-menu.sh" "menu/vless-menu.sh"
-    "menu/trojan-menu.sh" "menu/system-menu.sh" "menu/backup-menu.sh" "menu/bot-menu.sh"
+    "menu/trojan-menu.sh" "menu/zivpn-menu.sh" "menu/system-menu.sh" "menu/backup-menu.sh" "menu/bot-menu.sh"
     "menu/settings-menu.sh" "menu/info-menu.sh"
 )
 for file in "${FILES_MENU[@]}"; do download_file "$file" "$INSTALL_DIR/$file"; done
@@ -191,7 +191,7 @@ FILES_SYSTEM=(
     "system/auto-backup-online.sh" "system/auto-add-bug.sh" "system/list-bug.sh"
     "system/remove-bug.sh" "system/view-auto-ssl-analytics.sh" "system/fix-metrics-php.sh"
     "system/auto-setup-cloudflare-dns.sh" "system/fix-cloudflare-dns.sh"
-    "system/check-cloudflare-dns.sh" "system/fix-xray-config.sh"
+    "system/check-cloudflare-dns.sh" "system/fix-xray-config.sh" "system/setup-zivpn.sh"
     "system/create-clash-converter.sh" "system/list-backups.sh"
     "system/delete-backup.sh" "system/auto-backup-settings.sh" "system/download-backup.sh"
 )
@@ -206,9 +206,9 @@ FILES_BOT=(
 for file in "${FILES_BOT[@]}"; do download_file "$file" "$INSTALL_DIR/$file"; done
 
 # --- XRAY SCRIPTS ---
-FILES_XRAY=( "xray/setup-xray.sh" "xray/placeholder.sh" )
+FILES_XRAY=( "xray/setup-xray.sh" "xray/placeholder.sh" "xray/zivpn-common.sh" )
 # Add dynamic XRAY file lists
-PROTOCOLS=("vmess" "vless" "trojan")
+PROTOCOLS=("vmess" "vless" "trojan" "zivpn")
 ACTIONS=("create" "trial" "list" "renew" "delete" "check" "delete-expired" "lock" "unlock" "details" "limit-ip" "limit-quota")
 
 for proto in "${PROTOCOLS[@]}"; do
@@ -255,6 +255,9 @@ bash "$INSTALL_DIR/ssh/setup-ws.sh"
 
 echo -e "${CYAN}[INFO]${NC} Setting up BadVPN UDP Gateway..."
 bash "$INSTALL_DIR/ssh/setup-badvpn.sh"
+
+echo -e "${CYAN}[INFO]${NC} Setting up ZIVPN UDP Service..."
+bash "$INSTALL_DIR/system/setup-zivpn.sh"
 
 # Install XRAY
 echo -e "${CYAN}[INFO]${NC} Installing XRAY..."
@@ -466,6 +469,8 @@ ufw allow 8443/tcp  # HTTPS Alternate
 ufw allow 53/udp    # DNS
 ufw allow 443/udp   # QUIC/HTTP3
 ufw allow 7300/udp  # BadVPN UDP
+ufw allow 5667/udp  # ZIVPN UDP Server
+ufw allow 6000:19999/udp # ZIVPN UDP Forward Range
 
 # Save iptables rules for netfilter-persistent
 echo -e "${CYAN}[INFO]${NC} Saving firewall rules..."

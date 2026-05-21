@@ -32,19 +32,20 @@ echo -e "${GREEN}  [1]${NC} SSH Menu ${YELLOW}(WS, SSL, UDP)${NC}"
 echo -e "${GREEN}  [2]${NC} VMESS Menu"
 echo -e "${GREEN}  [3]${NC} VLESS Menu"
 echo -e "${GREEN}  [4]${NC} TROJAN Menu"
+echo -e "${GREEN}  [5]${NC} ZIVPN Menu"
 echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
 echo -e "${CYAN}             [ SYSTEM MENU ]${NC}"
 echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
-echo -e "${GREEN}  [5]${NC} System Management"
-echo -e "${GREEN}  [6]${NC} Backup & Restore"
-echo -e "${GREEN}  [7]${NC} Bot Telegram"
-echo -e "${GREEN}  [8]${NC} Settings"
-echo -e "${GREEN}  [9]${NC} Information & Status"
+echo -e "${GREEN}  [6]${NC} System Management"
+echo -e "${GREEN}  [7]${NC} Backup & Restore"
+echo -e "${GREEN}  [8]${NC} Bot Telegram"
+echo -e "${GREEN}  [9]${NC} Settings"
+echo -e "${GREEN} [10]${NC} Information & Status"
 echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
 echo -e "${RED}  [0]${NC} Exit"
 echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
 echo ""
-read -p "Select Menu [0-9]: " menu
+read -p "Select Menu [0-10]: " menu
 
 case $menu in
     1)
@@ -60,18 +61,21 @@ case $menu in
         /usr/local/sbin/tunneling/menu/trojan-menu.sh
         ;;
     5)
-        /usr/local/sbin/tunneling/menu/system-menu.sh
+        /usr/local/sbin/tunneling/menu/zivpn-menu.sh
         ;;
     6)
-        /usr/local/sbin/tunneling/menu/backup-menu.sh
+        /usr/local/sbin/tunneling/menu/system-menu.sh
         ;;
     7)
-        /usr/local/sbin/tunneling/menu/bot-menu.sh
+        /usr/local/sbin/tunneling/menu/backup-menu.sh
         ;;
     8)
-        /usr/local/sbin/tunneling/menu/settings-menu.sh
+        /usr/local/sbin/tunneling/menu/bot-menu.sh
         ;;
     9)
+        /usr/local/sbin/tunneling/menu/settings-menu.sh
+        ;;
+    10)
         /usr/local/sbin/tunneling/menu/info-menu.sh
         ;;
     0)
