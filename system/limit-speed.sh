@@ -33,23 +33,23 @@ case $option in
         echo ""
         echo -e "${YELLOW}Enter speed limit (in Mbit/s):${NC}"
         read -p "Speed limit: " limit
-        
+
         if [[ ! "$limit" =~ ^[0-9]+$ ]]; then
             echo -e "${RED}Invalid input! Please enter a number.${NC}"
             sleep 2
-            /usr/local/sbin/tunneling/limit-speed.sh
+            /usr/local/sbin/tunneling/system/limit-speed.sh
             exit 0
         fi
-        
+
         echo ""
         echo -e "${YELLOW}Applying speed limit of ${limit}Mbit/s...${NC}"
-        
+
         # Remove existing limits
         tc qdisc del dev $IFACE root 2>/dev/null
-        
+
         # Apply new limit
         tc qdisc add dev $IFACE root tbf rate ${limit}mbit burst 32kbit latency 400ms
-        
+
         if [ $? -eq 0 ]; then
             echo -e "${GREEN}✓ Speed limit applied successfully!${NC}"
         else
@@ -60,7 +60,7 @@ case $option in
         echo ""
         echo -e "${YELLOW}Removing speed limit...${NC}"
         tc qdisc del dev $IFACE root 2>/dev/null
-        
+
         if [ $? -eq 0 ]; then
             echo -e "${GREEN}✓ Speed limit removed successfully!${NC}"
         else
@@ -71,10 +71,10 @@ case $option in
         echo ""
         echo -e "${YELLOW}Current traffic control settings:${NC}"
         echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
-        
+
         # Check if TBF (Token Bucket Filter) is applied
         CURRENT_QDISC=$(tc qdisc show dev $IFACE | grep "qdisc tbf")
-        
+
         if [ -n "$CURRENT_QDISC" ]; then
             # Extract rate from tbf settings
             RATE=$(echo "$CURRENT_QDISC" | grep -oP 'rate \K[0-9]+[A-Za-z]+')
@@ -92,7 +92,7 @@ case $option in
             echo -e "${YELLOW}Current qdisc:${NC}"
             tc qdisc show dev $IFACE
         fi
-        
+
         echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
         ;;
     0)
@@ -102,7 +102,7 @@ case $option in
     *)
         echo -e "${RED}Invalid option!${NC}"
         sleep 1
-        /usr/local/sbin/tunneling/limit-speed.sh
+        /usr/local/sbin/tunneling/system/limit-speed.sh
         exit 0
         ;;
 esac

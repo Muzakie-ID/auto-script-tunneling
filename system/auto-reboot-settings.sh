@@ -40,31 +40,31 @@ case $option in
         echo -e "${YELLOW}Enable Auto Reboot${NC}"
         echo ""
         read -p "Enter reboot time (HH:MM, 24-hour format): " time
-        
+
         # Validate time format
         if [[ ! $time =~ ^[0-2][0-9]:[0-5][0-9]$ ]]; then
             echo -e "${RED}Invalid time format! Use HH:MM (e.g., 03:00)${NC}"
             sleep 2
-            /usr/local/sbin/tunneling/auto-reboot-settings.sh
+            /usr/local/sbin/tunneling/system/auto-reboot-settings.sh
             exit 0
         fi
-        
+
         HOUR=$(echo $time | cut -d: -f1)
         MINUTE=$(echo $time | cut -d: -f2)
-        
+
         # Create cron job
         echo "# Auto Reboot Daily" > $CRON_FILE
         echo "$MINUTE $HOUR * * * root /sbin/reboot" >> $CRON_FILE
-        
+
         # Restart cron
         systemctl restart cron
-        
+
         echo -e "${GREEN}✓ Auto reboot enabled at $time${NC}"
         ;;
     2)
         echo ""
         echo -e "${YELLOW}Disabling auto reboot...${NC}"
-        
+
         if [ -f "$CRON_FILE" ]; then
             rm -f $CRON_FILE
             systemctl restart cron
@@ -83,25 +83,25 @@ case $option in
             echo -e "${YELLOW}Change Reboot Time${NC}"
             echo ""
             read -p "Enter new reboot time (HH:MM, 24-hour format): " time
-            
+
             # Validate time format
             if [[ ! $time =~ ^[0-2][0-9]:[0-5][0-9]$ ]]; then
                 echo -e "${RED}Invalid time format! Use HH:MM (e.g., 03:00)${NC}"
                 sleep 2
-                /usr/local/sbin/tunneling/auto-reboot-settings.sh
+                /usr/local/sbin/tunneling/system/auto-reboot-settings.sh
                 exit 0
             fi
-            
+
             HOUR=$(echo $time | cut -d: -f1)
             MINUTE=$(echo $time | cut -d: -f2)
-            
+
             # Update cron job
             echo "# Auto Reboot Daily" > $CRON_FILE
             echo "$MINUTE $HOUR * * * root /sbin/reboot" >> $CRON_FILE
-            
+
             # Restart cron
             systemctl restart cron
-            
+
             echo -e "${GREEN}✓ Reboot time changed to $time${NC}"
         fi
         ;;
@@ -112,7 +112,7 @@ case $option in
     *)
         echo -e "${RED}Invalid option!${NC}"
         sleep 1
-        /usr/local/sbin/tunneling/auto-reboot-settings.sh
+        /usr/local/sbin/tunneling/system/auto-reboot-settings.sh
         exit 0
         ;;
 esac

@@ -55,4 +55,4 @@ echo -e "  - Squid    : 3128, 8080"
 echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
 echo ""
 read -n 1 -s -r -p "Press any key to back to menu"
-/usr/local/sbin/tunneling/ssh-menu.sh
+/usr/local/sbin/tunneling/menu/ssh-menu.sh

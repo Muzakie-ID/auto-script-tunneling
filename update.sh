@@ -32,7 +32,7 @@ if [ -d "/usr/local/sbin/tunneling" ]; then
     tar -czf "$BACKUP_FILE" \
         -C /usr/local/sbin tunneling \
         2>/dev/null
-    
+
     if [ $? -eq 0 ] && [ -f "$BACKUP_FILE" ]; then
         echo -e "${GREEN}[✓]${NC} Backup created: $(basename $BACKUP_FILE)"
     else
@@ -94,6 +94,10 @@ wget -q -O limit-speed.sh "${BASE_URL}/system/limit-speed.sh"
 wget -q -O monitor-service.sh "${BASE_URL}/system/monitor-service.sh"
 wget -q -O check-logs.sh "${BASE_URL}/system/check-logs.sh"
 wget -q -O auto-reboot-settings.sh "${BASE_URL}/system/auto-reboot-settings.sh"
+wget -q -O list-backups.sh "${BASE_URL}/system/list-backups.sh"
+wget -q -O delete-backup.sh "${BASE_URL}/system/delete-backup.sh"
+wget -q -O auto-backup-settings.sh "${BASE_URL}/system/auto-backup-settings.sh"
+wget -q -O download-backup.sh "${BASE_URL}/system/download-backup.sh"
 
 # Settings menu scripts
 wget -q -O change-domain.sh "${BASE_URL}/system/change-domain.sh"
@@ -180,14 +184,14 @@ if [ $failed -eq 0 ]; then
     echo -e "${GREEN}[✓]${NC} All files validated successfully"
     echo ""
     echo -e "${GREEN}[✓]${NC} Download completed"
-    
+
     # Install updates
     echo ""
     echo -e "${CYAN}[INFO]${NC} Installing updates..."
-    
+
     # Create directories if not exist
     mkdir -p /usr/local/sbin/tunneling/{menu,ssh,system,xray,bot}
-    
+
     # Copy scripts to respective directories
     cp -f *-menu.sh /usr/local/sbin/tunneling/menu/ 2>/dev/null
     cp -f ssh-*.sh /usr/local/sbin/tunneling/ssh/ 2>/dev/null
@@ -198,7 +202,7 @@ if [ $failed -eq 0 ]; then
     cp -f vmess-*.sh vless-*.sh trojan-*.sh placeholder.sh /usr/local/sbin/tunneling/xray/ 2>/dev/null
     cp -f bot-*.sh /usr/local/sbin/tunneling/bot/ 2>/dev/null
     cp -f telegram_bot.py /usr/local/sbin/tunneling/bot/ 2>/dev/null
-    
+
     # Set permissions
     chmod +x /usr/local/sbin/tunneling/menu/*.sh
     chmod +x /usr/local/sbin/tunneling/ssh/*.sh
@@ -206,19 +210,19 @@ if [ $failed -eq 0 ]; then
     chmod +x /usr/local/sbin/tunneling/xray/*.sh
     chmod +x /usr/local/sbin/tunneling/bot/*.sh
     chmod +x /usr/local/sbin/tunneling/bot/telegram_bot.py
-    
+
     echo -e "${GREEN}[✓]${NC} Files installed"
-    
+
     # Update version
     NEW_VERSION="1.0.1"
     jq ".version = \"$NEW_VERSION\" | .updated = \"$(date +%Y-%m-%d)\"" \
         /etc/tunneling/config.json > /tmp/config.json.tmp && \
         mv /tmp/config.json.tmp /etc/tunneling/config.json
-    
+
     # Clean up
     rm -f /tmp/*.sh
     rm -f /tmp/*.py
-    
+
     clear
     echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
     echo -e "${GREEN}            UPDATE COMPLETED SUCCESSFULLY!           ${NC}"

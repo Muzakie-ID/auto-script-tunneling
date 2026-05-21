@@ -16,7 +16,7 @@ NC='\033[0m'
 
 # Check if running as root
 if [[ $EUID -ne 0 ]]; then
-   echo -e "${RED}This script must be run as root${NC}" 
+   echo -e "${RED}This script must be run as root${NC}"
    exit 1
 fi
 
@@ -155,7 +155,7 @@ install_file() {
     local source_path="$1"
     local dest_path="$2"
     local filename=$(basename "$source_path")
-    
+
     if [[ -f "$source_path" ]]; then
         # Copy from local if exists (Instalasi dari git clone)
         cp "$source_path" "$dest_path"
@@ -178,7 +178,7 @@ for file in ssh/*.sh; do install_file "$file" "$INSTALL_DIR/ssh/$(basename "$fil
 # Install system scripts
 echo -e "${CYAN}[INFO]${NC} Installing system scripts..."
 for file in system/*.sh; do install_file "$file" "$INSTALL_DIR/system/$(basename "$file")"; done
-for file in *.sh; do 
+for file in *.sh; do
     if [[ "$file" == "setup.sh" ]]; then continue; fi
     install_file "$file" "$INSTALL_DIR/$(basename "$file")" 2>/dev/null
 done
@@ -245,6 +245,10 @@ ln -sf /etc/letsencrypt/live/$domain/privkey.pem /etc/xray/certs/privkey.pem
 # Configure XRAY
 echo -e "${CYAN}[INFO]${NC} Configuring XRAY..."
 bash "$INSTALL_DIR/xray/setup-xray.sh"
+
+# Setup Nginx reverse proxy
+echo -e "${CYAN}[INFO]${NC} Setting up Nginx reverse proxy..."
+bash "$INSTALL_DIR/system/setup-nginx.sh"
 
 # Configure cron for SSL renewal
 echo "0 3 * * * root certbot renew --quiet --post-hook 'systemctl reload nginx'" > /etc/cron.d/ssl-renewal

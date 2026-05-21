@@ -21,7 +21,7 @@ INSTALL_DIR="/usr/local/sbin/tunneling"
 
 # Check if running as root
 if [[ $EUID -ne 0 ]]; then
-   echo -e "${RED}This script must be run as root${NC}" 
+   echo -e "${RED}This script must be run as root${NC}"
    exit 1
 fi
 
@@ -96,7 +96,7 @@ echo -e "${CYAN}[INFO]${NC} Validating NGINX installation..."
 if ! command -v nginx &> /dev/null; then
     echo -e "${YELLOW}[WARNING]${NC} NGINX not found, retrying installation..."
     apt-get install --reinstall -y nginx
-    
+
     if ! command -v nginx &> /dev/null; then
         echo -e "${RED}[ERROR]${NC} Failed to install NGINX. Trying alternative method..."
         apt-get purge -y nginx nginx-common nginx-core
@@ -146,10 +146,10 @@ mkdir -p "$INSTALL_DIR/bot"
 download_file() {
     local source_path="$1"
     local dest_path="$2"
-    
+
     echo -e "${YELLOW}Downloading $source_path...${NC}"
     wget -q -O "$dest_path" "${BASE_URL}/$source_path" 2>/dev/null || curl -sL "${BASE_URL}/$source_path" -o "$dest_path"
-    
+
     if [[ ! -s "$dest_path" ]]; then
         echo -e "${RED}[ERROR] Failed to download $source_path${NC}"
     fi
@@ -159,17 +159,17 @@ echo -e "${CYAN}[INFO]${NC} Downloading scripts from GitHub..."
 
 # --- MENU SCRIPTS ---
 FILES_MENU=(
-    "menu/main-menu.sh" "menu/ssh-menu.sh" "menu/vmess-menu.sh" "menu/vless-menu.sh" 
-    "menu/trojan-menu.sh" "menu/system-menu.sh" "menu/backup-menu.sh" "menu/bot-menu.sh" 
+    "menu/main-menu.sh" "menu/ssh-menu.sh" "menu/vmess-menu.sh" "menu/vless-menu.sh"
+    "menu/trojan-menu.sh" "menu/system-menu.sh" "menu/backup-menu.sh" "menu/bot-menu.sh"
     "menu/settings-menu.sh" "menu/info-menu.sh"
 )
 for file in "${FILES_MENU[@]}"; do download_file "$file" "$INSTALL_DIR/$file"; done
 
 # --- SSH SCRIPTS ---
 FILES_SSH=(
-    "ssh/ssh-create.sh" "ssh/ssh-trial.sh" "ssh/ssh-renew.sh" "ssh/ssh-delete.sh" 
-    "ssh/ssh-check.sh" "ssh/ssh-list.sh" "ssh/ssh-delete-expired.sh" "ssh/ssh-lock.sh" 
-    "ssh/ssh-unlock.sh" "ssh/ssh-details.sh" "ssh/ssh-limit-ip.sh" "ssh/ssh-limit-quota.sh" 
+    "ssh/ssh-create.sh" "ssh/ssh-trial.sh" "ssh/ssh-renew.sh" "ssh/ssh-delete.sh"
+    "ssh/ssh-check.sh" "ssh/ssh-list.sh" "ssh/ssh-delete-expired.sh" "ssh/ssh-lock.sh"
+    "ssh/ssh-unlock.sh" "ssh/ssh-details.sh" "ssh/ssh-limit-ip.sh" "ssh/ssh-limit-quota.sh"
     "ssh/setup-dropbear.sh" "ssh/setup-stunnel.sh" "ssh/setup-squid.sh" "ssh/setup-tuntap.sh"
     "ssh/setup-ws.sh" "ssh/setup-badvpn.sh"
 )
@@ -177,29 +177,30 @@ for file in "${FILES_SSH[@]}"; do download_file "$file" "$INSTALL_DIR/$file"; do
 
 # --- SYSTEM SCRIPTS ---
 FILES_SYSTEM=(
-    "system/check-services.sh" "system/monitor-vps.sh" "system/backup-now.sh" 
-    "system/restore-backup.sh" "system/auto-backup.sh" "system/delete-expired.sh" 
-    "system/setup-nginx.sh" "system/restart-all.sh" "system/restart-service.sh" 
-    "system/speedtest.sh" "system/delete-all-expired.sh" "system/limit-speed.sh" 
-    "system/monitor-service.sh" "system/check-logs.sh" "system/view-logs.sh" 
-    "system/auto-reboot-settings.sh" "system/change-domain.sh" "system/change-banner.sh" 
-    "system/change-port.sh" "system/change-timezone.sh" "system/fix-error-domain.sh" 
-    "system/fix-error-proxy.sh" "system/renew-ssl.sh" "system/backup-ssl.sh" 
-    "system/restore-ssl.sh" "system/auto-record-wildcard.sh" "system/limit-speed-settings.sh" 
-    "system/reset-settings.sh" "system/enable-ssh-root.sh" "system/setup-rclone.sh" 
-    "system/setup-rclone-manual.sh" "system/backup-online.sh" "system/restore-online.sh" 
+    "system/check-services.sh" "system/monitor-vps.sh" "system/backup-now.sh"
+    "system/restore-backup.sh" "system/auto-backup.sh" "system/delete-expired.sh"
+    "system/setup-nginx.sh" "system/restart-all.sh" "system/restart-service.sh"
+    "system/speedtest.sh" "system/delete-all-expired.sh" "system/limit-speed.sh"
+    "system/monitor-service.sh" "system/check-logs.sh" "system/view-logs.sh"
+    "system/auto-reboot-settings.sh" "system/change-domain.sh" "system/change-banner.sh"
+    "system/change-port.sh" "system/change-timezone.sh" "system/fix-error-domain.sh"
+    "system/fix-error-proxy.sh" "system/renew-ssl.sh" "system/backup-ssl.sh"
+    "system/restore-ssl.sh" "system/auto-record-wildcard.sh" "system/limit-speed-settings.sh"
+    "system/reset-settings.sh" "system/enable-ssh-root.sh" "system/setup-rclone.sh"
+    "system/setup-rclone-manual.sh" "system/backup-online.sh" "system/restore-online.sh"
     "system/auto-backup-online.sh" "system/auto-add-bug.sh" "system/list-bug.sh"
     "system/remove-bug.sh" "system/view-auto-ssl-analytics.sh" "system/fix-metrics-php.sh"
-    "system/auto-setup-cloudflare-dns.sh" "system/fix-cloudflare-dns.sh" 
+    "system/auto-setup-cloudflare-dns.sh" "system/fix-cloudflare-dns.sh"
     "system/check-cloudflare-dns.sh" "system/fix-xray-config.sh"
-    "system/create-clash-converter.sh"
+    "system/create-clash-converter.sh" "system/list-backups.sh"
+    "system/delete-backup.sh" "system/auto-backup-settings.sh" "system/download-backup.sh"
 )
 for file in "${FILES_SYSTEM[@]}"; do download_file "$file" "$INSTALL_DIR/$file"; done
 
 # --- BOT SCRIPTS ---
 FILES_BOT=(
-    "bot/telegram_bot.py" "bot/bot-setup.sh" "bot/bot-start.sh" "bot/bot-stop.sh" 
-    "bot/bot-restart.sh" "bot/bot-status.sh" "bot/bot-auto-order.sh" "bot/bot-payment.sh" 
+    "bot/telegram_bot.py" "bot/bot-setup.sh" "bot/bot-start.sh" "bot/bot-stop.sh"
+    "bot/bot-restart.sh" "bot/bot-status.sh" "bot/bot-auto-order.sh" "bot/bot-payment.sh"
     "bot/bot-price.sh" "bot/bot-notification.sh" "bot/bot-test.sh"
 )
 for file in "${FILES_BOT[@]}"; do download_file "$file" "$INSTALL_DIR/$file"; done
@@ -281,7 +282,7 @@ if [[ "$wildcard_ssl" =~ ^[Yy]$ ]]; then
     echo -e "  ${YELLOW}2)${NC} Global API Key (Legacy)"
     echo ""
     read -p "Choose [1 or 2]: " cf_method
-    
+
     if [[ "$cf_method" == "1" ]]; then
         # API Token Method (Recommended)
         echo ""
@@ -295,7 +296,7 @@ if [[ "$wildcard_ssl" =~ ^[Yy]$ ]]; then
         echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
         echo ""
         read -p "Enter Cloudflare API Token: " cf_token
-        
+
         if [[ -n "$cf_token" ]]; then
             echo -e "${CYAN}[INFO]${NC} Installing Cloudflare DNS plugin..."
             # Install with pinned versions to avoid deprecation warnings
@@ -310,12 +311,12 @@ if [[ "$wildcard_ssl" =~ ^[Yy]$ ]]; then
                 pip3 install certbot-dns-cloudflare cloudflare==2.19.4 --break-system-packages 2>/dev/null || \
                 pip3 install certbot-dns-cloudflare cloudflare==2.19.4
             fi
-            
+
             mkdir -p /root/.secrets
             echo "# Cloudflare API Token" > /root/.secrets/cloudflare.ini
             echo "dns_cloudflare_api_token = $cf_token" >> /root/.secrets/cloudflare.ini
             chmod 600 /root/.secrets/cloudflare.ini
-            
+
             echo -e "${CYAN}[INFO]${NC} Requesting Wildcard Certificate (*.${domain})..."
             if certbot certonly --dns-cloudflare --dns-cloudflare-credentials /root/.secrets/cloudflare.ini \
                 -d "$domain" -d "*.$domain" --agree-tos --email "$email" --non-interactive --dns-cloudflare-propagation-seconds 30; then
@@ -330,7 +331,7 @@ if [[ "$wildcard_ssl" =~ ^[Yy]$ ]]; then
             echo -e "${RED}[ERROR]${NC} API Token is empty. Falling back to standard certificate."
             certbot certonly --standalone --preferred-challenges http --agree-tos --email "$email" -d "$domain" --non-interactive
         fi
-        
+
     elif [[ "$cf_method" == "2" ]]; then
         # Global API Key Method (Legacy)
         echo ""
@@ -343,7 +344,7 @@ if [[ "$wildcard_ssl" =~ ^[Yy]$ ]]; then
         echo ""
         read -p "Enter Cloudflare Email: " cf_email
         read -p "Enter Global API Key: " cf_api_key
-        
+
         if [[ -n "$cf_email" && -n "$cf_api_key" ]]; then
             echo -e "${CYAN}[INFO]${NC} Installing Cloudflare DNS plugin..."
             # Install with pinned versions to avoid deprecation warnings
@@ -358,20 +359,20 @@ if [[ "$wildcard_ssl" =~ ^[Yy]$ ]]; then
                 pip3 install certbot-dns-cloudflare cloudflare==2.19.4 --break-system-packages 2>/dev/null || \
                 pip3 install certbot-dns-cloudflare cloudflare==2.19.4
             fi
-            
+
             mkdir -p /root/.secrets
             echo "# Cloudflare Global API Key" > /root/.secrets/cloudflare.ini
             echo "dns_cloudflare_email = $cf_email" >> /root/.secrets/cloudflare.ini
             echo "dns_cloudflare_api_key = $cf_api_key" >> /root/.secrets/cloudflare.ini
             chmod 600 /root/.secrets/cloudflare.ini
-            
+
             # Auto-setup DNS records
-            echo -e "${B_CYA}[INFO]${RESET} Setting up DNS records via Cloudflare API..."
+            echo -e "${CYAN}[INFO]${NC} Setting up DNS records via Cloudflare API..."
             bash "$INSTALL_DIR/system/auto-setup-cloudflare-dns.sh" "$domain" "$cf_email" "$cf_api_key"
-            
+
             if [ $? -eq 0 ]; then
-                echo -e "${B_GRE}[✓]${RESET} DNS records configured automatically"
-                echo -e "${YEL}Waiting 10s for DNS propagation...${RESET}"
+                echo -e "${GREEN}[✓]${NC} DNS records configured automatically"
+                echo -e "${YELLOW}Waiting 10s for DNS propagation...${NC}"
                 sleep 10
             else
                 echo -e "${YELLOW}[WARNING]${NC} DNS auto-setup failed. Please configure manually:"
@@ -379,7 +380,7 @@ if [[ "$wildcard_ssl" =~ ^[Yy]$ ]]; then
                 echo "  CNAME Record: *.$domain → $domain"
                 read -p "Press Enter after DNS is configured..."
             fi
-            
+
             echo -e "${CYAN}[INFO]${NC} Requesting Wildcard Certificate (*.${domain})..."
             if certbot certonly --dns-cloudflare --dns-cloudflare-credentials /root/.secrets/cloudflare.ini \
                 -d "$domain" -d "*.$domain" --agree-tos --email "$email" --non-interactive --dns-cloudflare-propagation-seconds 30; then
@@ -423,7 +424,7 @@ echo -e "${CYAN}[INFO]${NC} Configuring XRAY..."
 bash "$INSTALL_DIR/xray/setup-xray.sh"
 
 # Setup Nginx
-echo -e "\n${B_CYA}[INFO]${RESET} Setting up Nginx...\n"
+echo -e "\n${CYAN}[INFO]${NC} Setting up Nginx...\n"
 bash "$INSTALL_DIR/system/setup-nginx.sh"
 
 # Di install.sh setelah setup-nginx.sh

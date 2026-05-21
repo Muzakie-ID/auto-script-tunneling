@@ -32,8 +32,8 @@ echo ""
 
 # Delete expired SSH accounts
 echo -e "${CYAN}[1/4] Checking SSH accounts...${NC}"
-if [ -f /usr/local/sbin/tunneling/ssh-delete-expired.sh ]; then
-    bash /usr/local/sbin/tunneling/ssh-delete-expired.sh
+if [ -f /usr/local/sbin/tunneling/ssh/ssh-delete-expired.sh ]; then
+    bash /usr/local/sbin/tunneling/ssh/ssh-delete-expired.sh
     echo -e "${GREEN}✓ SSH accounts checked${NC}"
 else
     echo -e "${YELLOW}✓ SSH delete script not found${NC}"
@@ -42,8 +42,8 @@ echo ""
 
 # Delete expired VMESS accounts
 echo -e "${CYAN}[2/4] Checking VMESS accounts...${NC}"
-if [ -f /usr/local/sbin/tunneling/vmess-delete-expired.sh ]; then
-    bash /usr/local/sbin/tunneling/vmess-delete-expired.sh
+if [ -f /usr/local/sbin/tunneling/xray/vmess-delete-expired.sh ]; then
+    bash /usr/local/sbin/tunneling/xray/vmess-delete-expired.sh
     echo -e "${GREEN}✓ VMESS accounts checked${NC}"
 else
     echo -e "${YELLOW}✓ VMESS delete script not found${NC}"
@@ -52,8 +52,8 @@ echo ""
 
 # Delete expired VLESS accounts
 echo -e "${CYAN}[3/4] Checking VLESS accounts...${NC}"
-if [ -f /usr/local/sbin/tunneling/vless-delete-expired.sh ]; then
-    bash /usr/local/sbin/tunneling/vless-delete-expired.sh
+if [ -f /usr/local/sbin/tunneling/xray/vless-delete-expired.sh ]; then
+    bash /usr/local/sbin/tunneling/xray/vless-delete-expired.sh
     echo -e "${GREEN}✓ VLESS accounts checked${NC}"
 else
     echo -e "${YELLOW}✓ VLESS delete script not found${NC}"
@@ -62,8 +62,8 @@ echo ""
 
 # Delete expired TROJAN accounts
 echo -e "${CYAN}[4/4] Checking TROJAN accounts...${NC}"
-if [ -f /usr/local/sbin/tunneling/trojan-delete-expired.sh ]; then
-    bash /usr/local/sbin/tunneling/trojan-delete-expired.sh
+if [ -f /usr/local/sbin/tunneling/xray/trojan-delete-expired.sh ]; then
+    bash /usr/local/sbin/tunneling/xray/trojan-delete-expired.sh
     echo -e "${GREEN}✓ TROJAN accounts checked${NC}"
 else
     echo -e "${YELLOW}✓ TROJAN delete script not found${NC}"

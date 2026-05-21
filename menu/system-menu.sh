@@ -83,7 +83,7 @@ case $menu in
         /usr/local/sbin/tunneling/system/auto-reboot-settings.sh
         ;;
     10)
-        /usr/local/sbin/tunneling/system/change-auto-reboot-settings.sh
+        /usr/local/sbin/tunneling/system/auto-reboot-settings.sh
         ;;
     11)
         /usr/local/sbin/tunneling/system/limit-speed.sh

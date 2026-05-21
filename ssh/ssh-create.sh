@@ -98,4 +98,4 @@ echo -e "CONNECT [host_port] HTTP/1.0[crlf][crlf]GET / HTTP/1.1[crlf]Host: $DOMA
 echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
 echo ""
 read -n 1 -s -r -p "Press any key to back to menu"
-/usr/local/sbin/tunneling/ssh-menu.sh
+/usr/local/sbin/tunneling/menu/ssh-menu.sh

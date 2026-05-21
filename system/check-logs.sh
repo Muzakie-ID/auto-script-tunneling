@@ -104,7 +104,7 @@ case $log in
     *)
         echo -e "${RED}Invalid option!${NC}"
         sleep 1
-        /usr/local/sbin/tunneling/check-logs.sh
+        /usr/local/sbin/tunneling/system/check-logs.sh
         exit 0
         ;;
 esac

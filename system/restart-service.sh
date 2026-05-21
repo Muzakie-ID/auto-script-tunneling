@@ -123,7 +123,7 @@ case $service in
     *)
         echo -e "${RED}Invalid option!${NC}"
         sleep 1
-        /usr/local/sbin/tunneling/restart-service.sh
+        /usr/local/sbin/tunneling/system/restart-service.sh
         exit 0
         ;;
 esac
