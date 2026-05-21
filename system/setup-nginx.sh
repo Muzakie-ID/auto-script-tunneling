@@ -125,9 +125,8 @@ server {
 }
 
 server {
-    listen 443 ssl;
-    listen [::]:443 ssl;
-    http2 on;
+    listen 443 ssl http2;
+    listen [::]:443 ssl http2;
     server_name $DOMAIN *.$DOMAIN;
 
     ssl_certificate /etc/letsencrypt/live/$DOMAIN/fullchain.pem;
@@ -991,9 +990,8 @@ server {
 
 # ===== MAIN DOMAIN - HTTPS (Full features) =====
 server {
-    listen 443 ssl;
-    listen [::]:443 ssl;
-    http2 on;
+    listen 443 ssl http2;
+    listen [::]:443 ssl http2;
     server_name $DOMAIN;
 
     ssl_certificate /etc/letsencrypt/live/$DOMAIN/fullchain.pem;
@@ -1390,11 +1388,14 @@ cat > /var/www/bug-hosts/index.html << 'BUGHTML'
 </html>
 BUGHTML
 
-# Disable IPv6 listen directives if IPv6 is not supported by kernel
+# Patch nginx directives for compatibility
 if [ ! -s /proc/net/if_inet6 ]; then
     echo "IPv6 not supported by kernel. Removing IPv6 listen directives from nginx config..."
     sed -i '/listen \[::\]:/d' /etc/nginx/sites-available/vpn 2>/dev/null
 fi
+
+# Old nginx builds may not support standalone `http2 on;`
+sed -i 's/^[[:space:]]*http2 on;[[:space:]]*$/    # http2 moved to listen directive/g' /etc/nginx/sites-available/vpn 2>/dev/null
 
 # Test nginx config
 nginx -t
