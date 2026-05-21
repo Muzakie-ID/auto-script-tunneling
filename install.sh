@@ -107,6 +107,14 @@ fi
 
 # Final check
 if command -v nginx &> /dev/null; then
+    # Ubuntu/OpenVZ kernels without IPv6 support will fail on `listen [::]:...`
+    if [ ! -s /proc/net/if_inet6 ]; then
+        echo -e "${YELLOW}[INFO]${NC} IPv6 not supported. Patching nginx configs to IPv4-only..."
+        sed -i '/listen \[::\]:/d' /etc/nginx/sites-available/default 2>/dev/null || true
+        sed -i '/listen \[::\]:/d' /etc/nginx/sites-enabled/default 2>/dev/null || true
+        sed -i '/listen \[::\]:/d' /etc/nginx/nginx.conf 2>/dev/null || true
+    fi
+    dpkg --configure -a 2>/dev/null || true
     echo -e "${GREEN}[SUCCESS]${NC} NGINX installed successfully: $(nginx -v 2>&1)"
 else
     echo -e "${RED}[CRITICAL]${NC} NGINX installation failed! Some features may not work."

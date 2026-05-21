@@ -102,6 +102,15 @@ apt-get install -y \
     dnsutils \
     bc
 
+# Patch nginx default config for kernels without IPv6 support
+if [ -x /usr/sbin/nginx ] && [ ! -s /proc/net/if_inet6 ]; then
+    echo -e "${YELLOW}[INFO]${NC} IPv6 not supported. Patching nginx default configs..."
+    sed -i '/listen \[::\]:/d' /etc/nginx/sites-available/default 2>/dev/null || true
+    sed -i '/listen \[::\]:/d' /etc/nginx/sites-enabled/default 2>/dev/null || true
+    sed -i '/listen \[::\]:/d' /etc/nginx/nginx.conf 2>/dev/null || true
+    dpkg --configure -a 2>/dev/null || true
+fi
+
 # Install BBR
 echo -e "${CYAN}[INFO]${NC} Installing BBR..."
 if ! grep -q "net.core.default_qdisc=fq" /etc/sysctl.conf; then
@@ -297,6 +306,9 @@ ufw reload
 
 # Final setup
 echo -e "${CYAN}[INFO]${NC} Finalizing installation..."
+if [ ! -s /proc/net/if_inet6 ]; then
+    sed -i '/listen \[::\]:/d' /etc/nginx/sites-available/vpn 2>/dev/null || true
+fi
 systemctl enable nginx
 systemctl enable xray
 systemctl enable fail2ban

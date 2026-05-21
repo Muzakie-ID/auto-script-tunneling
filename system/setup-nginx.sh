@@ -1390,6 +1390,12 @@ cat > /var/www/bug-hosts/index.html << 'BUGHTML'
 </html>
 BUGHTML
 
+# Disable IPv6 listen directives if IPv6 is not supported by kernel
+if [ ! -s /proc/net/if_inet6 ]; then
+    echo "IPv6 not supported by kernel. Removing IPv6 listen directives from nginx config..."
+    sed -i '/listen \[::\]:/d' /etc/nginx/sites-available/vpn 2>/dev/null
+fi
+
 # Test nginx config
 nginx -t
 
