@@ -36,8 +36,10 @@ fi
 
 username=$(jq -r '.username' "$json_file")
 uuid=$(jq -r '.uuid' "$json_file")
+password=$(jq -r '.password // "N/A"' "$json_file")
 expired=$(jq -r '.expired' "$json_file")
 created=$(jq -r '.created // empty' "$json_file")
+locked=$(jq -r '.locked // false' "$json_file")
 limit_ip=$(jq -r '.limit_ip // "Unlimited"' "$json_file")
 limit_quota=$(jq -r '.limit_quota // "Unlimited"' "$json_file")
 
@@ -68,12 +70,15 @@ fi
 echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
 echo -e "${YELLOW}Username:${NC} $username"
 echo -e "${YELLOW}UUID:${NC} $uuid"
+echo -e "${YELLOW}UDP Password:${NC} $password"
 echo -e "${YELLOW}Domain:${NC} $domain"
+echo -e "${YELLOW}UDP Endpoint:${NC} ${domain}:5667"
+echo -e "${YELLOW}UDP Forward:${NC} 6000-19999/udp -> 5667/udp"
 echo -e "${YELLOW}Created:${NC} $created_date"
 echo -e "${YELLOW}Expired:${NC} $exp_date"
+echo -e "${YELLOW}Locked:${NC} $locked"
 echo -e "${YELLOW}Limit IP:${NC} $limit_ip"
 echo -e "${YELLOW}Limit Quota:${NC} $limit_quota"
-echo -e "${YELLOW}Path:${NC} /zivpn"
 echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
 echo ""
 read -n 1 -s -r -p "Press any key to continue..."

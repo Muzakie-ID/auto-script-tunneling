@@ -1,7 +1,7 @@
 #!/bin/bash
 # ZIVPN Trial Account (1 Hour)
 
-source /usr/local/sbin/tunneling/xray/zivpn-common.sh 2>/dev/null || source $(dirname "$0")/zivpn-common.sh
+source /usr/local/sbin/tunneling/xray/zivpn-common.sh 2>/dev/null || source "$(dirname "$0")/zivpn-common.sh
 
 RED='\033[0;31m'
 GREEN='\033[0;32m'
