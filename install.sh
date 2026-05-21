@@ -59,37 +59,60 @@ echo "Installation started at $(date)"
 # Update and install dependencies
 echo -e "${CYAN}[INFO]${NC} Updating system and installing dependencies..."
 apt-get update
-apt-get install -y \
-    wget \
-    curl \
-    git \
-    unzip \
-    python3 \
-    python3-pip \
-    build-essential \
-    cmake \
-    screen \
-    cron \
-    socat \
-    netfilter-persistent \
-    jq \
-    vnstat \
-    nginx \
-    certbot \
-    python3-certbot-nginx \
-    php \
-    php-fpm \
-    php-cli \
-    sysstat \
-    squid \
-    dropbear \
-    stunnel4 \
-    fail2ban \
-    htop \
-    speedtest-cli \
-    net-tools \
-    dnsutils \
+
+ensure_packages_installed() {
+    local missing=()
+    local pkg
+
+    for pkg in "$@"; do
+        if ! dpkg -s "$pkg" >/dev/null 2>&1; then
+            missing+=("$pkg")
+        fi
+    done
+
+    if [ ${#missing[@]} -eq 0 ]; then
+        echo -e "${GREEN}[INFO]${NC} All dependencies already installed."
+        return 0
+    fi
+
+    echo -e "${CYAN}[INFO]${NC} Installing missing dependencies: ${missing[*]}"
+    DEBIAN_FRONTEND=noninteractive apt-get install -y "${missing[@]}"
+}
+
+DEPENDENCIES=(
+    wget
+    curl
+    git
+    unzip
+    python3
+    python3-pip
+    build-essential
+    cmake
+    screen
+    cron
+    socat
+    netfilter-persistent
+    jq
+    vnstat
+    nginx
+    certbot
+    python3-certbot-nginx
+    php
+    php-fpm
+    php-cli
+    sysstat
+    squid
+    dropbear
+    stunnel4
+    fail2ban
+    htop
+    speedtest-cli
+    net-tools
+    dnsutils
     bc
+)
+
+ensure_packages_installed "${DEPENDENCIES[@]}"
 
 # Validate NGINX installation
 echo -e "${CYAN}[INFO]${NC} Validating NGINX installation..."

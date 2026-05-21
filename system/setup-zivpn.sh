@@ -8,6 +8,11 @@ NC='\033[0m'
 
 echo -e "${CYAN}[INFO]${NC} Installing ZIVPN UDP server..."
 
+# Ensure jq is available for account sync/config processing
+if ! command -v jq >/dev/null 2>&1; then
+    DEBIAN_FRONTEND=noninteractive apt-get install -y jq >/dev/null 2>&1 || true
+fi
+
 ARCH=$(uname -m)
 BIN_URL=""
 

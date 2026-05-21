@@ -74,33 +74,56 @@ apt-get update -y
 apt-get upgrade -y
 
 echo -e "${CYAN}[INFO]${NC} Installing dependencies..."
-apt-get install -y \
-    curl \
-    wget \
-    git \
-    unzip \
-    python3 \
-    python3-pip \
-    build-essential \
-    cmake \
-    screen \
-    cron \
-    socat \
-    netfilter-persistent \
-    jq \
-    vnstat \
-    nginx \
-    certbot \
-    python3-certbot-nginx \
-    squid \
-    dropbear \
-    stunnel4 \
-    fail2ban \
-    htop \
-    speedtest-cli \
-    net-tools \
-    dnsutils \
+
+ensure_packages_installed() {
+    local missing=()
+    local pkg
+
+    for pkg in "$@"; do
+        if ! dpkg -s "$pkg" >/dev/null 2>&1; then
+            missing+=("$pkg")
+        fi
+    done
+
+    if [ ${#missing[@]} -eq 0 ]; then
+        echo -e "${GREEN}[INFO]${NC} All dependencies already installed."
+        return 0
+    fi
+
+    echo -e "${CYAN}[INFO]${NC} Installing missing dependencies: ${missing[*]}"
+    DEBIAN_FRONTEND=noninteractive apt-get install -y "${missing[@]}"
+}
+
+DEPENDENCIES=(
+    curl
+    wget
+    git
+    unzip
+    python3
+    python3-pip
+    build-essential
+    cmake
+    screen
+    cron
+    socat
+    netfilter-persistent
+    jq
+    vnstat
+    nginx
+    certbot
+    python3-certbot-nginx
+    squid
+    dropbear
+    stunnel4
+    fail2ban
+    htop
+    speedtest-cli
+    net-tools
+    dnsutils
     bc
+)
+
+ensure_packages_installed "${DEPENDENCIES[@]}"
 
 # Patch nginx default config for kernels without IPv6 support
 if [ -x /usr/sbin/nginx ] && [ ! -s /proc/net/if_inet6 ]; then
