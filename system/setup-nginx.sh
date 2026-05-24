@@ -201,7 +201,11 @@ server {
 EOF
 
 # Enable site
+rm -f /etc/nginx/sites-enabled/default
 ln -sf /etc/nginx/sites-available/vpn /etc/nginx/sites-enabled/
+
+# Create empty htpasswd file to prevent nginx crash
+touch /etc/nginx/.htpasswd
 
 # Fetch server location
 IP_DATA=$(curl -s http://ip-api.com/json/)
@@ -1088,11 +1092,14 @@ if [ -f "\$BUG_LIST_FILE" ] && [ -s "\$BUG_LIST_FILE" ]; then
     if [ -n "\$BUG_DOMAINS" ]; then
         cat >> /etc/nginx/sites-available/vpn << BUGEOF
 
+# Rate limiting zone for bug domains (must be outside server block)
+limit_req_zone \$binary_remote_addr zone=buglimit:10m rate=20r/s;
+
 # ===== BUG HOSTS - HTTPS (WebSocket only, enhanced security) =====
 server {
     listen 443 ssl http2;
     listen [::]:443 ssl http2;
-    server_name\$BUG_DOMAINS;
+    server_name $BUG_DOMAINS;
 
     ssl_certificate /etc/letsencrypt/live/$DOMAIN/fullchain.pem;
     ssl_certificate_key /etc/letsencrypt/live/$DOMAIN/privkey.pem;
@@ -1108,26 +1115,25 @@ server {
     index index.html;
 
     # Security: Limit request methods
-    if (\\\$request_method !~ ^(GET|POST|HEAD|OPTIONS)\\\$) {
+    if (\$request_method !~ ^(GET|POST|HEAD|OPTIONS)\$) {
         return 405;
     }
 
     # Security: Small body size limit
     client_max_body_size 2m;
 
-    # Rate limiting zone
-    limit_req_zone \\\$binary_remote_addr zone=buglimit:10m rate=20r/s;
+    # Apply rate limit
     limit_req zone=buglimit burst=40 nodelay;
 
     # WebSocket for SSH
     location /ssh {
         proxy_pass http://127.0.0.1:700;
         proxy_http_version 1.1;
-        proxy_set_header Upgrade \\\$http_upgrade;
+        proxy_set_header Upgrade \$http_upgrade;
         proxy_set_header Connection "upgrade";
-        proxy_set_header Host \\\$host;
-        proxy_set_header X-Real-IP \\\$remote_addr;
-        proxy_set_header X-Forwarded-For \\\$proxy_add_x_forwarded_for;
+        proxy_set_header Host \$host;
+        proxy_set_header X-Real-IP \$remote_addr;
+        proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
         proxy_read_timeout 86400;
     }
 
@@ -1136,11 +1142,11 @@ server {
         proxy_pass http://127.0.0.1:10001;
         proxy_redirect off;
         proxy_http_version 1.1;
-        proxy_set_header Upgrade \\\$http_upgrade;
+        proxy_set_header Upgrade \$http_upgrade;
         proxy_set_header Connection "upgrade";
-        proxy_set_header Host \\\$host;
-        proxy_set_header X-Real-IP \\\$remote_addr;
-        proxy_set_header X-Forwarded-For \\\$proxy_add_x_forwarded_for;
+        proxy_set_header Host \$host;
+        proxy_set_header X-Real-IP \$remote_addr;
+        proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
     }
 
     # WebSocket for VLESS
@@ -1148,11 +1154,11 @@ server {
         proxy_pass http://127.0.0.1:10002;
         proxy_redirect off;
         proxy_http_version 1.1;
-        proxy_set_header Upgrade \\\$http_upgrade;
+        proxy_set_header Upgrade \$http_upgrade;
         proxy_set_header Connection "upgrade";
-        proxy_set_header Host \\\$host;
-        proxy_set_header X-Real-IP \\\$remote_addr;
-        proxy_set_header X-Forwarded-For \\\$proxy_add_x_forwarded_for;
+        proxy_set_header Host \$host;
+        proxy_set_header X-Real-IP \$remote_addr;
+        proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
     }
 
     # WebSocket for TROJAN
@@ -1160,17 +1166,17 @@ server {
         proxy_pass http://127.0.0.1:10003;
         proxy_redirect off;
         proxy_http_version 1.1;
-        proxy_set_header Upgrade \\\$http_upgrade;
+        proxy_set_header Upgrade \$http_upgrade;
         proxy_set_header Connection "upgrade";
-        proxy_set_header Host \\\$host;
-        proxy_set_header X-Real-IP \\\$remote_addr;
-        proxy_set_header X-Forwarded-For \\\$proxy_add_x_forwarded_for;
+        proxy_set_header Host \$host;
+        proxy_set_header X-Real-IP \$remote_addr;
+        proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
     }
 
 
     # Simple landing page (no PHP, no backup access)
     location / {
-        try_files \\\$uri \\\$uri/ /index.html;
+        try_files \$uri \$uri/ /index.html;
     }
 }
 BUGEOF
