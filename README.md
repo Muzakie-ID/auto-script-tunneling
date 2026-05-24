@@ -1,4 +1,4 @@
-# AUTOSCRIPT TUNNELING VPN
+﻿# AUTOSCRIPT TUNNELING VPN
 
 Script otomatis untuk setup VPN Server dengan berbagai protocol yang siap dijual/disewakan.
 
@@ -17,6 +17,7 @@ Script otomatis untuk setup VPN Server dengan berbagai protocol yang siap dijual
 - **VMESS**
 - **VLESS**
 - **TROJAN**
+- **ZIVPN (UDP Custom)**
 
 ## 📥 Installation
 Jika VPS Anda belum enable SSH root login dengan password, jalankan script ini terlebih dahulu:
@@ -528,15 +529,6 @@ Silahkan digunakan untuk keperluan komersial (jualan/sewa VPN).
 - Script ini untuk educational purpose
 - Gunakan dengan bijak dan legal
 - Admin tidak bertanggung jawab atas penyalahgunaan
-
-## 🎉 Features Coming Soon
-
-- [ ] Multi-user Shadowsocks
-- [ ] Wireguard Support
-- [ ] V2Ray Support
-- [ ] Multi-domain Support
-- [ ] Web Panel Admin
-- [ ] Mobile App
 
 ---
 
