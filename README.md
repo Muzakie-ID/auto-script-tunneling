@@ -4,7 +4,7 @@ Script otomatis untuk setup VPN Server dengan berbagai protocol yang siap dijual
 
 ## 📋 Minimum Requirements
 
-- **OS:** Ubuntu 22.04+ atau Debian 11+
+- **OS:** Ubuntu 22.04+ / Debian 11+ / **Debian 13 (Trixie) Supported**
 - **RAM:** 1 GB (Optimized untuk low resource)
 - **CPU:** 1 Core
 - **Storage:** 10 GB
