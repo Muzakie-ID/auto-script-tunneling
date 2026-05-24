@@ -1,7 +1,7 @@
 #!/bin/bash
 # ZIVPN Trial Account (1 Hour)
 
-source /usr/local/sbin/tunneling/xray/zivpn-common.sh 2>/dev/null || source "$(dirname "$0")/zivpn-common.sh
+source /usr/local/sbin/tunneling/xray/zivpn-common.sh 2>/dev/null || source "$(dirname "$0")/zivpn-common.sh"
 
 RED='\033[0;31m'
 GREEN='\033[0;32m'
@@ -41,10 +41,17 @@ sync_zivpn_auth_config
 
 echo ""
 echo -e "${GREEN}✓ ZIVPN Trial created successfully!${NC}"
+echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
 echo -e "${YELLOW}Username:${NC} $username"
-echo -e "${YELLOW}Expired:${NC} $exp_date (1 Hour)"
-echo -e "${YELLOW}Limit:${NC} 1 IP, 1 GB"
+echo -e "${YELLOW}UUID:${NC} $uuid"
 echo -e "${YELLOW}UDP Password:${NC} $password"
-echo -e "${YELLOW}UDP Endpoint:${NC} ${domain}:5667"
+echo -e "${YELLOW}Domain:${NC} $domain"
+echo -e "${YELLOW}Expired:${NC} $exp_date (1 Hour)"
+echo -e "${YELLOW}Limit IP:${NC} 1"
+echo -e "${YELLOW}Limit Quota:${NC} 1GB"
+echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+echo -e "${GREEN}ZIVPN UDP Endpoint:${NC}"
+echo -e "${YELLOW}${domain}:5667${NC} (or 6000-19999/udp forwarded)"
+echo -e "${YELLOW}Auth Password:${NC} $password"
 echo ""
 read -n 1 -s -r -p "Press any key to continue..."

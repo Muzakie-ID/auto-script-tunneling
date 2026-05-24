@@ -1,4 +1,4 @@
-#!/bin/bash
+﻿#!/bin/bash
 
 # Colors
 RED='\033[0;31m'
@@ -23,12 +23,12 @@ echo -e "${GREEN}  [5]${NC} XRAY Logs"
 echo -e "${GREEN}  [6]${NC} NGINX Access Logs"
 echo -e "${GREEN}  [7]${NC} NGINX Error Logs"
 echo -e "${GREEN}  [8]${NC} System Logs (syslog)"
-echo -e "${GREEN}  [9]${NC} Authentication Logs"
+echo -e "${GREEN}  [9]${NC} Authentication Logs"`necho -e "${GREEN} [10]${NC} ZIVPN Logs"
 echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
 echo -e "${RED}  [0]${NC} Back"
 echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
 echo ""
-read -p "Select log [0-9]: " log
+read -p "Select log [0-10]: " log
 
 case $log in
     1)
@@ -96,6 +96,13 @@ case $log in
         echo -e "${YELLOW}Authentication Logs (last 50 lines):${NC}"
         echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
         tail -n 50 /var/log/auth.log
+        ;;
+    10)
+        echo ""
+        echo -e "
+${YELLOW}ZIVPN Logs (last 50 lines):${NC}"
+        echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+        journalctl -u zivpn -n 50 --no-pager
         ;;
     0)
         /usr/local/sbin/tunneling/menu/system-menu.sh
