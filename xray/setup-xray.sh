@@ -6,6 +6,20 @@
 DOMAIN=$(cat /root/domain.txt)
 UUID=$(cat /proc/sys/kernel/random/uuid)
 
+# Ensure directories exist
+mkdir -p /usr/local/etc/xray
+mkdir -p /var/log/xray
+mkdir -p /etc/tunneling/vmess
+mkdir -p /etc/tunneling/vless
+mkdir -p /etc/tunneling/trojan
+mkdir -p /etc/tunneling/zivpn
+
+# Check if xray is installed
+if ! command -v xray &>/dev/null; then
+    echo "⚠️  WARNING: Xray binary not found! Config will be created but service may not start."
+    echo "  Run: bash -c \"\$(curl -L https://github.com/XTLS/Xray-install/raw/main/install-release.sh)\" @ install"
+fi
+
 # Create XRAY config
 cat > /usr/local/etc/xray/config.json << EOF
 {
@@ -86,6 +100,17 @@ cat > /usr/local/etc/xray/config.json << EOF
   }
 }
 EOF
+
+# Validate generated config
+if command -v jq &>/dev/null; then
+    if ! jq empty /usr/local/etc/xray/config.json 2>/dev/null; then
+        echo "❌ ERROR: Generated XRAY config is invalid JSON!"
+        echo "  Please check /usr/local/etc/xray/config.json manually."
+        exit 1
+    else
+        echo "✓ XRAY config JSON validated successfully"
+    fi
+fi
 
 # Check if SSL certificate exists
 if [ -f "/etc/letsencrypt/live/$DOMAIN/fullchain.pem" ]; then

@@ -14,34 +14,9 @@ echo -e "${GREEN}          ENABLE SSH ROOT LOGIN                     ${NC}"
 echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
 echo ""
 
-# Update and Upgrade System
-echo -e "${CYAN}[1/5]${NC} Updating package lists..."
-if apt-get update -y; then
-    echo -e "${GREEN}✓${NC} Package lists updated successfully"
-else
-    echo -e "${RED}✗${NC} Failed to update package lists"
-    read -p "Continue anyway? (y/n): " continue_update
-    if [[ ! $continue_update =~ ^[Yy]$ ]]; then
-        exit 1
-    fi
-fi
-
-echo ""
-echo -e "${CYAN}[2/5]${NC} Upgrading system packages..."
-echo -e "${YELLOW}This may take a few minutes...${NC}"
-if DEBIAN_FRONTEND=noninteractive apt-get upgrade -y -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold"; then
-    echo -e "${GREEN}✓${NC} System packages upgraded successfully"
-else
-    echo -e "${RED}✗${NC} Failed to upgrade packages"
-    read -p "Continue anyway? (y/n): " continue_upgrade
-    if [[ ! $continue_upgrade =~ ^[Yy]$ ]]; then
-        exit 1
-    fi
-fi
-
 # Get server IP
 echo ""
-echo -e "${CYAN}[3/5]${NC} Getting server information..."
+echo -e "${CYAN}[1/3]${NC} Getting server information..."
 SERVER_IP=$(curl -s ifconfig.me 2>/dev/null)
 if [ -z "$SERVER_IP" ]; then
     SERVER_IP=$(wget -qO- ifconfig.me 2>/dev/null)
@@ -58,7 +33,7 @@ if grep -q "^PermitRootLogin yes" /etc/ssh/sshd_config 2>/dev/null; then
     echo -e "${GREEN}✓${NC} Root login already enabled"
     echo ""
 else
-    echo -e "${CYAN}[4/5]${NC} Enabling root login..."
+    echo -e "${CYAN}[2/3]${NC} Enabling root login..."
     
     # Backup SSH config
     cp /etc/ssh/sshd_config /etc/ssh/sshd_config.bak.$(date +%Y%m%d)
@@ -80,7 +55,7 @@ fi
 
 # Set root password
 echo ""
-echo -e "${CYAN}[5/5]${NC} Setting root password..."
+echo -e "${CYAN}[3/3]${NC} Setting root password..."
 echo -e "${YELLOW}Please enter a strong password for root user${NC}"
 echo ""
 
@@ -190,21 +165,25 @@ fi
 
 echo ""
 echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
-echo -e "${YELLOW}          SYSTEM REBOOT REQUIRED                    ${NC}"
+echo -e "${YELLOW}          REBOOT (OPTIONAL)                         ${NC}"
 echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
 echo ""
-echo -e "${YELLOW}System has been updated and upgraded.${NC}"
-echo -e "${YELLOW}A reboot is recommended to apply all changes.${NC}"
+echo -e "${YELLOW}SSH root login is now active. You can connect immediately.${NC}"
+echo -e "${YELLOW}A reboot is optional but recommended.${NC}"
 echo ""
-read -p "Press [Enter] to reboot now or Ctrl+C to cancel..."
-
-echo ""
-echo -e "${CYAN}Rebooting system in 3 seconds...${NC}"
-sleep 1
-echo -e "${CYAN}Rebooting system in 2 seconds...${NC}"
-sleep 1
-echo -e "${CYAN}Rebooting system in 1 second...${NC}"
-sleep 1
-
-echo -e "${GREEN}Rebooting now...${NC}"
-reboot
+read -p "Do you want to reboot now? (y/n): " reboot_choice
+if [[ $reboot_choice =~ ^[Yy]$ ]]; then
+    echo ""
+    echo -e "${CYAN}Rebooting system in 3 seconds...${NC}"
+    sleep 1
+    echo -e "${CYAN}Rebooting system in 2 seconds...${NC}"
+    sleep 1
+    echo -e "${CYAN}Rebooting system in 1 second...${NC}"
+    sleep 1
+    echo -e "${GREEN}Rebooting now...${NC}"
+    reboot
+else
+    echo ""
+    echo -e "${GREEN}Reboot skipped. You can reboot later with: reboot${NC}"
+    echo ""
+fi

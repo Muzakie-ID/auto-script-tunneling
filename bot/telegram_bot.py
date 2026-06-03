@@ -302,7 +302,7 @@ def confirm_approve_order(call):
         if protocol == 'ssh':
             os.system(f"bash {create_script} {username} {password} {days} >/dev/null 2>&1")
         elif protocol in ['vmess', 'vless', 'trojan']:
-            os.system(f"echo '{username}\n{days}' | bash {create_script}")
+            os.system(f"printf '%s\n' '{username}' '{days}' '0' '0' | bash {create_script}")
     else:
         bot.answer_callback_query(call.id, f"❌ Unknown protocol: {protocol}")
         return
@@ -778,7 +778,310 @@ def manage_users(message):
         reply_markup=markup
     )
 
-# Admin Settings
+# Handle manage users callback - list users per protocol
+@bot.callback_query_handler(func=lambda call: call.data.startswith('users_'))
+def handle_users_list(call):
+    if call.from_user.id != ADMIN_ID:
+        bot.answer_callback_query(call.id, "⛔️ Access denied!")
+        return
+    
+    protocol = call.data.replace('users_', '')
+    bot.answer_callback_query(call.id)
+    
+    # Determine user data directory
+    if protocol == 'ssh':
+        user_dir = '/etc/tunneling/ssh'
+    else:
+        user_dir = f'/etc/tunneling/{protocol}'
+    
+    if not os.path.exists(user_dir):
+        bot.send_message(call.message.chat.id, f"📁 No {protocol.upper()} users found (directory does not exist).")
+        return
+    
+    user_files = [f for f in os.listdir(user_dir) if f.endswith('.json')]
+    
+    if not user_files:
+        bot.send_message(call.message.chat.id, f"📭 No {protocol.upper()} users found.")
+        return
+    
+    # Build user list
+    user_list = f"👥 *{protocol.upper()} USERS* ({len(user_files)})\n\n"
+    
+    markup = types.InlineKeyboardMarkup(row_width=1)
+    
+    for uf in sorted(user_files):
+        try:
+            filepath = os.path.join(user_dir, uf)
+            with open(filepath, 'r') as f:
+                user_data = json.load(f)
+            
+            username = user_data.get('username', uf.replace('.json', ''))
+            expired_ts = user_data.get('expired', 0)
+            
+            # Format expiry
+            if expired_ts:
+                try:
+                    exp_date = datetime.fromtimestamp(int(expired_ts)).strftime('%Y-%m-%d')
+                    is_expired = datetime.now().timestamp() > int(expired_ts)
+                    status = "🔴" if is_expired else "🟢"
+                except:
+                    exp_date = str(expired_ts)
+                    status = "⚪"
+            else:
+                exp_date = "N/A"
+                status = "⚪"
+            
+            user_list += f"{status} `{username}` → {exp_date}\n"
+            
+            # Add detail button for each user
+            btn = types.InlineKeyboardButton(
+                f"{status} {username} ({exp_date})",
+                callback_data=f"userdetail_{protocol}_{username}"
+            )
+            markup.add(btn)
+            
+        except Exception as e:
+            user_list += f"⚠️ `{uf}` (error reading)\n"
+    
+    user_list += "\n🟢 = Active  🔴 = Expired"
+    
+    # Add back button
+    btn_back = types.InlineKeyboardButton("« Back", callback_data="back_manage_users")
+    markup.add(btn_back)
+    
+    bot.send_message(
+        call.message.chat.id,
+        user_list,
+        parse_mode='Markdown',
+        reply_markup=markup
+    )
+
+# Handle user detail callback
+@bot.callback_query_handler(func=lambda call: call.data.startswith('userdetail_'))
+def handle_user_detail(call):
+    if call.from_user.id != ADMIN_ID:
+        bot.answer_callback_query(call.id, "⛔️ Access denied!")
+        return
+    
+    bot.answer_callback_query(call.id)
+    
+    parts = call.data.replace('userdetail_', '').split('_', 1)
+    if len(parts) != 2:
+        bot.send_message(call.message.chat.id, "❌ Invalid user data.")
+        return
+    
+    protocol, username = parts
+    
+    if protocol == 'ssh':
+        user_file = f'/etc/tunneling/ssh/{username}.json'
+    else:
+        user_file = f'/etc/tunneling/{protocol}/{username}.json'
+    
+    if not os.path.exists(user_file):
+        bot.send_message(call.message.chat.id, f"❌ User `{username}` not found.", parse_mode='Markdown')
+        return
+    
+    try:
+        with open(user_file, 'r') as f:
+            user_data = json.load(f)
+        
+        # Format details
+        created_ts = user_data.get('created', 0)
+        expired_ts = user_data.get('expired', 0)
+        
+        created_str = datetime.fromtimestamp(int(created_ts)).strftime('%Y-%m-%d %H:%M') if created_ts else 'N/A'
+        expired_str = datetime.fromtimestamp(int(expired_ts)).strftime('%Y-%m-%d %H:%M') if expired_ts else 'N/A'
+        
+        is_expired = datetime.now().timestamp() > int(expired_ts) if expired_ts else False
+        status_str = "🔴 Expired" if is_expired else "🟢 Active"
+        
+        limit_ip = user_data.get('limit_ip', 0)
+        limit_quota = user_data.get('limit_quota', 0)
+        
+        detail_text = f"""
+📋 *USER DETAIL*
+
+👤 Username: `{username}`
+🔐 Protocol: {protocol.upper()}
+📊 Status: {status_str}
+
+📅 Created: {created_str}
+⏰ Expired: {expired_str}
+🔢 IP Limit: {limit_ip if limit_ip and int(limit_ip) > 0 else 'Unlimited'}
+💾 Quota: {limit_quota if limit_quota and int(limit_quota) > 0 else 'Unlimited'} GB
+"""
+        
+        if protocol in ['vmess', 'vless', 'trojan']:
+            uuid = user_data.get('uuid', 'N/A')
+            detail_text += f"🆔 UUID: `{uuid}`\n"
+        
+        # Action buttons
+        markup = types.InlineKeyboardMarkup(row_width=2)
+        btn_renew = types.InlineKeyboardButton("🔄 Renew", callback_data=f"renewuser_{protocol}_{username}")
+        btn_delete = types.InlineKeyboardButton("🗑 Delete", callback_data=f"deleteuser_{protocol}_{username}")
+        btn_back = types.InlineKeyboardButton("« Back to List", callback_data=f"users_{protocol}")
+        markup.add(btn_renew, btn_delete)
+        markup.add(btn_back)
+        
+        bot.send_message(
+            call.message.chat.id,
+            detail_text,
+            parse_mode='Markdown',
+            reply_markup=markup
+        )
+    except Exception as e:
+        bot.send_message(call.message.chat.id, f"❌ Error reading user data: {str(e)}")
+
+# Handle delete user callback
+@bot.callback_query_handler(func=lambda call: call.data.startswith('deleteuser_'))
+def handle_delete_user(call):
+    if call.from_user.id != ADMIN_ID:
+        bot.answer_callback_query(call.id, "⛔️ Access denied!")
+        return
+    
+    parts = call.data.replace('deleteuser_', '').split('_', 1)
+    if len(parts) != 2:
+        bot.answer_callback_query(call.id, "❌ Invalid data.")
+        return
+    
+    protocol, username = parts
+    bot.answer_callback_query(call.id)
+    
+    # Confirm deletion
+    markup = types.InlineKeyboardMarkup(row_width=2)
+    btn_yes = types.InlineKeyboardButton("✅ Yes, Delete", callback_data=f"confirmdelete_{protocol}_{username}")
+    btn_no = types.InlineKeyboardButton("❌ Cancel", callback_data=f"userdetail_{protocol}_{username}")
+    markup.add(btn_yes, btn_no)
+    
+    bot.send_message(
+        call.message.chat.id,
+        f"⚠️ *CONFIRM DELETE*\n\nAre you sure you want to delete `{username}` ({protocol.upper()})?",
+        parse_mode='Markdown',
+        reply_markup=markup
+    )
+
+@bot.callback_query_handler(func=lambda call: call.data.startswith('confirmdelete_'))
+def handle_confirm_delete(call):
+    if call.from_user.id != ADMIN_ID:
+        bot.answer_callback_query(call.id, "⛔️ Access denied!")
+        return
+    
+    parts = call.data.replace('confirmdelete_', '').split('_', 1)
+    if len(parts) != 2:
+        bot.answer_callback_query(call.id, "❌ Invalid data.")
+        return
+    
+    protocol, username = parts
+    bot.answer_callback_query(call.id, "Deleting...")
+    
+    # Delete script paths
+    SCRIPT_PATHS = {
+        'vmess': '/usr/local/sbin/tunneling/xray/vmess-delete.sh',
+        'vless': '/usr/local/sbin/tunneling/xray/vless-delete.sh',
+        'trojan': '/usr/local/sbin/tunneling/xray/trojan-delete.sh',
+        'ssh': '/usr/local/sbin/tunneling/ssh/ssh-delete.sh'
+    }
+    
+    delete_script = SCRIPT_PATHS.get(protocol)
+    if delete_script and os.path.exists(delete_script):
+        os.system(f"printf '%s\n' '{username}' 'y' | bash {delete_script} >/dev/null 2>&1")
+    
+    # Also clean up the JSON file
+    if protocol == 'ssh':
+        user_file = f'/etc/tunneling/ssh/{username}.json'
+    else:
+        user_file = f'/etc/tunneling/{protocol}/{username}.json'
+    
+    if os.path.exists(user_file):
+        os.remove(user_file)
+    
+    # Delete confirmation message
+    try:
+        bot.delete_message(call.message.chat.id, call.message.message_id)
+    except:
+        pass
+    
+    bot.send_message(
+        call.message.chat.id,
+        f"✅ User `{username}` ({protocol.upper()}) has been deleted.",
+        parse_mode='Markdown'
+    )
+
+# Handle renew user callback
+@bot.callback_query_handler(func=lambda call: call.data.startswith('renewuser_'))
+def handle_renew_user(call):
+    if call.from_user.id != ADMIN_ID:
+        bot.answer_callback_query(call.id, "⛔️ Access denied!")
+        return
+    
+    parts = call.data.replace('renewuser_', '').split('_', 1)
+    if len(parts) != 2:
+        bot.answer_callback_query(call.id, "❌ Invalid data.")
+        return
+    
+    protocol, username = parts
+    bot.answer_callback_query(call.id)
+    
+    msg = bot.send_message(
+        call.message.chat.id,
+        f"🔄 *RENEW USER*\n\nUser: `{username}` ({protocol.upper()})\n\nEnter number of days to extend:",
+        parse_mode='Markdown'
+    )
+    bot.register_next_step_handler(msg, process_renew_user, protocol, username)
+
+def process_renew_user(message, protocol, username):
+    if message.from_user.id != ADMIN_ID:
+        return
+    
+    try:
+        days = int(message.text.strip())
+        if days < 1 or days > 365:
+            bot.send_message(message.chat.id, "❌ Days must be between 1 and 365!")
+            return
+    except ValueError:
+        bot.send_message(message.chat.id, "❌ Invalid number!")
+        return
+    
+    SCRIPT_PATHS = {
+        'vmess': '/usr/local/sbin/tunneling/xray/vmess-renew.sh',
+        'vless': '/usr/local/sbin/tunneling/xray/vless-renew.sh',
+        'trojan': '/usr/local/sbin/tunneling/xray/trojan-renew.sh',
+        'ssh': '/usr/local/sbin/tunneling/ssh/ssh-renew.sh'
+    }
+    
+    renew_script = SCRIPT_PATHS.get(protocol)
+    if renew_script and os.path.exists(renew_script):
+        os.system(f"printf '%s\n' '{username}' '{days}' | bash {renew_script} >/dev/null 2>&1")
+    
+    bot.send_message(
+        message.chat.id,
+        f"✅ User `{username}` ({protocol.upper()}) renewed for {days} days.",
+        parse_mode='Markdown'
+    )
+
+# Handle back to manage users
+@bot.callback_query_handler(func=lambda call: call.data == 'back_manage_users')
+def handle_back_manage_users(call):
+    if call.from_user.id != ADMIN_ID:
+        bot.answer_callback_query(call.id, "⛔️ Access denied!")
+        return
+    
+    bot.answer_callback_query(call.id)
+    
+    markup = types.InlineKeyboardMarkup(row_width=2)
+    btn1 = types.InlineKeyboardButton("SSH Users", callback_data="users_ssh")
+    btn2 = types.InlineKeyboardButton("VMESS Users", callback_data="users_vmess")
+    btn3 = types.InlineKeyboardButton("VLESS Users", callback_data="users_vless")
+    btn4 = types.InlineKeyboardButton("TROJAN Users", callback_data="users_trojan")
+    markup.add(btn1, btn2, btn3, btn4)
+    
+    bot.send_message(
+        call.message.chat.id,
+        "👥 *MANAGE USERS*\n\nSelect protocol:",
+        parse_mode='Markdown',
+        reply_markup=markup
+    )
+
 @bot.message_handler(func=lambda message: message.text == '⚙️ Settings')
 def admin_settings(message):
     if message.from_user.id != ADMIN_ID:
@@ -1263,8 +1566,8 @@ def process_create_account(message, protocol, username, days, limit_ip):
              cmd = f"bash {create_script} {username} {password} {days} {limit_ip} {limit_quota}"
              exit_code = os.system(cmd + " >/dev/null 2>&1")
         else:
-             # Use standard echo with newlines, same as approve_order
-             cmd = f"echo '{username}\n{days}\n{limit_ip}\n{limit_quota}' | bash {create_script}"
+             # Use printf for proper newlines when piping to create script
+             cmd = f"printf '%s\n' '{username}' '{days}' '{limit_ip}' '{limit_quota}' | bash {create_script}"
              # Also add || true to prevent pipe failure
              exit_code = os.system(cmd + " >/dev/null 2>&1")
         

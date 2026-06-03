@@ -165,6 +165,24 @@ if ! grep -q "net.core.default_qdisc=fq" /etc/sysctl.conf; then
     sysctl -p
 fi
 
+# Create directories for user data
+mkdir -p /etc/tunneling/vmess
+mkdir -p /etc/tunneling/vless
+mkdir -p /etc/tunneling/trojan
+mkdir -p /etc/tunneling/zivpn
+mkdir -p /etc/tunneling/ssh
+mkdir -p /etc/tunneling/bot/orders
+
+# Create initial config.json
+cat > /etc/tunneling/config.json << CFGEOF
+{
+  "version": "1.0.0",
+  "installed": "$(date +%Y-%m-%d)",
+  "domain": "$domain"
+}
+CFGEOF
+echo -e "${GREEN}[SUCCESS]${NC} Initial config created"
+
 # Create Directory Structure
 mkdir -p "$INSTALL_DIR"
 mkdir -p "$INSTALL_DIR/menu"
@@ -293,6 +311,16 @@ bash "$INSTALL_DIR/system/setup-zivpn.sh"
 # Install XRAY
 echo -e "${CYAN}[INFO]${NC} Installing XRAY..."
 bash -c "$(curl -L https://github.com/XTLS/Xray-install/raw/main/install-release.sh)" @ install
+
+# Verify Xray installed
+if ! command -v xray &>/dev/null; then
+    echo -e "${YELLOW}[WARNING]${NC} Xray not found after install. Retrying..."
+    bash -c "$(curl -L https://github.com/XTLS/Xray-install/raw/main/install-release.sh)" @ install
+fi
+
+# Ensure Xray config directory exists
+mkdir -p /usr/local/etc/xray
+mkdir -p /var/log/xray
 
 # Setup SSL Certificate
 echo -e "${CYAN}[INFO]${NC} Setting up SSL certificate..."

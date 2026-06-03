@@ -55,9 +55,30 @@ EOF
 
 CONFIG_FILE="/usr/local/etc/xray/config.json"
 if [ ! -f "$CONFIG_FILE" ]; then
-    echo -e "${RED}XRAY config not found: $CONFIG_FILE${NC}"
-    rm -f "/etc/tunneling/vless/${username}.json"
-    exit 1
+    echo -e "${YELLOW}XRAY config not found, regenerating...${NC}"
+    bash /usr/local/sbin/tunneling/xray/setup-xray.sh 2>/dev/null
+    if [ ! -f "$CONFIG_FILE" ]; then
+        echo -e "${RED}XRAY config not found: $CONFIG_FILE${NC}"
+        rm -f "/etc/tunneling/vless/${username}.json"
+        exit 1
+    fi
+fi
+
+# Validate config is valid JSON with proper structure
+if ! jq empty "$CONFIG_FILE" 2>/dev/null; then
+    echo -e "${YELLOW}XRAY config is corrupt, regenerating...${NC}"
+    bash /usr/local/sbin/tunneling/xray/setup-xray.sh 2>/dev/null
+    if ! jq empty "$CONFIG_FILE" 2>/dev/null; then
+        echo -e "${RED}Failed to regenerate XRAY config!${NC}"
+        rm -f "/etc/tunneling/vless/${username}.json"
+        exit 1
+    fi
+fi
+
+# Validate inbounds structure exists
+if [ "$(jq '.inbounds' "$CONFIG_FILE" 2>/dev/null)" = "null" ]; then
+    echo -e "${YELLOW}XRAY config missing inbounds, regenerating...${NC}"
+    bash /usr/local/sbin/tunneling/xray/setup-xray.sh 2>/dev/null
 fi
 
 if grep -q "\"email\": \"$username@$domain\"" "$CONFIG_FILE"; then
