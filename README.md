@@ -47,7 +47,7 @@ Script ini akan:
 Cara termudah, cukup jalankan perintah ini di terminal VPS Anda:
 
 ```bash
-sysctl -w net.ipv6.conf.all.disable_ipv6=1 && sysctl -w net.ipv6.conf.default.disable_ipv6=1 && apt update && apt install -y bzip2 gzip coreutils screen curl unzip wget && wget https://raw.githubusercontent.com/Muzakie-ID/auto-script-tunneling-v2/main/install.sh && chmod +x install.sh && sed -i -e 's/\r$//' install.sh && screen -S setup ./install.sh
+sysctl -w net.ipv6.conf.all.disable_ipv6=1; sysctl -w net.ipv6.conf.default.disable_ipv6=1; apt update && apt install -y bzip2 gzip coreutils screen curl unzip wget && wget https://raw.githubusercontent.com/Muzakie-ID/auto-script-tunneling-v2/main/install.sh && chmod +x install.sh && sed -i -e 's/\r$//' install.sh && screen -S setup ./install.sh
 ```
 
 > **💡 Setelah install selesai**, ketik `menu` untuk langsung masuk panel. **Tidak perlu** jalankan update script terlebih dahulu.
