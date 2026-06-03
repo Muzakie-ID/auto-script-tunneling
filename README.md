@@ -1,4 +1,4 @@
-﻿# AUTOSCRIPT TUNNELING VPN
+# AUTOSCRIPT TUNNELING VPN
 
 Script otomatis untuk setup VPN Server dengan berbagai protocol yang siap dijual/disewakan.
 
@@ -20,29 +20,42 @@ Script otomatis untuk setup VPN Server dengan berbagai protocol yang siap dijual
 - **ZIVPN (UDP Custom)**
 
 ## 📥 Installation
+
+### ⚙️ Pre-Installation (Optional - Enable SSH Root Login)
+
 Jika VPS Anda belum enable SSH root login dengan password, jalankan script ini terlebih dahulu:
 
-
 ```bash
-wget https://raw.githubusercontent.com/Muzakie-ID/auto-script-tunneling-v2/main/system/enable-ssh-root.sh && chmod +x enable-ssh-root.sh && ./enable-ssh-root.sh
+wget https://raw.githubusercontent.com/Muzakie-ID/auto-script-tunneling-v2/main/system/enable-ssh-root.sh && chmod +x enable-ssh-root.sh && sed -i -e 's/\r$//' enable-ssh-root.sh && ./enable-ssh-root.sh
 ```
 
 Script ini akan:
-- ✅ Enable SSH root login
+- ✅ Enable SSH root login (`PermitRootLogin yes`)
+- ✅ Enable Password Authentication
 - ✅ Set password untuk root user
 - ✅ Display IP, username, password untuk login
 - ✅ Auto restart SSH service
+- ✅ Reboot opsional (tanya user)
 
-**⚠️ Note:** Lewati step ini jika Anda sudah bisa login sebagai root dengan password.
+> **⚠️ Note:** Script ini **TIDAK** melakukan `apt update/upgrade` agar proses cepat dan tidak hang. Update system dilakukan saat menjalankan `install.sh`.
 
----
+> **💡 Tip:** Lewati step ini jika Anda sudah bisa login sebagai root dengan password.
+
+
+### Quick Install (One-Liner - Recommended)
+
 Cara termudah, cukup jalankan perintah ini di terminal VPS Anda:
+
 ```bash
-sysctl -w net.ipv6.conf.all.disable_ipv6=1 && sysctl -w net.ipv6.conf.default.disable_ipv6=1 && apt update && apt install -y bzip2 gzip coreutils screen curl wget && wget -q https://raw.githubusercontent.com/Muzakie-ID/auto-script-tunneling-v2/main/install.sh && chmod +x install.sh && ./install.sh
+sysctl -w net.ipv6.conf.all.disable_ipv6=1 && sysctl -w net.ipv6.conf.default.disable_ipv6=1 && apt update && apt install -y bzip2 gzip coreutils screen curl unzip wget && wget https://raw.githubusercontent.com/Muzakie-ID/auto-script-tunneling-v2/main/install.sh && chmod +x install.sh && sed -i -e 's/\r$//' install.sh && screen -S setup ./install.sh
 ```
 
-Manual Installation (Git Clone)
+> **💡 Setelah install selesai**, ketik `menu` untuk langsung masuk panel. **Tidak perlu** jalankan update script terlebih dahulu.
+
+### Manual Installation (Git Clone)
+
 Jika Anda ingin melihat source code sebelum install:
+
 ```bash
 apt update && apt install git -y
 git clone https://github.com/Muzakie-ID/auto-script-tunneling-v2
@@ -95,6 +108,7 @@ chmod +x setup.sh
 - ✅ Payment QRIS (Auto & Manual)
 - ✅ Notifikasi Account Expired
 - ✅ Notifikasi Login User
+- ✅ **Manage Users** (List, Detail, Renew, Delete via Bot)
 
 ### 🎨 Customization
 - ✅ Manual UUID (XRAY)
@@ -103,17 +117,17 @@ chmod +x setup.sh
 - ✅ Custom Banner
 - ✅ Custom Port
 
-## 📦 Installation
+## 📦 Post-Installation
 
-### ⚙️ Pre-Installation (Optional - Enable SSH Root Login)
+### ⚙️ Setelah Install
 
+Script `install.sh` akan otomatis:
+- ✅ Membuat `/etc/tunneling/config.json` (konfigurasi awal)
+- ✅ Membuat semua direktori user data (SSH, VMESS, VLESS, TROJAN)
+- ✅ Install dan konfigurasi Xray, Nginx, SSL
+- ✅ Setup firewall (UFW)
 
-
-### Quick Install (One-Liner)
-
-```bash
-sysctl -w net.ipv6.conf.all.disable_ipv6=1 && sysctl -w net.ipv6.conf.default.disable_ipv6=1 && apt update && apt install -y bzip2 gzip coreutils screen curl unzip wget && wget https://raw.githubusercontent.com/Muzakie-ID/auto-script-tunneling-v2/main/install.sh && chmod +x install.sh && sed -i -e 's/\r$//' install.sh && screen -S setup ./install.sh
-```
+**Anda bisa langsung ketik `menu` setelah install selesai.**
 
 ### Quick Install (Step by Step)
 
@@ -226,16 +240,17 @@ menu
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
      AUTOSCRIPT TUNNELING VPN
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-1. SSH Menu
-2. VMESS Menu
-3. VLESS Menu
-4. TROJAN Menu
-5. System Menu
-6. Backup & Restore
-7. Bot Telegram
-8. Settings
-9. Information
-0. Exit
+ 1. SSH Menu (WS, SSL, UDP)
+ 2. VMESS Menu
+ 3. VLESS Menu
+ 4. TROJAN Menu
+ 5. ZIVPN UDP Menu
+ 6. System Management
+ 7. Backup & Restore
+ 8. Bot Telegram
+ 9. Settings
+10. Information & Status
+ 0. Exit
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ```
 
@@ -243,7 +258,7 @@ menu
 
 1. Buat bot baru di [@BotFather](https://t.me/BotFather)
 2. Copy Token Bot
-3. Masuk menu: `menu` → `7. Bot Telegram` → `Setup Bot`
+3. Masuk menu: `menu` → `8. Bot Telegram` → `Setup Bot`
 4. Paste Token Bot
 5. Bot siap digunakan
 
@@ -260,7 +275,7 @@ menu
 
 ### Setup QRIS Payment
 
-1. Masuk menu: `menu` → `7. Bot Telegram` → `Payment Setup`
+1. Masuk menu: `menu` → `8. Bot Telegram` → `Payment Setup`
 2. Upload QRIS Image
 3. Set Payment Gateway (Manual/Auto)
 4. Set Price List
@@ -360,7 +375,48 @@ menu → 5. System Menu → 2. Restart Services
 ### Check Logs
 
 ```bash
-tail -f /var/log/tunneling/error.log
+# Xray logs
+tail -f /var/log/xray/error.log
+
+# Nginx logs
+tail -f /var/log/nginx/error.log
+
+# Install log
+cat /root/install-log.txt
+```
+
+### Fix Error jq: Cannot iterate over null
+
+Jika muncul error `jq: Cannot iterate over null (null)` saat membuat akun VMESS/VLESS/TROJAN:
+
+```bash
+# Regenerate Xray config
+bash /usr/local/sbin/tunneling/xray/setup-xray.sh
+
+# Restart Xray
+systemctl restart xray
+
+# Verifikasi config valid
+jq empty /usr/local/etc/xray/config.json && echo "Config OK" || echo "Config CORRUPT"
+```
+
+### Script Tidak Bisa Jalan Setelah Install
+
+Jika `menu` error setelah fresh install:
+
+```bash
+# Pastikan config.json ada
+cat /etc/tunneling/config.json
+
+# Jika tidak ada, buat manual:
+mkdir -p /etc/tunneling
+cat > /etc/tunneling/config.json << EOF
+{
+  "version": "1.0.0",
+  "installed": "$(date +%Y-%m-%d)",
+  "domain": "$(cat /root/domain.txt 2>/dev/null || echo 'yourdomain.com')"
+}
+EOF
 ```
 
 ## 📝 Port Information & Firewall Configuration
@@ -532,6 +588,6 @@ Silahkan digunakan untuk keperluan komersial (jualan/sewa VPN).
 
 ---
 
-**© 2024 AUTOSCRIPT TUNNELING - All Rights Reserved**
+**© 2024-2026 AUTOSCRIPT TUNNELING - All Rights Reserved**
 
 **Happy Selling! 💰**
