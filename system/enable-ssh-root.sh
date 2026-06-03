@@ -8,6 +8,13 @@ YELLOW='\033[1;33m'
 CYAN='\033[0;36m'
 NC='\033[0m'
 
+# Check for root privileges
+if [ "$EUID" -ne 0 ]; then
+    echo -e "${RED}Error: This script must be run as root!${NC}"
+    echo -e "${YELLOW}Please run with sudo: sudo ./enable-ssh-root.sh${NC}"
+    exit 1
+fi
+
 clear
 echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
 echo -e "${GREEN}          ENABLE SSH ROOT LOGIN                     ${NC}"
